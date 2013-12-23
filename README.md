@@ -35,7 +35,12 @@ you can re-run as normally (see below).
 
 Starting from prompt
 ========
-Simply run: **mvn jfx:run**
+Simply run:
+
+<pre>
+export _JAVA_OPTIONS="-Djava.library.path=target/natives -Xmx256m -XX:+UseConcMarkSweepGC -XX:MaxPermSize=64m -Xss1m"
+mvn jfx:run
+</pre>
 
 
 Word of WARNING
