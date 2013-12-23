@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.rvantwisk.cnctools.misc.*?>
+<?import com.rvantwisk.cnctools.misc.RestrictiveTextField?>
+<?import java.lang.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.*?>
+<?scenebuilder-classpath-element ../../../../../../../target/classes?>
+
+<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+  <children>
+    <HBox alignment="CENTER" prefHeight="-1.0" prefWidth="-1.0">
+      <children>
+        <RestrictiveTextField fx:id="iValue" minWidth="75.0" prefWidth="75.0" />
+        <ComboBox fx:id="iDimension" prefWidth="-1.0" />
+      </children>
+    </HBox>
+  </children>
+</fx:root>

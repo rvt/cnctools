@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <!-- ******************************************************************** -->
+    <!-- Mark bean transactions as annotation driven -->
+    <!-- ******************************************************************** -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- ******************************************************************** -->
+    <!-- PropertyConfigurer for the DAO -->
+    <!-- ******************************************************************** -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:application.properties"/>
+    </bean>
+
+    <!-- ******************************************************************** -->
+    <!-- Setup the transaction manager -->
+    <!-- ******************************************************************** -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!-- ******************************************************************** -->
+    <!-- Setup each data source -->
+    <!-- ******************************************************************** -->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${db.driver_class}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
+
+    <!-- ******************************************************************** -->
+    <!-- Setup each persistence unit -->
+    <!-- ******************************************************************** -->
+
+    <!-- Configure a JPA vendor adapter -->
+    <bean id="openJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="showSql" value="${connection.show_sql}"/>
+        <property name="generateDdl" value="${connection.generateDdl}"/>
+        <property name="databasePlatform" value="${connection.dialect}"/>
+    </bean>
+
+    <!-- EntityManager Factory that brings together the persistence unit, datasource,
+        and JPA Vendor -->
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter" ref="openJpaVendorAdapter"/>
+        <property name="persistenceUnitName" value="CNCTools"/>
+        <property name="packagesToScan" value="com.rvantwisk.cnctools.data"/>
+    </bean>
+
+    <bean id="sharedEntityManager" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+</beans>

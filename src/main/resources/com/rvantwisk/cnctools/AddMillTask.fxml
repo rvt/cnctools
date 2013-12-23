@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.lang.Long?>
+<?import java.net.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="383.999755859375" prefWidth="768.999755859375" style="-fx-background-color: #EEEEEE" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.AddMillTaskController">
+  <children>
+    <GridPane id="GridPane" layoutY="85.0" prefWidth="508.999755859375" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+      <children>
+        <Label alignment="CENTER_RIGHT" prefWidth="124.0" text="Operation Name:" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="tv_taskName" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label alignment="CENTER_RIGHT" prefWidth="124.0" text="Operation:" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TableView fx:id="tbl_assignedMillTasks" minHeight="100.0" prefHeight="198.0" prefWidth="557.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+          <columns>
+            <TableColumn maxWidth="750.0" minWidth="31.0" prefWidth="122.0" sortable="false" text="name">
+              <cellValueFactory>
+                <PropertyValueFactory property="name" />
+              </cellValueFactory>
+            </TableColumn>
+            <TableColumn maxWidth="5000.0" minWidth="400.0" prefWidth="472.0" sortable="false" style="    -fx-border-width: 0;&#10;    -fx-border-color: red;" text="Description">
+              <cellValueFactory>
+                <PropertyValueFactory property="description" />
+              </cellValueFactory>
+            </TableColumn>
+          </columns>
+        </TableView>
+      </children>
+      <columnConstraints>
+        <ColumnConstraints hgrow="NEVER" maxWidth="123.0" minWidth="10.0" prefWidth="105.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="613.0" minWidth="10.0" prefWidth="613.0" />
+      </columnConstraints>
+      <hgap>
+        <Long fx:value="10" />
+      </hgap>
+      <rowConstraints>
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+      <vgap>
+        <Long fx:value="10" />
+      </vgap>
+    </GridPane>
+    <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="728.999755859375" styleClass="header" text="Add new Operation" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <font>
+        <Font size="28.0" />
+      </font>
+    </Label>
+    <Separator prefWidth="718.999755859375" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+    <HBox alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <children>
+        <Button cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+        <Button fx:id="bt_add" defaultButton="true" mnemonicParsing="false" onAction="#add" text="Add" />
+      </children>
+    </HBox>
+  </children>
+  <stylesheets>
+    <URL value="@CNCTools.css" />
+  </stylesheets>
+</AnchorPane>

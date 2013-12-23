@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2013, R. van Twisk
+  ~ All rights reserved.
+  ~ Licensed under the The BSD 3-Clause License;
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at:
+  ~
+  ~ http://opensource.org/licenses/BSD-3-Clause
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions
+  ~ are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright
+  ~ notice, this list of conditions and the following disclaimer.
+  ~
+  ~ Redistributions in binary form must reproduce the above copyright
+  ~ notice, this list of conditions and the following disclaimer in the
+  ~ documentation and/or other materials provided with the distribution.
+  ~
+  ~ Neither the name of the aic-util nor the names of its
+  ~ contributors may be used to endorse or promote products derived from
+  ~ this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ~ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  ~ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  ~ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  ~ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  ~ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  ~ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+  ~ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+  ~ OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="459.0" styleClass="theme, AnchorPaneHome" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.AboutController">
+  <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="728.999755859375" styleClass="header" text="CNC Tools Lite" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <font>
+      <Font size="28.0" />
+    </font>
+  </Label>
+  <stylesheets>
+    <URL value="@CNCTools.css" />
+    <URL value="@CNCTools.css" />
+  </stylesheets>
+  <AnchorPane id="AnchorPane" layoutX="14.0" layoutY="63.0">
+    <children>
+      <Label contentDisplay="TOP" layoutX="0.0" prefWidth="209.0" text="(c) 2013 R. van Twisk" AnchorPane.topAnchor="0.0" />
+      <Label contentDisplay="TOP" layoutX="287.0" prefWidth="144.0" text="Version 1.0.0-ALPHA" AnchorPane.topAnchor="0.0" />
+    </children>
+  </AnchorPane>
+  <Label contentDisplay="TOP" layoutX="14.0" layoutY="165.0" prefWidth="209.0" text="Libraries used:" />
+  <Button fx:id="close" layoutX="384.0" layoutY="196.0" mnemonicParsing="false" onAction="#onClose" text="Close" />
+  <Hyperlink layoutX="94.0" layoutY="93.0" onAction="#openMainWebsite" text="http://riesvantwisk.com/cms/home/cnctools" />
+  <Hyperlink layoutX="22.0" layoutY="180.0" onAction="#openLWGL" text="LWGL - http://lwjgl.org" />
+</AnchorPane>

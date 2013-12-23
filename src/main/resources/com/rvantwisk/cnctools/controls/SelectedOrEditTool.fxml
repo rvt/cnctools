@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.lang.Long?>
+<?import java.net.*?>
+<?import java.net.URL?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+    <children>
+        <Label text=" - " fx:id="iName" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+        <HBox alignment="CENTER" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <Button fx:id="bntSelect" defaultButton="false" mnemonicParsing="false" onAction="#onSelect" prefWidth="60.0" text="Select"/>
+                <Button fx:id="btnEdit" mnemonicParsing="false" prefWidth="60.0" text="Edit" onAction="#onEdit"/>
+            </children>
+        </HBox>
+    </children>
+    <stylesheets>
+        <URL value="@../CNCTools.css"/>
+    </stylesheets>
+</fx:root>

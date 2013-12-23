@@ -1,0 +1,21 @@
+<configuration> <!-- This will give you some valuable info about logback config upon runtime. Remove this for production. -->
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>cnctools.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>cnctools.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 7 days worth of history -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date{yyyy-dd-mm HH:mm:ss.SSS,UTC} %level [%thread] %logger [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
