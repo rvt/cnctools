@@ -70,6 +70,11 @@ public class Test {
     DecimalFormat dd2 = new DecimalFormat("0.00");
     FeedRateMode lastFeedrateMode = FeedRateMode.G94;
 
+    public static void main2(String[] args) throws SimException, UnsupportedSimException {
+
+
+    }
+
     public static void main(String[] args) throws SimException, UnsupportedSimException {
 /*
 
@@ -94,6 +99,9 @@ public class Test {
         System.out.print(GCodes.groups.get(GCodes.Group.FeedRateModes));
 
 */
+
+
+
         long startTime = System.currentTimeMillis();
 
         Test t = new Test();

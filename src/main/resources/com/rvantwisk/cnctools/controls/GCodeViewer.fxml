@@ -13,12 +13,12 @@
 
 <?import com.rvantwisk.cnctools.opengl.OpenGLImage?>
 <fx:root type="javafx.scene.layout.AnchorPane" prefHeight="449.0" prefWidth="510.0" style="-fx-background-color: antiquewhite;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
-  <children>
-    <Label id="" fx:id="glInfoLabel" styleClass="canvas-label" text="G-Code Viewer" textFill="BLACK" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
-      <font>
-        <Font name="System Bold" size="14.0" fx:id="x4" />
-      </font>
-    </Label>
-    <OpenGLImage fx:id="openGLImage" fitHeight="382.0" fitWidth="454.0" layoutX="0.0" layoutY="0.0" pickOnBounds="true" preserveRatio="false" scaleY="-1.0" smooth="false" />
-  </children>
+    <children>
+        <Label id="" fx:id="glInfoLabel" styleClass="canvas-label" text="G-Code Viewer" textFill="BLACK" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
+            <font>
+                <Font name="System Bold" size="14.0" fx:id="x4"/>
+            </font>
+        </Label>
+        <OpenGLImage fx:id="openGLImage" fitHeight="382.0" fitWidth="454.0" layoutX="0.0" layoutY="0.0" pickOnBounds="true" preserveRatio="false" scaleY="-1.0" smooth="false"/>
+    </children>
 </fx:root>

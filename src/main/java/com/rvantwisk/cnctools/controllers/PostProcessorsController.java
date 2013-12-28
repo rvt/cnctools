@@ -39,13 +39,12 @@
 package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
-import com.rvantwisk.cnctools.controls.ToolParametersControl;
+import com.rvantwisk.cnctools.controls.PostProcessorControl;
+import com.rvantwisk.cnctools.data.PostProcessorConfig;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ProjectModel;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -59,96 +58,75 @@ import jfxtras.labs.dialogs.MonologFXButton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/10/13
- * Time: 8:11 AM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 12/27/13.
  */
-public class ToolConfigurationsController extends DialogController {
-
+public class PostProcessorsController extends DialogController {
     private Mode mode;
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
-    }
+    private PostProcessorConfig postProcessConfig = null;
 
-    public Mode getMode() {
-        return mode;
-    }
+
+    @FXML
+    private Button btnUse;
+    @FXML
+    private Button btnCopy;
+    @FXML
+    private Button btnDelete;
 
     public enum Mode {
         EDIT, // Mode to just close teh dialog box
         SELECT // Mode to show a close button and a 'USE' button
     }
+    public void setMode(Mode mode) {
+        this.mode = mode;
+        if (mode == Mode.SELECT) {
+            btnUse.setVisible(true);
+        } else {
+            btnUse.setVisible(false);
+        }
+    }
 
-    private final StringProperty closeButtonText = new SimpleStringProperty();
+    @FXML
+    private ListView<PostProcessorConfig> v_postprocessorList;
 
     @Autowired
     @Qualifier("projectModel")
     private ProjectModel projectModel;
 
     @FXML
-    private ToolParametersControl toolParameters; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded
+    private PostProcessorControl postProcessor; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded
 
     @FXML
-    private ResourceBundle resources;
+    public void onCopy(ActionEvent actionEvent) {
+
+    }
 
     @FXML
-    private URL location;
-
-    @FXML
-    private ListView<ToolParameter> v_toolsList;
-    @FXML
-    private Button btnDelete;
-    @FXML
-    private Button btnCopy;
-    @FXML
-    private Button btnNew;
-    @FXML
-    private Button btnUse;
-    @FXML
-    private Button bntApply;
-
-
-    @FXML
-    void onDelete(ActionEvent event) {
-        if (v_toolsList.getSelectionModel().selectedItemProperty().get() != null) {
+    public void onDelete(ActionEvent actionEvent) {
+        if (v_postprocessorList.getSelectionModel().selectedItemProperty().get() != null) {
             MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
-            dialog.setTitleText("Deleting a Tool");
-            dialog.setMessage("Are you sure you want to delete this tool?");
+            dialog.setTitleText("Deleting a postprocessor");
+            dialog.setMessage("Are you sure you want to delete this post processor?");
             if (dialog.show() == MonologFXButton.Type.YES) {
-                ToolParameter p = v_toolsList.getSelectionModel().getSelectedItem();
-                projectModel.toolDBProperty().remove(p);
-                v_toolsList.getSelectionModel().clearSelection();
+                PostProcessorConfig p = v_postprocessorList.getSelectionModel().getSelectedItem();
+                projectModel.postProcessorsProperty().remove(p);
+                v_postprocessorList.getSelectionModel().clearSelection();
             }
         }
     }
 
     @FXML
-
-    void onNew(ActionEvent event) {
-        StockToolParameter tp = Factory.newStockTool();
-        projectModel.toolDBProperty().add(tp);
-        int i = projectModel.toolDBProperty().indexOf(tp);
-        v_toolsList.getSelectionModel().selectIndices(i);
+    public void onUse(ActionEvent actionEvent) {
+        postProcessor.applyData();
+        this.postProcessConfig = postProcessor.getData();
+        setReturned(Result.USE);
+        getDialog().close();
     }
 
     @FXML
-    void onApply(ActionEvent event) {
-        toolParameters.applyToolParameters();
-    }
-
-    @FXML
-    void onCopy(ActionEvent event) {
-    }
-
-    public ToolParameter getTool() {
-        return toolParameters.getTool();
+    public void onApply(ActionEvent actionEvent) {
+        postProcessor.applyData();
     }
 
     @FXML
@@ -158,47 +136,57 @@ public class ToolConfigurationsController extends DialogController {
     }
 
     @FXML
-    void onUse(ActionEvent event) {
-        setReturned(Result.USEMODIFIED);
-        getDialog().close();
+    public void onNew(ActionEvent actionEvent) {
+        PostProcessorConfig tp = Factory.newPostProcessor();
+        projectModel.postProcessorsProperty().add(tp);
+        int i = projectModel.postProcessorsProperty().indexOf(tp);
+        v_postprocessorList.getSelectionModel().selectIndices(i);
+    }
+
+    public PostProcessorConfig getPostProcessConfig() {
+        return postProcessConfig;
+    }
+
+    public void setPostProcessConfig(PostProcessorConfig postProcessConfig) {
+        this.postProcessConfig = postProcessConfig;
     }
 
     @FXML
     void initialize() {
-        v_toolsList.setItems(projectModel.toolDBProperty());
+        v_postprocessorList.setItems(projectModel.postProcessorsProperty());
 
-        if (mode == Mode.EDIT) {
+        if (mode == Mode.SELECT) {
             btnUse.setVisible(true);
         } else {
             btnUse.setVisible(false);
         }
 
         //    toolConfig.con
-        toolParameters.disableProperty().bind(v_toolsList.getSelectionModel().selectedItemProperty().isNull());
-        btnCopy.disableProperty().bind(v_toolsList.getSelectionModel().selectedItemProperty().isNull());
-        btnDelete.disableProperty().bind(v_toolsList.getSelectionModel().selectedItemProperty().isNull());
+        postProcessor.disableProperty().bind(v_postprocessorList.getSelectionModel().selectedItemProperty().isNull());
+        btnCopy.disableProperty().bind(v_postprocessorList.getSelectionModel().selectedItemProperty().isNull());
+        btnDelete.disableProperty().bind(v_postprocessorList.getSelectionModel().selectedItemProperty().isNull());
 
         // When the user selects a item in the list then update the tool panel
-        v_toolsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ToolParameter>() {
+        v_postprocessorList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<PostProcessorConfig>() {
             @Override
-            public void changed(ObservableValue<? extends ToolParameter> observable, ToolParameter oldValue, ToolParameter newValue) {
-                if (v_toolsList.getSelectionModel().selectedItemProperty().get() == null) {
-                    toolParameters.setTool(null);
-                //    toolParametersController.setTool(new ToolParameter("", ToolParameter.Units.MM, new EndMill(6.0)));
+            public void changed(ObservableValue<? extends PostProcessorConfig> observable, PostProcessorConfig oldValue, PostProcessorConfig newValue) {
+                if (v_postprocessorList.getSelectionModel().selectedItemProperty().get() == null) {
+                    postProcessor.setData(null);
+                    //    toolParametersController.setTool(new ToolParameter("", ToolParameter.Units.MM, new EndMill(6.0)));
                 } else {
-                    toolParameters.setTool(newValue);
+                    postProcessor.setData(newValue);
                 }
             }
         });
 
 
         // Set text in ListView
-        v_toolsList.setCellFactory(new Callback<ListView<ToolParameter>, ListCell<ToolParameter>>() {
+        v_postprocessorList.setCellFactory(new Callback<ListView<PostProcessorConfig>, ListCell<PostProcessorConfig>>() {
             @Override
-            public ListCell<ToolParameter> call(ListView<ToolParameter> p) {
-                ListCell<ToolParameter> cell = new ListCell<ToolParameter>() {
+            public ListCell<PostProcessorConfig> call(ListView<PostProcessorConfig> p) {
+                ListCell<PostProcessorConfig> cell = new ListCell<PostProcessorConfig>() {
                     @Override
-                    protected void updateItem(ToolParameter t, boolean bln) {
+                    protected void updateItem(PostProcessorConfig t, boolean bln) {
                         super.updateItem(t, bln);
                         this.textProperty().unbind();
                         if (t != null) {
@@ -211,13 +199,7 @@ public class ToolConfigurationsController extends DialogController {
                 return cell;
             }
         });
-    }
 
-    public StringProperty closeButtonTextProperty() {
-        return closeButtonText;
-    }
 
-    public void setCloseButtonText(String closeButtonText) {
-        this.closeButtonText.set(closeButtonText);
     }
 }

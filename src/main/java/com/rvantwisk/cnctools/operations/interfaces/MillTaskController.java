@@ -50,8 +50,8 @@ import javafx.collections.ObservableList;
  * Time: 2:08 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface MillTaskController extends DialogController {
-    void setProject(final Project p);
-    void setToolDB(final ObservableList<ToolParameter> tooldb);
-    void setTask(final Task task);
+public abstract class MillTaskController extends DialogController {
+    public abstract void setProject(final Project p);
+    public abstract void setToolDB(final ObservableList<ToolParameter> tooldb);
+    public abstract void setTask(final Task task);
 }

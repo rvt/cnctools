@@ -67,8 +67,10 @@ public class ProjectModel {
 
     private static final String PROJECTS_XML = "projects.xml";
     private static final String TOOLS_XML = "tools.xml";
+    private static final String POSTPROCESSORS_XML = "postprocessors.xml";
     final private ObservableList<Project> projectsProperty = FXCollections.observableArrayList();
     final private ObservableList<ToolParameter> toolDBProperty = FXCollections.observableArrayList();
+    final private ObservableList<PostProcessorConfig> postProcessors = FXCollections.observableArrayList();
 
     public ObservableList<Project> projectsProperty() {
         return projectsProperty;
@@ -76,6 +78,9 @@ public class ProjectModel {
 
     public ObservableList<ToolParameter> toolDBProperty() {
         return toolDBProperty;
+    }
+    public ObservableList<PostProcessorConfig> postProcessorsProperty() {
+        return postProcessors;
     }
 
     public void addProject(String projectname, String description) {
@@ -170,6 +175,18 @@ public class ProjectModel {
         }
     }
 
+    public void savePostProcessors() {
+        XStream xstream = getXStream();
+        File file = new File(POSTPROCESSORS_XML);
+        try {
+            String xml = xstream.toXML(new ArrayList<>(postProcessors));
+            FileUtil.saveFile(xml, file);
+        } catch (Exception e) { // catches ANY exception
+            logger.error("savePostProcessors", e);
+        }
+    }
+
+
     public void loadToolsFromDB () {
         XStream xstream = getXStream();
         try {
@@ -192,6 +209,19 @@ public class ProjectModel {
             projectsProperty.addAll(projects);
         } catch (Exception e) { // catches ANY exception
             logger.error("Error tools projects DB", e);
+        }
+    }
+
+    public void loadPostProcessors() {
+        XStream xstream = getXStream();
+        try {
+
+            File file = new File(POSTPROCESSORS_XML);
+            ArrayList<PostProcessorConfig> data = (ArrayList<PostProcessorConfig>) xstream.fromXML(readFileIntoString(file).toString());
+            postProcessors.clear();
+            postProcessors.addAll(data);
+        } catch (Exception e) { // catches ANY exception
+            logger.error("Error loading post processors from DB", e);
         }
     }
 
@@ -221,4 +251,6 @@ public class ProjectModel {
     public static <T extends Object> T deepCopy(final Object obj){
         return (T)getXStream().fromXML(getXStream().toXML(obj));
     }
+
+
 }

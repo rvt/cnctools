@@ -50,12 +50,10 @@ import java.net.URISyntaxException;
 /**
  * Created by rvt on 12/23/13.
  */
-public class AboutController implements DialogController {
-    private FXMLDialog dialog;
+public class AboutController extends DialogController {
 
     @FXML
     private Button close;
-
 
     @FXML
     void initialize() {
@@ -65,13 +63,7 @@ public class AboutController implements DialogController {
 
     @FXML
     private void onClose() {
-        dialog.close();
-    }
-
-
-    @Override
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
+        getDialog().close();
     }
 
     @FXML

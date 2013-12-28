@@ -96,11 +96,15 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
 
         int steps = Math.abs((int) (Math.floor(a - lastA) / AAXISSTEPDEGREES));
         double stepSize = (a - lastA) / steps;
+        double stepZSize = (machine.getZ() - lastZ) / steps;
+        double stepXSize = (machine.getX() - lastX) / steps;
+        double stepYSize = (machine.getY() - lastY) / steps;
+
 
 
         for (int i = 0; i < steps; i++) {
 
-            Vector3D rotatedLoc = new Rotation(new Vector3D(1.0, 0.0, 0.0), lastA / 360.0 * Math.PI * 2.0 + (stepSize * i) / 360.0 * Math.PI * 2.0).applyTo(new Vector3D(x, y, z));
+            Vector3D rotatedLoc = new Rotation(new Vector3D(1.0, 0.0, 0.0), lastA / 360.0 * Math.PI * 2.0 + (stepSize * i) / 360.0 * Math.PI * 2.0).applyTo(new Vector3D(lastX+stepXSize*i, lastY+stepYSize*i, lastZ+stepZSize*i));
 
             data.add((float) (rotatedLoc.getX() + machine.getOX()));
             data.add((float) (rotatedLoc.getY() + machine.getOY()));

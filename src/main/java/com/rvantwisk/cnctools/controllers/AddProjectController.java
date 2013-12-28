@@ -46,15 +46,10 @@ import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public class AddProjectController implements DialogController {
+public class AddProjectController extends DialogController {
     @Autowired
     @Qualifier("projectModel")
     private ProjectModel projectModel;
-    private FXMLDialog dialog;
-
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
 
     @FXML
     TextField projectName;
@@ -65,11 +60,11 @@ public class AddProjectController implements DialogController {
     @FXML
     public void add() {
         projectModel.addProject(projectName.getText(), projectDescription.getText());
-        dialog.close();
+        getDialog().close();
     }
 
     @FXML
     public void cancel() {
-        dialog.close();
+        getDialog().close();
     }
 }

@@ -36,20 +36,42 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.gcodegenerator;
+package com.rvantwisk.cnctools.gcodegenerator.interfaces;
+
+import com.rvantwisk.cnctools.gcodegenerator.GCodeBuilder;
 
 public interface GCodeGenerator {
 
-    public void rapidMove(Double a, Double x, Double y, Double z);
-    public void move(Double a, Double x, Double y, Double z);
-    public void setFeedRate(Double f);
-
-    public void setOutput(StringBuilder b);
+    /**
+     * Add a small comtent on the next line
+     * @param comment
+     */
     public void comment(final String comment);
-    public void commentLarge(String comment);
 
-    public void enableG93(Double F);
-    public void enableG94(Double F);
+    /**
+     * Add a large comment on the next line(s)
+     * @param comment
+     */
+    public void commentLarge(final String comment);
 
-    public void addRaw(final String rawGCode);
+    /**
+     * Provide a output to write into
+     * @param b
+     */
+    public void setOutput(final StringBuilder b);
+
+    /**
+     * Add a new GCode block
+     * @param GCodeBuilder
+     */
+    public void addBlock(final GCodeBuilder GCodeBuilder);
+
+    /**
+     * Add raw gcode, be carefull using raw code, not all dialect's might support what you are trying to accomplish
+     * @param s
+     */
+    void addRaw(String s);
+
+    void startProgram();
+    void endProgram();
 }

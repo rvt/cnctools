@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;

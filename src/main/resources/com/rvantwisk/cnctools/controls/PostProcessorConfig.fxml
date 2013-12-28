@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.lang.Long?>
+<?import java.net.*?>
+<?import java.net.URL?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+<!--
+  ~ Copyright (c) 2013, R. van Twisk
+  ~ All rights reserved.
+  ~ Licensed under the The BSD 3-Clause License;
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at:
+  ~
+  ~ http://opensource.org/licenses/BSD-3-Clause
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions
+  ~ are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright
+  ~ notice, this list of conditions and the following disclaimer.
+  ~
+  ~ Redistributions in binary form must reproduce the above copyright
+  ~ notice, this list of conditions and the following disclaimer in the
+  ~ documentation and/or other materials provided with the distribution.
+  ~
+  ~ Neither the name of the aic-util nor the names of its
+  ~ contributors may be used to endorse or promote products derived from
+  ~ this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ~ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  ~ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  ~ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  ~ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  ~ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  ~ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+  ~ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+  ~ OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<fx:root type="javafx.scene.layout.AnchorPane" id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="327.0" prefWidth="493.0" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1"
+         xmlns="http://javafx.com/javafx/2.2">
+    <children>
+        <TabPane prefHeight="302.0" prefWidth="601.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <tabs>
+                <Tab text="Misc Config">
+                    <content>
+                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="308.0" prefWidth="477.0">
+                            <children>
+                                <AnchorPane layoutX="20.0" layoutY="48.0" prefHeight="88.0" prefWidth="356.0" styleClass="border">
+                                    <children>
+                                        <Label alignment="CENTER" layoutX="74.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="X"/>
+                                        <Label alignment="CENTER" layoutX="104.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="Y"/>
+                                        <Label alignment="CENTER" layoutX="134.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="Z"/>
+                                        <Label alignment="CENTER" layoutX="164.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="A"/>
+                                        <Label alignment="CENTER" layoutX="194.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="B"/>
+                                        <Label alignment="CENTER" layoutX="224.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="C"/>
+                                        <Label alignment="CENTER" layoutX="254.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="U"/>
+                                        <Label alignment="CENTER" layoutX="284.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="V"/>
+                                        <Label alignment="CENTER" layoutX="314.0" layoutY="14.0" prefWidth="30.0" styleClass="bold" text="W"/>
+                                        <TextField fx:id="axisX" alignment="CENTER" layoutX="74.0" layoutY="33.0" prefWidth="30.0" text="X"/>
+                                        <TextField fx:id="axisY" alignment="CENTER" layoutX="104.0" layoutY="33.0" prefWidth="30.0" text="Y"/>
+                                        <TextField fx:id="axisZ" alignment="CENTER" layoutX="134.0" layoutY="33.0" prefWidth="30.0" text="Z"/>
+                                        <TextField fx:id="axisA" alignment="CENTER" layoutX="164.0" layoutY="33.0" prefWidth="30.0" text="A"/>
+                                        <TextField fx:id="axisB" alignment="CENTER" layoutX="194.0" layoutY="33.0" prefWidth="30.0" text="B"/>
+                                        <TextField fx:id="axisC" alignment="CENTER" layoutX="224.0" layoutY="33.0" prefWidth="30.0" text="C"/>
+                                        <TextField fx:id="axisU" alignment="CENTER" layoutX="254.0" layoutY="33.0" prefWidth="30.0" text="U"/>
+                                        <TextField fx:id="axisV" alignment="CENTER" layoutX="284.0" layoutY="33.0" prefWidth="30.0" text="V"/>
+                                        <TextField fx:id="axisW" alignment="CENTER" layoutX="314.0" layoutY="33.0" prefWidth="30.0" text="W"/>
+                                        <TextField fx:id="decX" alignment="CENTER" layoutX="74.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decY" alignment="CENTER" layoutX="104.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decZ" alignment="CENTER" layoutX="134.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decA" alignment="CENTER" layoutX="164.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decB" alignment="CENTER" layoutX="194.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decC" alignment="CENTER" layoutX="224.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decU" alignment="CENTER" layoutX="254.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decV" alignment="CENTER" layoutX="284.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <TextField fx:id="decW" alignment="CENTER" layoutX="314.0" layoutY="55.0" prefWidth="30.0" text="3"/>
+                                        <Label blendMode="SRC_OVER" layoutX="24.0" layoutY="-7.0" mouseTransparent="false" styleClass="boxheader" text="Axis Configuration"/>
+                                        <Label alignment="CENTER_RIGHT" layoutX="0.0" layoutY="36.0" prefWidth="70.0" text="Axis"/>
+                                        <Label alignment="CENTER_RIGHT" layoutX="0.0" layoutY="58.0" prefWidth="70.0" text="Decimals"/>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane layoutX="21.0" layoutY="159.0" prefHeight="117.0" prefWidth="356.0" styleClass="border">
+                                    <children>
+                                        <Label blendMode="SRC_OVER" layoutX="24.0" layoutY="-7.0" mouseTransparent="false" styleClass="boxheader" text="Other Configuration"/>
+                                        <CheckBox fx:id="toolchange" layoutX="21.0" layoutY="15.0" mnemonicParsing="false" text=""/>
+                                        <TextField id="decX" fx:id="decF" alignment="CENTER" layoutX="15.0" layoutY="34.0" prefWidth="30.0" text="3"/>
+                                        <Label layoutY="15.0" text="Auto Tool Change" AnchorPane.leftAnchor="50.0"/>
+                                        <Label layoutY="37.0" text="Number of decimals F" AnchorPane.leftAnchor="50.0"/>
+                                        <TextField id="decX" fx:id="decS" alignment="CENTER" layoutX="15.0" layoutY="56.0" prefWidth="30.0" text="3"/>
+                                        <Label layoutY="59.0" text="Number of decimals S" AnchorPane.leftAnchor="50.0"/>
+                                        <TextField id="decX" fx:id="decOther" alignment="CENTER" layoutX="15.0" layoutY="77.0" prefWidth="30.0" text="3"/>
+                                        <Label layoutY="80.0" text="Number of decimals others" AnchorPane.leftAnchor="50.0"/>
+                                    </children>
+                                </AnchorPane>
+                                <Label alignment="CENTER_RIGHT" layoutX="24.0" layoutY="15.0" prefWidth="55.0" text="Name:"/>
+                                <TextField fx:id="name" layoutX="87.0" layoutY="12.0" prefWidth="200.0"/>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Start/End">
+                    <content>
+                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TextArea id="preabmle" fx:id="preamble" prefWidth="175.0" wrapText="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="30.0"/>
+                                <Label text="Before program start:" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="11.0"/>
+                                <Label text="After program ends:" AnchorPane.leftAnchor="201.0" AnchorPane.topAnchor="11.0"/>
+                                <TextArea fx:id="postamble" prefWidth="175.0" wrapText="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="195.0" AnchorPane.topAnchor="30.0"/>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+    <stylesheets>
+        <URL value="@../CNCTools.css"/>
+    </stylesheets>
+</fx:root>

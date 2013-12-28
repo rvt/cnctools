@@ -45,24 +45,30 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="459.0" styleClass="theme, AnchorPaneHome" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.AboutController">
-  <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="728.999755859375" styleClass="header" text="CNC Tools Lite" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-    <font>
-      <Font size="28.0" />
-    </font>
-  </Label>
-  <stylesheets>
-    <URL value="@CNCTools.css" />
-    <URL value="@CNCTools.css" />
-  </stylesheets>
-  <AnchorPane id="AnchorPane" layoutX="14.0" layoutY="63.0">
-    <children>
-      <Label contentDisplay="TOP" layoutX="0.0" prefWidth="209.0" text="(c) 2013 R. van Twisk" AnchorPane.topAnchor="0.0" />
-      <Label contentDisplay="TOP" layoutX="287.0" prefWidth="144.0" text="Version 1.0.0-ALPHA" AnchorPane.topAnchor="0.0" />
-    </children>
-  </AnchorPane>
-  <Label contentDisplay="TOP" layoutX="14.0" layoutY="165.0" prefWidth="209.0" text="Libraries used:" />
-  <Button fx:id="close" layoutX="384.0" layoutY="196.0" mnemonicParsing="false" onAction="#onClose" text="Close" />
-  <Hyperlink layoutX="94.0" layoutY="93.0" onAction="#openMainWebsite" text="http://riesvantwisk.com/cms/home/cnctools" />
-  <Hyperlink layoutX="22.0" layoutY="180.0" onAction="#openLWGL" text="LWGL - http://lwjgl.org" />
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="459.0" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+            fx:controller="com.rvantwisk.cnctools.controllers.AboutController">
+    <stylesheets>
+        <URL value="@CNCTools.css"/>
+        <URL value="@CNCTools.css"/>
+    </stylesheets>
+    <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="728.999755859375" styleClass="header" text="CNC Tools Lite" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0"
+           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <font>
+            <Font size="28.0"/>
+        </font>
+    </Label>
+    <AnchorPane id="AnchorPane" minHeight="178.0" prefHeight="178.0" prefWidth="459.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="60.0">
+        <children>
+            <AnchorPane id="AnchorPane" layoutX="0.0" layoutY="0.0">
+                <children>
+                    <Label contentDisplay="TOP" layoutX="0.0" prefWidth="209.0" text="(c) 2013 R. van Twisk" AnchorPane.topAnchor="0.0"/>
+                    <Label contentDisplay="TOP" layoutX="287.0" prefWidth="144.0" text="Version 1.0.0-ALPHA" AnchorPane.topAnchor="0.0"/>
+                </children>
+            </AnchorPane>
+            <Label contentDisplay="TOP" layoutX="0.0" layoutY="102.0" prefWidth="209.0" text="Libraries used:"/>
+            <Button fx:id="close" mnemonicParsing="false" onAction="#onClose" text="Close" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
+            <Hyperlink layoutX="80.0" layoutY="30.0" onAction="#openMainWebsite" text="http://riesvantwisk.com/cms/home/cnctools"/>
+            <Hyperlink layoutX="8.0" layoutY="117.0" onAction="#openLWGL" text="LWGL - http://lwjgl.org"/>
+        </children>
+    </AnchorPane>
 </AnchorPane>

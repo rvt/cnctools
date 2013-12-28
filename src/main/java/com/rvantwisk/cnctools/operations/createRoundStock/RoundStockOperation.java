@@ -41,7 +41,7 @@ package com.rvantwisk.cnctools.operations.createRoundStock;
 import com.rvantwisk.cnctools.data.AbstractOperation;
 import com.rvantwisk.cnctools.data.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -143,6 +143,6 @@ public class RoundStockOperation extends AbstractOperation {
 //        graph.getChildren().clear();
 //        graph.getChildren().add(canvas);
 
-        helper.calculate(null);
+        helper.calculate();
     }
 }

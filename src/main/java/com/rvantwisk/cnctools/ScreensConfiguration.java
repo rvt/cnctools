@@ -143,6 +143,8 @@ public class ScreensConfiguration {
     @Scope("prototype")
     @Qualifier("toolConfigurationsDialog")
     public FXMLDialog toolConfigurationsDialog() {
+        ToolConfigurationsController tcc = new ToolConfigurationsController();
+        tcc.setMode(ToolConfigurationsController.Mode.EDIT);
         return new FXMLDialog(toolConfigurationsController(), getClass().getResource("ToolConfigurations.fxml"), primaryStage);
     }
 
@@ -202,6 +204,23 @@ public class ScreensConfiguration {
     @Qualifier("gCodeEditorController")
     public GCodeViewerController gCodeEditorController() {
         return new GCodeViewerController();
+    }
+
+    /**
+     * ***************************** GCodeEditor Tool *******************************
+     */
+    @Bean
+    @Scope("prototype")
+    @Qualifier("postProcessorsDialog")
+    public FXMLDialog postProcessorsDialog() {
+        return new FXMLDialog(postProcessorsController(), getClass().getResource("PostProcessors.fxml"), primaryStage);
+    }
+
+    @Bean
+    @Scope("prototype")
+    @Qualifier("postProcessorsController")
+    public PostProcessorsController postProcessorsController() {
+        return new PostProcessorsController();
     }
 
 

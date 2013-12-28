@@ -56,8 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 9:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AddMillTaskController implements DialogController {
-    private FXMLDialog dialog;
+public class AddMillTaskController extends DialogController {
 
     @Autowired
     private DialogBuilder dialogBuilder;
@@ -67,10 +66,6 @@ public class AddMillTaskController implements DialogController {
     @FXML Button bt_add;
 
     private Project currentProject;
-
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -89,12 +84,12 @@ public class AddMillTaskController implements DialogController {
         if (tbl_assignedMillTasks.getSelectionModel().selectedItemProperty().get()!=null) {
             AvailableTask mt = (AvailableTask)tbl_assignedMillTasks.getSelectionModel().getSelectedItem();
             currentProject.millTasksProperty().add(new Task(tv_taskName.getText(), mt.getDescription(), mt.getClassName(), mt.getFxmlFileName()));
-            dialog.close();
+            getDialog().close();
         }
     }
 
     @FXML
     public void cancel() {
-        dialog.close();
+        getDialog().close();
     }
 }

@@ -62,7 +62,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
-public class Controller implements MillTaskController {
+public class Controller extends MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Project project;

@@ -40,27 +40,14 @@ package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.stage.WindowEvent;
 
 /**
  * Created by rvt on 12/6/13.
  */
-public class GCodeViewerController implements DialogController {
+public class GCodeViewerController extends DialogController {
 
     @FXML
     private GCodeViewerControl gCodeControl;
 
-    private FXMLDialog dialog;
-
-    @Override
-    public void setDialog(FXMLDialog dialog) {
-        dialog.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle(final WindowEvent e) {
-                gCodeControl.stop();
-            }
-        });
-
-    }
 }

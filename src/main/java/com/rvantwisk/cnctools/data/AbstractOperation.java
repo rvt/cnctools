@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 
 /**
  * Created with IntelliJ IDEA.

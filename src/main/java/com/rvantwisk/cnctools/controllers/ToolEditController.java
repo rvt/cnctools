@@ -13,14 +13,7 @@ import javafx.fxml.FXML;
  * Time: 9:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ToolEditController implements DialogController {
-
-    private FXMLDialog dialog;
-
-    @Override
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
+public class ToolEditController extends DialogController {
 
     @FXML
     private ToolParametersControl toolParameters; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded
@@ -30,13 +23,13 @@ public class ToolEditController implements DialogController {
     @FXML
     void onClose(ActionEvent event) {
         result = Result.DISMISS;
-        dialog.close();
+        getDialog().close();
     }
 
     @FXML
     void onUse(ActionEvent event) {
         result = Result.USE;
-        dialog.close();
+        getDialog().close();
     }
 
     public Result getResult() {

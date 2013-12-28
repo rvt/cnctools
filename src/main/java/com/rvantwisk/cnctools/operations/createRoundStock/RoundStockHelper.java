@@ -38,11 +38,10 @@
 
 package com.rvantwisk.cnctools.operations.createRoundStock;
 
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
+import com.rvantwisk.cnctools.gcodegenerator.GCodeBuilder;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.cnctools.operations.math.Intersect;
 import com.rvantwisk.cnctools.operations.math.Point;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.util.List;
 
@@ -68,120 +67,53 @@ public class RoundStockHelper {
 
     // Intermediate results
 
-    List<Point> intersectionPoints;
-    Point millPA;
-    Point millPB;
-    Point millCenter;
-    Point pa;
-    Point pb;
-    Point center;
-    Double nextDepth;
-    Point startPoint;
+    private List<Point> intersectionPoints;
+    private Point millPA;
+    private Point millPB;
+    private Point millCenter;
+    private Point pa;
+    private Point pb;
+    private Point center;
+    private Double nextDepth;
+    private Point startPoint;
 
-    GCodeGenerator gCode;
+    final GCodeGenerator gCode;
 
     public RoundStockHelper(GCodeGenerator gcodeGenerator) {
         gCode = gcodeGenerator;
     }
 
-    private void drawStart(GraphicsContext gc) {
-        if (gc == null) return;
-        gc.translate(300, 300);
-        gc.scale(7.0, 7.0);
-
-    }
-
-    private void draw(GraphicsContext gc) {
-        if (gc == null) return;
-        gc.setFill(Color.GREEN);
-        gc.setStroke(Color.BLUE);
-        gc.setLineWidth(0.1);
-
-        // Draw stock square
-        gc.setStroke(Color.BLACK);
-        gc.strokeLine(pa.x, pa.y, pb.x, pb.y);
-        gc.strokeLine(pb.x, pb.y, pa.x, -pa.y);
-        gc.strokeLine(pa.x, -pa.y, -pb.x, pb.y);
-        gc.strokeLine(-pb.x, pb.y, pa.x, pa.y);
-
-        // Final stock size
-        gc.setStroke(Color.BLUE);
-        gc.fillOval(center.x - finalSize, center.y - finalSize, finalSize * 2.0, finalSize * 2.0);
-
-        // Firce radialDepth circle
-        gc.setStroke(Color.ORANGE);
-        gc.strokeOval(center.x - nextDepth, center.y - nextDepth, nextDepth * 2.0, nextDepth * 2.0);
-
-        // First intersectionpoint
-        gc.setFill(Color.RED);
-        gc.fillOval(startPoint.x - 1, startPoint.y - 1, 1 * 1.0, 1 * 1.0);
-
-
-    }
-
-    private void drawEndmill(GraphicsContext gc, Double A, Double Z) {
-        if (gc == null) return;
-        // Draw Endmill
-        gc.setStroke(Color.RED);
-
-        A = A / (180.0 / Math.PI);
-        Point millCenter = new Point(Z * Math.sin(A), Z * Math.cos(A));
-
-        Point millPA = millCenter.rot90(true).normalize().mul(millSize / 2.0).add(millCenter);
-        Point millPB = millCenter.rot90(false).normalize().mul(millSize / 2.0).add(millCenter);
-
-        gc.setFill(Color.GREEN);
-        gc.fillOval(millPA.x - 1, millPA.y - 1, 1 * 1.0, 1 * 1.0);
-        gc.setFill(Color.BLUE);
-        gc.fillOval(millPB.x - 1, millPB.y - 1, 1 * 1.0, 1 * 1.0);
-        gc.setFill(Color.YELLOW);
-        gc.fillOval(millCenter.x - 1, millCenter.y - 1, 1 * 1.0, 1 * 1.0);
-
-
-        Point l = millPA.sub(millPB).rot90(false).normalize().mul(millSize * 4.0).add(millPA);
-        gc.strokeLine(millPA.x, millPA.y, millPB.x, millPB.y);
-        gc.strokeLine(millPA.x, millPA.y, l.x, l.y);
-        l = millPB.sub(millPA).rot90(true).normalize().mul(millSize * 4.0).add(millPB);
-        gc.strokeLine(millPB.x, millPB.y, l.x, l.y);
-
-
-    }
-
-    public void calculate(GraphicsContext gc) {
+    public void calculate() {
         nextDepth = stockSize * Math.sqrt(2);
 
-        gCode.setFeedRate(feedRate);
-        gCode.rapidMove(null, null, null, stockSize * Math.sqrt(2) + stockClearance);
-        gCode.rapidMove(0.0, 0.0, 0.0, null);
-        drawStart(gc);
+        gCode.addBlock(new GCodeBuilder().F(feedRate));
 
-        Double previousDepth, lastDepth;
-        while ((lastDepth = calculateBase()) > -1) {
-            draw(gc);
+        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0).Y(0.0));
+
+        while ((calculateBase()) > -1) {
             gCode.commentLarge("Angle at 0.0");
-            calculate(0.0, gc);
+            calculate(0.0);
             gCode.commentLarge("Angle at 180.0");
-            calculate(180.0, gc);
+            calculate(180.0);
             gCode.commentLarge("Angle at 270.0");
-            calculate(270.0, gc);
+            calculate(270.0);
             gCode.commentLarge("Angle at 90.0");
-            calculate(90.0, gc);
-            previousDepth = lastDepth;
+            calculate(90.0);
         }
-        draw(gc);
         gCode.commentLarge("start final rounds");
-        calculate2(gc);
-        gCode.rapidMove(null, 0.0, null, stockSize * Math.sqrt(2) + stockClearance);
+        fullRoundMillSteps();
+        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(new GCodeBuilder().X(0.0));
         gCode.commentLarge("Done");
     }
 
-    private void calculate2(GraphicsContext gc) {
+    private void fullRoundMillSteps() {
         Double offsetAngle = 0.0;
-        gCode.rapidMove(null, null, null, stockSize * Math.sqrt(2) + stockClearance);
-        gCode.rapidMove(0.0, 0.0, null, null);
-        while (nextDepth > finalSize) {
-            draw(gc);
 
+        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0));
+        while (nextDepth > finalSize) {
             offsetAngle = fullRoundMillStep(offsetAngle);
 
             nextDepth = nextDepth - axialDepth;
@@ -191,25 +123,20 @@ public class RoundStockHelper {
         }
 
         nextDepth = finalSize;
-        draw(gc);
         fullRoundMillStep(offsetAngle);
-
     }
 
     private Double fullRoundMillStep(Double offsetAngle) {
         gCode.commentLarge("Full mill step at : Z=" + nextDepth);
 
-
         Double totalAngle = (stockLength / radialDepth) * 360.0;
         Double millLength = (stockLength / radialDepth) * Math.PI * finalSize * 2.0;
         Double G93F = this.feedRate / millLength;
 
-        gCode.move(null, null, null, nextDepth);
-        gCode.enableG93(G93F);
-        gCode.move(offsetAngle + totalAngle, stockLength, null, null);
-        gCode.enableG94(feedRate);
-        gCode.rapidMove(null, null, null, nextDepth + rapidClearance);
-        gCode.rapidMove(null, 0.0, null, null);
+        gCode.addBlock(new GCodeBuilder().G1().Z(nextDepth));
+        gCode.addBlock(new GCodeBuilder().G93(G93F).A(offsetAngle + totalAngle).X(stockLength));
+        gCode.addBlock(new GCodeBuilder().G0().Z(nextDepth + rapidClearance));
+        gCode.addBlock(new GCodeBuilder().X(0.0));
 
         return totalAngle + offsetAngle;
     }
@@ -252,7 +179,7 @@ public class RoundStockHelper {
         return nextDepth;
     }
 
-    private void calculate(Double angleOffset, GraphicsContext gc) {
+    private void calculate(Double angleOffset) {
 
 
         // Start mill operation
@@ -260,24 +187,27 @@ public class RoundStockHelper {
         Double startAngle = currentAngle;
         Double stepAngle = Point.angleBetween2Lines(Point.zero, startPoint, Point.zero, millPA) * (180.0 / Math.PI);
 
-        gCode.rapidMove(null, null, null, stockSize * Math.sqrt(2) + stockClearance);
-        gCode.rapidMove(currentAngle + 1.0 + angleOffset, null, null, null);
+        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(new GCodeBuilder().A(currentAngle + 1.0 + angleOffset));
+
         Boolean isEnd;
         do {
-            drawEndmill(gc, currentAngle + angleOffset, nextDepth);
             // Remove some material
             gCode.comment("Remove stock");
-            gCode.move(currentAngle + angleOffset, null, null, nextDepth);
-            gCode.move(null, stockLength, null, null);
-            gCode.rapidMove(currentAngle + angleOffset + 1.0, null, null, nextDepth + rapidClearance);
-            gCode.rapidMove(null, 0.0, null, null);
+            gCode.addBlock(new GCodeBuilder().G1().Z(nextDepth));
+            gCode.addBlock(new GCodeBuilder().G1().A(currentAngle + angleOffset));
+            gCode.addBlock(new GCodeBuilder().X(stockLength));
+
+            gCode.addBlock(new GCodeBuilder().G0().Z(nextDepth + rapidClearance));
+            gCode.addBlock(new GCodeBuilder().G0().A(currentAngle + angleOffset + 1.0).X(0.0));
+
             currentAngle = currentAngle - Math.abs(stepAngle);
 
             // Test if we reached the end of this round
             isEnd = reachedEndOf(-startAngle, currentAngle);
 
             if (isEnd) {
-                gCode.rapidMove(null, null, null, stockSize * Math.sqrt(2) + stockClearance);
+                gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
             }
 
         } while (!isEnd);

@@ -33,7 +33,9 @@
                         <Button fx:id="addMillTask" disable="true" onAction="#addMillTask" text="add" />
                         <Button fx:id="removeMilltask" onAction="#removeMillTask" text="Remove" />
                         <Button fx:id="editMilltask" onAction="#editMillTask" text="Edit" />
-                        <Button fx:id="generateGCode" text="G-Code" onAction="#generateGCode" />
+                        <Button fx:id="generateGCode" onAction="#generateGCode" text="Save G-Code" />
+                        <Button fx:id="btnPostProcessor" onAction="#onSelectPostprocessor" text="Post Processor" />
+                        <Button fx:id="btnView" disable="false" onAction="#onViewGCode" text="View" visible="true" />
                       </children>
                     </HBox>
                     <TableView fx:id="tbl_millTasks" prefHeight="223.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="39.0">
@@ -64,7 +66,7 @@
                 </AnchorPane>
                 <AnchorPane id="anchorPane4" fx:id="details" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                   <children>
-                    <TextArea fx:id="descriptionValue" prefHeight="298.0" prefWidth="556.0" styleClass="descriptionValue" text="TextArea" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="36.0" />
+                    <TextArea fx:id="descriptionValue" prefHeight="298.0" prefWidth="556.0" styleClass="descriptionValue" text="" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="36.0" />
                     <Label id="label4" layoutX="20.0" layoutY="14.0" minWidth="-Infinity" text="PROJECT DESCRIPTION:" />
                   </children>
                 </AnchorPane>
@@ -89,14 +91,15 @@
       <menus>
         <Menu mnemonicParsing="false" text="Configuration">
           <items>
+            <MenuItem mnemonicParsing="false" onAction="#onPostProcessorConfig" text="Edit Post Processors" />
             <MenuItem mnemonicParsing="false" onAction="#toolsConfiguration" text="Tool Configuration" />
             <!--MenuItem mnemonicParsing="false" onAction="#machinesConfiguration" text="Machines Configuration" /-->
-              <MenuItem mnemonicParsing="false" onAction="#save" text="Save" />
+            <MenuItem mnemonicParsing="false" onAction="#save" text="Save" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" text="About" onAction="#showAbout"/>
+            <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
           </items>
         </Menu>
       </menus>

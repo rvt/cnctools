@@ -39,7 +39,7 @@
 package com.rvantwisk.cnctools.operations.customgcode;
 
 import com.rvantwisk.cnctools.data.AbstractOperation;
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

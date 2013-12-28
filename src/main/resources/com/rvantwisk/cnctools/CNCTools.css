@@ -1,6 +1,10 @@
 .theme {
     master-color: gray;
-    -fx-font-size: 12px;
+    -fx-font-size: 11px;
+}
+
+.dialog {
+    -fx-padding: 15 15 15 15;
 }
 
 .darkList {
@@ -22,32 +26,30 @@
     -fx-font-size: 18px;
 }
 
-
 .table-view {
     -fx-border-width: 0;
     -fx-border-color: red;
     -fx-font-size: 10px;
 }
 
-
 GridPane {
     -fx-border-width: 0;
     -fx-border-color: red;
     -fx-font-size: 12px;
-    -fx-hgap:10px;
+    -fx-hgap: 10px;
 }
 
 .gridPaneTableType {
     -fx-border-width: 0;
     -fx-font-size: 12px;
-    -fx-hgap:10px;
+    -fx-hgap: 10px;
     -fx-vgap: 0;
 }
 
-.gridPaneTableType  {
+.gridPaneTableType {
     -fx-border-width: 0;
     -fx-font-size: 12px;
-    -fx-hgap:10px;
+    -fx-hgap: 10px;
     -fx-vgap: 0;
 }
 
@@ -68,19 +70,19 @@ HBox {
     -fx-text-fill: derive(master-color, 200%);
     -fx-font-size: 24px;
 
-    -fx-background-color:
-        linear-gradient(
-            derive(master-color, 120%),
-            derive(master-color, 90%)
-        ),
-        radial-gradient(
-            center 50% -40%,
-            radius 180%,
-            derive(master-color, 75%) 55%,
-            derive(master-color, 55%) 55%
-        );
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.55) , 5, 0.0 , 0 , 1 );
+    -fx-background-color: linear-gradient(derive(master-color, 120%), derive(master-color, 90%)), radial-gradient(center 50% -40%, radius 180%, derive(master-color, 75%) 55%, derive(master-color, 55%) 55%);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.55), 5, 0.0, 0, 1);
     -fx-text-fill: derive(master-color, -60%);
 
-
 }
+
+.border {
+    -fx-border-width: 1;
+    -fx-border-color: master-color;
+}
+
+.boxheader {
+    -fx-background-color: white;
+    -fx-padding: 0 2 0 2;
+}
+

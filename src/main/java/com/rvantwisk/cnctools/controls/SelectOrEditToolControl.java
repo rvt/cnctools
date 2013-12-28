@@ -102,11 +102,11 @@ public class SelectOrEditToolControl extends VBox {
     void onEdit(ActionEvent event) {
         ToolEditController tec = (ToolEditController) toolEditDialog.getController();
         tec.setTool(ProjectModel.<ToolParameter>deepCopy((tool.get())));
-        toolEditDialog.showAndWait();
         ToolEditController tcc = (ToolEditController) toolEditDialog.getController();
         if (tcc.getResult() != DialogController.Result.DISMISS) {
             setTool(tcc.getTool());
         }
+        toolEditDialog.showAndWait();
     }
 
     @FXML
@@ -118,8 +118,8 @@ public class SelectOrEditToolControl extends VBox {
 
     @FXML
     void onSelect(ActionEvent event) {
-        toolConfigurationsDialog.showAndWait();
         ToolConfigurationsController tcc = (ToolConfigurationsController) toolConfigurationsDialog.getController();
+        toolConfigurationsDialog.showAndWait();
         if (tcc.getReturned() != DialogController.Result.DISMISS) {
             setTool(tcc.getTool());
         }

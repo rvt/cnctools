@@ -42,13 +42,11 @@ import com.rvantwisk.cnctools.controllers.FXMLDialog;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
-import com.rvantwisk.cnctools.data.EndMill;
-import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.data.Task;
-import com.rvantwisk.cnctools.data.ToolParameter;
-import com.rvantwisk.cnctools.gcodegenerator.LinuxCNCIndexer;
+import com.rvantwisk.cnctools.data.*;
+import com.rvantwisk.cnctools.gcodegenerator.dialects.RS274;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -67,7 +65,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-public class Controller implements MillTaskController {
+public class Controller extends MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Project project;
@@ -219,15 +217,22 @@ public class Controller implements MillTaskController {
     }
 
     private void generateGCode() {
+        String error = "";
         try {
 
             fillModal();
             StringBuilder sb = new StringBuilder();
-            LinuxCNCIndexer gCodeGenerator = new LinuxCNCIndexer();
+
+            PostProcessorConfig ppc;
+//            PostProcessorConfig ppc = project.getPostProcessor();
+//            if (ppc==null) {
+            ppc = Factory.newPostProcessor();
+//            }
+
+            RS274 gCodeGenerator = new RS274(ppc);
             gCodeGenerator.setOutput(sb);
             final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
-//        helper.setClearancebeforeFinal(2.0);
             helper.setFinalSize(model.finalSizeProperty().getValue());  // Diameter
             helper.setStockSize(model.stockSizeProperty().getValue()); // Diameter
             helper.setStockLength(model.finalLengthProperty().getValue());
@@ -237,22 +242,17 @@ public class Controller implements MillTaskController {
             helper.setAxialDepth(model.toolParametersProperty().get().axialDepthProperty().getValue());
             helper.setFeedRate(model.toolParametersProperty().get().feedRateProperty().getValue());
 
-            helper.calculate(null);
+            helper.calculate();
 
             InputStream str = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
             gCodeViewerControl.load(str);
 
-//            errors.textProperty().set("");
-//            errors.getTooltip().setText("");
         } catch (UnsupportedSimException e) {
-//            errors.textProperty().set(e.getMessage());
-//            errors.getTooltip().setText(e.getMessage());
+            error = e.getMessage();
         } catch (SimException e) {
-//            errors.textProperty().set(e.getMessage());
-//            errors.getTooltip().setText(e.getMessage());
+            error = e.getMessage();
         } catch (Exception e) {
-//            errors.textProperty().set(e.getMessage());
-//            errors.getTooltip().setText(e.getMessage());
+            error = e.getMessage();
         }
     }
 

@@ -39,8 +39,11 @@
 package com.rvantwisk.cnctools.misc;
 
 import com.rvantwisk.cnctools.data.EndMill;
+import com.rvantwisk.cnctools.data.PostProcessorConfig;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
+import com.rvantwisk.cnctools.gcodegenerator.dialects.RS274;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -82,7 +85,6 @@ public class Factory {
         //nt.setCoolant(Boolean.FALSE);
 
         nt.setSpindleDirection(ToolParameter.SpindleDirection.CW);
-
         nt.spindleSpeedProperty().set(new DimensionProperty(3000.0, Dimensions.Dim.RPM));
         nt.feedRateProperty().set(new DimensionProperty(750.0, Dimensions.Dim.MM_MINUTE));
         nt.plungeRateProperty().set(new DimensionProperty(350.0, Dimensions.Dim.MM_MINUTE));
@@ -93,4 +95,55 @@ public class Factory {
     }
 
 
+    public static PostProcessorConfig newPostProcessor() {
+        final PostProcessorConfig nt = new PostProcessorConfig();
+        nt.setName("New");
+        nt.setSpaceBetweenWords(false);
+        nt.decimalsFProperty().set(2);
+        nt.decimalsSProperty().set(0);
+        nt.decimalsOthersProperty().set(2);
+        nt.hasToolChangerProperty().setValue(false);
+        nt.axisDecimalsProperty().put("A", 2);
+        nt.axisDecimalsProperty().put("B", 2);
+        nt.axisDecimalsProperty().put("C", 2);
+        nt.axisDecimalsProperty().put("X", 2);
+        nt.axisDecimalsProperty().put("Y", 2);
+        nt.axisDecimalsProperty().put("Z", 2);
+        nt.axisDecimalsProperty().put("U", 2);
+        nt.axisDecimalsProperty().put("V", 2);
+        nt.axisDecimalsProperty().put("W", 2);
+        nt.axisMappingProperty().put("A", "A");
+        nt.axisMappingProperty().put("B", "B");
+        nt.axisMappingProperty().put("C", "C");
+        nt.axisMappingProperty().put("X", "X");
+        nt.axisMappingProperty().put("Y", "Y");
+        nt.axisMappingProperty().put("Z", "Z");
+        nt.axisMappingProperty().put("U", "U");
+        nt.axisMappingProperty().put("V", "V");
+        nt.axisMappingProperty().put("W", "W");
+        nt.preabmleProperty().set("%\n" +
+                "G17 G21 G40 G49\n" +
+                "G64 P0.01");
+        nt.postambleProperty().set("M30\n" +
+                "%");
+        nt.setDialect("RS274");
+        return nt;
+    }
+
+    /**
+     * Retreive a postprocessor dialect from a post processor configuration
+     * @param pc    PostProcessorConfiguration
+     * @return
+     *
+     * TODO: Need to change this to use enum's or class name, for now we just have one dialect
+     */
+    public static GCodeGenerator getProcessorDialect(final PostProcessorConfig pc) {
+        switch (pc.getDialect())
+        {
+            case "RS274":
+                return new RS274(pc);
+            default:
+                throw new RuntimeException("Dialect ["+pc.getDialect()+"] not found");
+        }
+    }
 }

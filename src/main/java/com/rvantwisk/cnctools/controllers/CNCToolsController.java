@@ -40,6 +40,7 @@ package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.ScreensConfiguration;
 import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.controls.PostProcessorControl;
 import com.rvantwisk.cnctools.data.*;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import com.rvantwisk.cnctools.misc.Dimensions;
@@ -81,7 +82,7 @@ import java.nio.file.StandardOpenOption;
  * Time: 6:11 PM
  * To change this template use File | Settings | File Templates.
  */
-public class CNCToolsController implements DialogController {
+public class CNCToolsController extends DialogController {
 
     @Autowired
     @Qualifier("projectModel")
@@ -105,6 +106,10 @@ public class CNCToolsController implements DialogController {
     Button deleteProject;
     @FXML
     Button generateGCode;
+    @FXML
+    Button btnView;
+    @FXML
+    Button btnPostProcessor;
 
 
     BeanPathAdapter<Project> currentProjectBinding;
@@ -128,32 +133,48 @@ public class CNCToolsController implements DialogController {
     }
 
     @FXML
+    public void onPostProcessorConfig(ActionEvent actionEvent) {
+        screens.postProcessorsDialog().showAndWait();
+
+    }
+
+    @FXML
     public void generateGCode(ActionEvent event) throws Exception {
         if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
             final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
-            final StringBuilder gCode = p.getGCode();
 
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
-            fileChooser.setTitle("Save GCode");
-            File file = fileChooser.showSaveDialog(null);
-            if (file != null) {
-                try {
-                    file.delete();
-                    BufferedWriter br = Files.newBufferedWriter(file.toPath(),
-                            Charset.forName("UTF-8"),
-                            new OpenOption[]{StandardOpenOption.CREATE_NEW});
-                    br.write(gCode.toString());
-                    br.write("\n");
+            if (p.postProcessorProperty().get() == null) {
+                MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                dialog.setTitleText("No postprocessor");
+                dialog.setMessage("No post processor configured, please select a post processor first!");
+                dialog.show();
+            } else {
 
-                    br.flush();
-                    br.close();
+                final StringBuilder gCode = p.getGCode();
 
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
+                fileChooser.setTitle("Save GCode");
+                File file = fileChooser.showSaveDialog(null);
+                if (file != null) {
+                    try {
+                        file.delete();
+                        BufferedWriter br = Files.newBufferedWriter(file.toPath(),
+                                Charset.forName("UTF-8"),
+                                new OpenOption[]{StandardOpenOption.CREATE_NEW});
+                        br.write(gCode.toString());
+                        br.write("\n");
+
+                        br.flush();
+                        br.close();
+
+                    } catch (IOException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
             }
+
         }
     }
 
@@ -164,7 +185,7 @@ public class CNCToolsController implements DialogController {
             MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
             dialog.setTitleText("Deleting a project");
             dialog.setMessage("Are you sure you want to delete this project?");
-            if (dialog.showDialog() == MonologFXButton.Type.YES) {
+            if (dialog.show() == MonologFXButton.Type.YES) {
                 Project p = v_projectList.getSelectionModel().getSelectedItem();
                 descriptionValue.setText("");
                 projectModel.projectsProperty().remove(v_projectList.getSelectionModel().getSelectedItem());
@@ -184,9 +205,9 @@ public class CNCToolsController implements DialogController {
     @FXML
     public void addMillTask(ActionEvent event) throws Exception {
         FXMLDialog mt = screens.millTaskDialog();
-        mt.showAndWait();
         AddMillTaskController mtc = (AddMillTaskController) mt.getController();
         mtc.setCurrentProject(v_projectList.getSelectionModel().getSelectedItem());
+        mt.showAndWait();
     }
 
     @FXML
@@ -195,7 +216,7 @@ public class CNCToolsController implements DialogController {
             MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
             dialog.setTitleText("Deleting a milltask");
             dialog.setMessage("Are you sure you want to delete this task?");
-            if (dialog.showDialog() == MonologFXButton.Type.YES) {
+            if (dialog.show() == MonologFXButton.Type.YES) {
                 Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
                 project.millTasksProperty().remove(tbl_millTasks.getSelectionModel().getSelectedIndex());
             }
@@ -231,7 +252,7 @@ public class CNCToolsController implements DialogController {
         MonologFX dialog = new MonologFX(MonologFX.Type.ERROR);
         dialog.setTitleText("Error creating Mill Task dialog");
         dialog.setMessage(error);
-        dialog.showDialog();
+        dialog.show();
 
     }
 
@@ -322,20 +343,57 @@ public class CNCToolsController implements DialogController {
 
     }
 
+    private void addDefaultPostprocessorSet() {
+        // Defaul't MM post processor
+        PostProcessorConfig ppc = Factory.newPostProcessor();
+        ppc.setName("LinuxCNC (mm)");
+        ppc.preabmleProperty().set("%\n" +
+                "G17 G21 G40 G49\n" +
+                "G64 P0.01");
+        projectModel.postProcessorsProperty().add(ppc);
+
+        ppc = Factory.newPostProcessor();
+        ppc.setName("LinuxCNC (inch)");
+        ppc.axisDecimalsProperty().put("A", 4);
+        ppc.axisDecimalsProperty().put("B", 4);
+        ppc.axisDecimalsProperty().put("C", 4);
+        ppc.axisDecimalsProperty().put("X", 4);
+        ppc.axisDecimalsProperty().put("Y", 4);
+        ppc.axisDecimalsProperty().put("Z", 4);
+        ppc.axisDecimalsProperty().put("U", 4);
+        ppc.axisDecimalsProperty().put("V", 4);
+        ppc.axisDecimalsProperty().put("W", 4);
+        ppc.preabmleProperty().set("%\n" +
+                "G17 G20 G40 G49\n" +
+                "G64 P0.001");
+        projectModel.postProcessorsProperty().add(ppc);
+    }
+
+
     @FXML
         // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         v_projectList.setItems(projectModel.projectsProperty());
 
+        projectModel.loadPostProcessors();
+        if (projectModel.postProcessorsProperty().size() == 0) {
+            addDefaultPostprocessorSet();
+            projectModel.savePostProcessors();
+            MonologFX dialog = new MonologFX(MonologFX.Type.INFO);
+            dialog.setTitleText("Postprocessor defaults loaded");
+            dialog.setMessage("No Post Processors where found, a new a new post processor set has been created.");
+            dialog.show();
+        }
+
+
         projectModel.loadToolsFromDB();
-        Integer s = projectModel.toolDBProperty().size();
         if (projectModel.toolDBProperty().size() == 0) {
             addDefaultToolSet();
             projectModel.saveToolDB();
             MonologFX dialog = new MonologFX(MonologFX.Type.INFO);
             dialog.setTitleText("Tools defaults loaded");
             dialog.setMessage("No tools where found, a new a new toolset has been created.");
-            dialog.showDialog();
+            dialog.show();
         }
 
         projectModel.loadProjectsFromDB();
@@ -345,11 +403,12 @@ public class CNCToolsController implements DialogController {
             MonologFX dialog = new MonologFX(MonologFX.Type.INFO);
             dialog.setTitleText("Project defaults loaded");
             dialog.setMessage("No project was found, a new template project was created. Feel free to delete or modify");
-            dialog.showDialog();
+            dialog.show();
         }
 
-
         deleteProject.disableProperty().bind(v_projectList.getSelectionModel().selectedItemProperty().isNull());
+        btnPostProcessor.disableProperty().bind(v_projectList.getSelectionModel().selectedItemProperty().isNull());
+        btnView.disableProperty().bind(v_projectList.getSelectionModel().selectedItemProperty().isNull());
         removeMilltask.disableProperty().bind(tbl_millTasks.getSelectionModel().selectedItemProperty().isNull());
         addMillTask.disableProperty().bind(v_projectList.getSelectionModel().selectedItemProperty().isNull());
         editMilltask.disableProperty().bind(tbl_millTasks.getSelectionModel().selectedItemProperty().isNull());
@@ -406,16 +465,39 @@ public class CNCToolsController implements DialogController {
         // Save DB on exit
         dialog.setOnHidden(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
-                projectModel.saveProjects();
-                projectModel.saveToolDB();
+                save(null);
             }
         });
     }
 
+
     public void save(ActionEvent actionEvent) {
         projectModel.saveProjects();
         projectModel.saveToolDB();
+        projectModel.savePostProcessors();
     }
 
+    @FXML
+    public void onSelectPostprocessor(ActionEvent actionEvent) {
+        if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+            final FXMLDialog dialog = screens.postProcessorsDialog();
+            PostProcessorsController controller = (PostProcessorsController) dialog.getController();
+            controller.setMode(PostProcessorsController.Mode.SELECT);
+            dialog.showAndWait();
+
+            if (controller.getReturned() == Result.USE) {
+                Project P = v_projectList.getSelectionModel().getSelectedItem();
+
+                P.setPostProcessor(ProjectModel.<PostProcessorConfig>deepCopy(controller.getPostProcessConfig()));
+            }
+
+
+        }
+    }
+
+    @FXML
+    public void onViewGCode(ActionEvent actionEvent) {
+
+    }
 }
 

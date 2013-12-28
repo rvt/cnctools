@@ -38,18 +38,22 @@
 
 package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.cnctools.gcodegenerator.GCodeGenerator;
-import com.rvantwisk.cnctools.gcodegenerator.LinuxCNCIndexer;
+import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
+import com.rvantwisk.cnctools.misc.Factory;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 
 public class Project {
 
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty description = new SimpleStringProperty();
     private final ObservableList<Task> milltasks = FXCollections.observableArrayList();
+    private  ObjectProperty<PostProcessorConfig> postProcessor = new SimpleObjectProperty<>();
 
     public Project() {
     }
@@ -57,6 +61,14 @@ public class Project {
     public Project(String projectName, String description) {
         this.name.set(projectName);
         this.description.set(description);
+    }
+
+    public Object readResolve() {
+        if (postProcessor==null) {
+            postProcessor = new SimpleObjectProperty<>();
+            postProcessorProperty().set(Factory.newPostProcessor());
+        }
+        return this;
     }
 
     public String toString() {
@@ -94,15 +106,30 @@ public class Project {
         this.description.set(description);
     }
 
+    public PostProcessorConfig getPostProcessor() {
+        return postProcessor.get();
+    }
+
+    public ObjectProperty<PostProcessorConfig> postProcessorProperty() {
+        return postProcessor;
+    }
+
+    public void setPostProcessor(PostProcessorConfig postProcessor) {
+        this.postProcessor.set(postProcessor);
+    }
+
     public StringBuilder getGCode() {
         final StringBuilder gcode = new StringBuilder();
-        final GCodeGenerator gCodeGenerator = new LinuxCNCIndexer();
+
+        final GCodeGenerator gCodeGenerator = Factory.getProcessorDialect(postProcessor.get());
         gCodeGenerator.setOutput(gcode);
 
+        gCodeGenerator.startProgram();
         for (Task t : milltasks) {
+            gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + t.getName(), 50, "-"));
             t.generateGCode(gCodeGenerator);
         }
-
+        gCodeGenerator.endProgram();
         return gcode;
     }
 

@@ -41,16 +41,10 @@ package com.rvantwisk.cnctools.controllers;
 import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
 import javafx.fxml.FXML;
 
-public class ErrorController implements DialogController {
-    private FXMLDialog dialog;
-
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
-
+public class ErrorController extends DialogController {
 
     @FXML
     public void close() {
-        dialog.close();
+        getDialog().close();
     }
 }

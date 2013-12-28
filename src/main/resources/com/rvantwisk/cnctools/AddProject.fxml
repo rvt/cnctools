@@ -9,45 +9,49 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="319.999755859375" prefWidth="558.999755859375" style="-fx-background-color: #EEEEEE" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.AddProjectController">
-  <children>
-    <GridPane id="GridPane" layoutY="95.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="40.0">
-      <children>
-        <Label alignment="CENTER_RIGHT" prefWidth="124.0" text="Project Name:" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-        <TextField fx:id="projectName" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-        <TextArea fx:id="projectDescription" prefHeight="123.0" prefWidth="298.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Label text="Project Description:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-      </children>
-      <columnConstraints>
-        <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-      </columnConstraints>
-      <hgap>
-        <Long fx:value="10" />
-      </hgap>
-      <rowConstraints>
-        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      </rowConstraints>
-      <vgap>
-        <Long fx:value="10" />
-      </vgap>
-    </GridPane>
-    <Separator prefWidth="503.0" AnchorPane.bottomAnchor="42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-    <Separator prefWidth="483.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
-    <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="768.999755859375" styleClass="header" text="Add new Operation" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <font>
-        <Font size="28.0" />
-      </font>
-    </Label>
-    <HBox prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
-      <children>
-        <Button cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
-        <Button defaultButton="true" mnemonicParsing="false" onAction="#add" text="Add" />
-      </children>
-    </HBox>
-  </children>
-  <stylesheets>
-    <URL value="@CNCTools.css" />
-  </stylesheets>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="276.0" prefWidth="513.999755859375" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.AddProjectController">
+    <children>
+        <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="518.999755859375" styleClass="header" text="Add new Operation" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0"
+               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <font>
+                <Font size="28.0"/>
+            </font>
+        </Label>
+        <AnchorPane id="AnchorPane" prefHeight="324.999755859375" prefWidth="568.999755859375" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="60.0">
+            <children>
+                <GridPane id="GridPane" prefHeight="207.999755859375" prefWidth="528.999755859375" AnchorPane.bottomAnchor="32.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <Label alignment="CENTER_RIGHT" contentDisplay="LEFT" prefWidth="115.0" text="Project Name:" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="projectName" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <TextArea fx:id="projectDescription" prefHeight="123.0" prefWidth="298.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label alignment="CENTER_RIGHT" prefWidth="115.0" text="Project Description:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    </children>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="10.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <hgap>
+                        <Long fx:value="10"/>
+                    </hgap>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <vgap>
+                        <Long fx:value="10"/>
+                    </vgap>
+                </GridPane>
+                <HBox prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                    <children>
+                        <Button cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel"/>
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#add" text="Add"/>
+                    </children>
+                </HBox>
+            </children>
+        </AnchorPane>
+    </children>
+    <stylesheets>
+        <URL value="@CNCTools.css"/>
+    </stylesheets>
 </AnchorPane>

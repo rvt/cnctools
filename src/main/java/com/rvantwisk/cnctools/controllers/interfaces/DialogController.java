@@ -40,11 +40,27 @@ package com.rvantwisk.cnctools.controllers.interfaces;
 
 import com.rvantwisk.cnctools.controllers.FXMLDialog;
 
-public interface DialogController {
-    enum Result {
+public abstract class DialogController {
+    public enum Result {
         CLOSE, USE, APPLY, SAVE, YES, NO, ACCEPT, USEMODIFIED, DISMISS
     }
+    private FXMLDialog dialog;
 
-    void setDialog(FXMLDialog dialog);
-//    Result getDialogResult();
+    public FXMLDialog getDialog() {
+        return dialog;
+    }
+
+    public void setDialog(FXMLDialog dialog) {
+        this.dialog = dialog;
+    }
+
+    private Result returned;
+
+    public Result getReturned() {
+        return returned;
+    }
+
+    public void setReturned(Result returned) {
+        this.returned = returned;
+    }
 }
