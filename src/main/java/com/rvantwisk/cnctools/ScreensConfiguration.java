@@ -173,7 +173,6 @@ public class ScreensConfiguration {
 
     /**
      * ***************************** About Tool *******************************
-     * @param window
      */
     @Bean
     @Scope("prototype")

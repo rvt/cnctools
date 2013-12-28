@@ -62,6 +62,8 @@ import javafx.util.Callback;
 import jfxtras.labs.dialogs.MonologFX;
 import jfxtras.labs.dialogs.MonologFXButton;
 import jfxtras.labs.scene.control.BeanPathAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -83,6 +85,7 @@ import java.nio.file.StandardOpenOption;
  * To change this template use File | Settings | File Templates.
  */
 public class CNCToolsController extends DialogController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     @Qualifier("projectModel")
@@ -124,72 +127,91 @@ public class CNCToolsController extends DialogController {
 
     @FXML
     public void addProject(ActionEvent event) throws Exception {
-        screens.projectDialog().showAndWait();
+        try {
+            screens.projectDialog().showAndWait();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void showAbout(ActionEvent event) throws Exception {
-        screens.aboutDialog().showAndWait();
+        try {
+            screens.aboutDialog().showAndWait();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void onPostProcessorConfig(ActionEvent actionEvent) {
-        screens.postProcessorsDialog().showAndWait();
-
+        try {
+            screens.postProcessorsDialog().showAndWait();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void generateGCode(ActionEvent event) throws Exception {
-        if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
-            final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
+        try {
+            if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+                final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
 
-            if (p.postProcessorProperty().get() == null) {
-                MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
-                dialog.setTitleText("No postprocessor");
-                dialog.setMessage("No post processor configured, please select a post processor first!");
-                dialog.show();
-            } else {
+                if (p.postProcessorProperty().get() == null) {
+                    MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                    dialog.setTitleText("No postprocessor");
+                    dialog.setMessage("No post processor configured, please select a post processor first!");
+                    dialog.show();
+                } else {
 
-                final StringBuilder gCode = p.getGCode();
+                    final StringBuilder gCode = p.getGCode();
 
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
-                fileChooser.setTitle("Save GCode");
-                File file = fileChooser.showSaveDialog(null);
-                if (file != null) {
-                    try {
-                        file.delete();
-                        BufferedWriter br = Files.newBufferedWriter(file.toPath(),
-                                Charset.forName("UTF-8"),
-                                new OpenOption[]{StandardOpenOption.CREATE_NEW});
-                        br.write(gCode.toString());
-                        br.write("\n");
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
+                    fileChooser.setTitle("Save GCode");
+                    File file = fileChooser.showSaveDialog(null);
+                    if (file != null) {
+                        try {
+                            file.delete();
+                            BufferedWriter br = Files.newBufferedWriter(file.toPath(),
+                                    Charset.forName("UTF-8"),
+                                    new OpenOption[]{StandardOpenOption.CREATE_NEW});
+                            br.write(gCode.toString());
+                            br.write("\n");
 
-                        br.flush();
-                        br.close();
+                            br.flush();
+                            br.close();
 
-                    } catch (IOException ex) {
-                        System.out.println(ex.getMessage());
+                        } catch (IOException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                     }
                 }
-            }
 
+            }
+        } catch (Exception e) {
+            handleException(e);
         }
     }
 
 
     @FXML
     public void deleteProject(ActionEvent event) throws Exception {
-        if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
-            MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
-            dialog.setTitleText("Deleting a project");
-            dialog.setMessage("Are you sure you want to delete this project?");
-            if (dialog.show() == MonologFXButton.Type.YES) {
-                Project p = v_projectList.getSelectionModel().getSelectedItem();
-                descriptionValue.setText("");
-                projectModel.projectsProperty().remove(v_projectList.getSelectionModel().getSelectedItem());
+        try {
+            if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+                MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                dialog.setTitleText("Deleting a project");
+                dialog.setMessage("Are you sure you want to delete this project?");
+                if (dialog.show() == MonologFXButton.Type.YES) {
+                    Project p = v_projectList.getSelectionModel().getSelectedItem();
+                    descriptionValue.setText("");
+                    projectModel.projectsProperty().remove(v_projectList.getSelectionModel().getSelectedItem());
+                }
             }
+        } catch (Exception e) {
+            handleException(e);
         }
     }
 
@@ -199,61 +221,55 @@ public class CNCToolsController extends DialogController {
 
     @FXML
     public void toolsConfiguration(ActionEvent event) throws Exception {
-        screens.toolConfigurationsDialog().showAndWait();
+        try {
+            screens.toolConfigurationsDialog().showAndWait();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void addMillTask(ActionEvent event) throws Exception {
-        FXMLDialog mt = screens.millTaskDialog();
-        AddMillTaskController mtc = (AddMillTaskController) mt.getController();
-        mtc.setCurrentProject(v_projectList.getSelectionModel().getSelectedItem());
-        mt.showAndWait();
+        try {
+            FXMLDialog mt = screens.millTaskDialog();
+            AddMillTaskController mtc = (AddMillTaskController) mt.getController();
+            mtc.setCurrentProject(v_projectList.getSelectionModel().getSelectedItem());
+            mt.showAndWait();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void removeMillTask(ActionEvent event) throws Exception {
-        if (tbl_millTasks.getSelectionModel().getSelectedCells().size() > 0) {
-            MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
-            dialog.setTitleText("Deleting a milltask");
-            dialog.setMessage("Are you sure you want to delete this task?");
-            if (dialog.show() == MonologFXButton.Type.YES) {
-                Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
-                project.millTasksProperty().remove(tbl_millTasks.getSelectionModel().getSelectedIndex());
+        try {
+            if (tbl_millTasks.getSelectionModel().getSelectedCells().size() > 0) {
+                MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                dialog.setTitleText("Deleting a milltask");
+                dialog.setMessage("Are you sure you want to delete this task?");
+                if (dialog.show() == MonologFXButton.Type.YES) {
+                    Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
+                    project.millTasksProperty().remove(tbl_millTasks.getSelectionModel().getSelectedIndex());
+                }
             }
+        } catch (Exception e) {
+            handleException(e);
         }
     }
 
     @FXML
     public void editMillTask(ActionEvent event) throws Exception {
-        String error = "";
         try {
             Task task = (Task) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
-
-
             FXMLDialog dialog = screens.milltaskFactory().getOperationDialog(
                     v_projectList.getSelectionModel().getSelectedItem(),
                     projectModel.toolDBProperty(),
                     task);
 
             dialog.showAndWait();
-            return;
-        } catch (ClassNotFoundException e) {
-            error = "This Milltask cannot be edited because the controller for this task wasn't found.";
-        } catch (NoSuchMethodException e) {
-            error = "This Milltask cannot be edited because the method for this task wasn't found.";
-        } catch (IllegalAccessException e) {
-            error = "This Milltask cannot be edited because it was illegally accessed.";
-        } catch (InvocationTargetException e) {
-            error = "This Milltask cannot be edited because it was incorrectly invoked.";
-        } catch (InstantiationException e) {
-            error = "This Milltask cannot be edited because it was incorrectly instanciated.";
+        } catch (Exception e) {
+            handleException(e);
         }
-
-        MonologFX dialog = new MonologFX(MonologFX.Type.ERROR);
-        dialog.setTitleText("Error creating Mill Task dialog");
-        dialog.setMessage(error);
-        dialog.show();
-
     }
 
 
@@ -472,32 +488,65 @@ public class CNCToolsController extends DialogController {
 
 
     public void save(ActionEvent actionEvent) {
-        projectModel.saveProjects();
-        projectModel.saveToolDB();
-        projectModel.savePostProcessors();
+        try {
+            projectModel.saveProjects();
+        } catch (Exception e) {
+            handleException(e);
+        }
+        try {
+            projectModel.saveToolDB();
+        } catch (Exception e) {
+            handleException(e);
+        }
+        try {
+            projectModel.savePostProcessors();
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @FXML
     public void onSelectPostprocessor(ActionEvent actionEvent) {
-        if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
-            final FXMLDialog dialog = screens.postProcessorsDialog();
-            PostProcessorsController controller = (PostProcessorsController) dialog.getController();
-            controller.setMode(PostProcessorsController.Mode.SELECT);
-            dialog.showAndWait();
-
-            if (controller.getReturned() == Result.USE) {
-                Project P = v_projectList.getSelectionModel().getSelectedItem();
-
-                P.setPostProcessor(ProjectModel.<PostProcessorConfig>deepCopy(controller.getPostProcessConfig()));
+        try {
+            if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+                final FXMLDialog dialog = screens.postProcessorsDialog();
+                PostProcessorsController controller = (PostProcessorsController) dialog.getController();
+                controller.setMode(PostProcessorsController.Mode.SELECT);
+                dialog.showAndWait();
+                if (controller.getReturned() == Result.USE) {
+                    Project P = v_projectList.getSelectionModel().getSelectedItem();
+                    P.setPostProcessor(ProjectModel.<PostProcessorConfig>deepCopy(controller.getPostProcessConfig()));
+                }
             }
-
-
+        } catch (Exception e) {
+            handleException(e);
         }
+
     }
 
     @FXML
     public void onViewGCode(ActionEvent actionEvent) {
 
+    }
+
+    /**
+     * Handle exception and show a strack trace, at least to inform the user that something was wrong
+     * This is also a last resort, if you can handle the exception in the dialog, please do so and instruct the user!
+     *
+     * @param exception
+     */
+    public void handleException(Exception exception) {
+        logger.error("generateGCode: General Exception", exception);
+        FXMLDialog dialog = screens.errorDialog();
+        ErrorController controller = (ErrorController) dialog.getController();
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement trace : exception.getStackTrace()) {
+            if (trace.getClassName().startsWith("com.rvantwisk")) {
+                sb.append(trace.getClassName()).append(":").append(trace.getMethodName()).append(":").append(trace.getLineNumber()).append("\n");
+            }
+        }
+        controller.setMessage(exception.toString() + "\n" + sb.toString());
+        dialog.showAndWait();
     }
 }
 

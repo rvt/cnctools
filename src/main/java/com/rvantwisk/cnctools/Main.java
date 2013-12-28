@@ -38,6 +38,7 @@
 
 package com.rvantwisk.cnctools;
 
+import com.rvantwisk.cnctools.controllers.CNCToolsController;
 import com.rvantwisk.cnctools.controllers.FXMLDialog;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -46,7 +47,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class Main extends Application {
 
     private static Stage stage;
-
+    CNCToolsController controller=null;
 
     static public Stage getPrimaryStage() {
         return stage;
@@ -62,6 +63,7 @@ public class Main extends Application {
         screens.setContext(context);
 
         FXMLDialog dialog =  screens.cncTools();
+        controller = (CNCToolsController) dialog.getController();
         dialog.show();
 
 
@@ -80,6 +82,7 @@ public class Main extends Application {
     // http://www.scorchworks.com/Fengrave/fengrave.html#vcarve
 
     public static void main(String[] args) {
+
 
         // Detect OS/X and set AWT to that we can use OPenGL, this might not be needed fro Java 8
         String osName = System.getProperty("os.name");

@@ -43,7 +43,6 @@ import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,6 @@ import java.util.List;
 @Configuration
 @Import(ScreensConfiguration.class)
 //@ImportResource("spring/spring-db.xml")
-@EnableTransactionManagement
 public class IndexerAppConfiguration {
 
     private static List<Class<? extends RoundStockHelper>> operations=new ArrayList<Class<? extends RoundStockHelper>>();
@@ -66,9 +64,4 @@ public class IndexerAppConfiguration {
     public List<Class<? extends RoundStockHelper>> getAllOperations()  {
         return operations;
     }
-
-
-
-
-
 }

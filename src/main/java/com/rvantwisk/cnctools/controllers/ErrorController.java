@@ -40,11 +40,23 @@ package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 
 public class ErrorController extends DialogController {
 
     @FXML
+    private TextArea message;
+
+    @FXML
     public void close() {
         getDialog().close();
+    }
+
+    public String getMessage() {
+        return message.getText();
+    }
+
+    public void setMessage(String message) {
+        this.message.setText(message);
     }
 }

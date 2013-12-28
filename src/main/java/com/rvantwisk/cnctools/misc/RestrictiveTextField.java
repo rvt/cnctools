@@ -39,11 +39,9 @@
 package com.rvantwisk.cnctools.misc;
 
 /**
- * Created with IntelliJ IDEA.
  * User: rvt
  * Date: 11/29/13
  * Time: 3:07 PM
- * To change this template use File | Settings | File Templates.
  */
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
