@@ -14,134 +14,171 @@
 <?import javafx.scene.text.Font?>
 <?scenebuilder-classpath-element ../../../../../../../target/classes?>
 
-<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
-    <children>
-        <TabPane prefHeight="435.0" prefWidth="654.999755859375" tabClosingPolicy="UNAVAILABLE">
-            <tabs>
-                <Tab text="General">
-                    <content>
-                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <GridPane gridLinesVisible="false" prefHeight="-1.0" prefWidth="298.0" styleClass="gridPaneTableType" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <children>
-                                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Name:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0" GridPane.vgrow="NEVER"/>
-                                        <TextField fx:id="iName" prefWidth="181.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="0"/>
-                                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Tool Type:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.vgrow="NEVER"/>
-                                        <ChoiceBox fx:id="cbToolType" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Units:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.vgrow="NEVER"/>
-                                        <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                            <children>
-                                                <CheckBox id="cbUnitMM" mnemonicParsing="false" text="MM"/>
-                                                <CheckBox id="cbUnitInch" mnemonicParsing="false" text="Inch">
-                                                    <HBox.margin>
-                                                        <Insets left="5.0"/>
-                                                    </HBox.margin>
-                                                </CheckBox>
-                                            </children>
-                                        </HBox>
-                                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="No. Futes:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.vgrow="NEVER"/>
-                                        <Label alignment="CENTER_RIGHT" text="Tool Number:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1"/>
-                                        <ChoiceBox id="cbNoFlutes" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                            <items>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <String fx:value="Item 1"/>
-                                                    <String fx:value="Item 2"/>
-                                                    <String fx:value="Item 3"/>
-                                                </FXCollections>
-                                            </items>
-                                        </ChoiceBox>
-                                        <TextField id="iName" fx:id="iToolnumber" prefWidth="182.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                    </children>
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="106.0"/>
-                                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="132.0" minWidth="0.0" prefWidth="104.0"/>
-                                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="128.0" minWidth="0.0" prefWidth="68.0"/>
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                    </rowConstraints>
-                                </GridPane>
-                                <VBox layoutX="298.0" layoutY="55.0" prefHeight="200.0" prefWidth="240.999755859375">
-                                    <children>
-                                        <Label alignment="CENTER" prefWidth="173.0" styleClass="bold" text="Tool geometry" textAlignment="CENTER"/>
-                                        <GridPane gridLinesVisible="false" prefHeight="-1.0" prefWidth="173.0" styleClass="gridPaneTableType">
-                                            <children>
-                                                <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefWidth="58.9998779296875" text="Diameter:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0"
-                                                       GridPane.vgrow="NEVER"/>
-                                                <DimensionControl fx:id="iDiameter" dimensionType="LENGTH" prefHeight="30.0" prefWidth="138.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="0"/>
-                                            </children>
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="85.0"/>
-                                                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="146.0" minWidth="0.0" prefWidth="146.0"/>
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                            </rowConstraints>
-                                        </GridPane>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Cut Data">
-                    <content>
-                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="284.999755859375" prefWidth="560.0">
-                            <children>
-                                <GridPane alignment="CENTER" gridLinesVisible="false" layoutX="35.0" layoutY="7.0" prefHeight="-1.0" prefWidth="337.0" styleClass="gridPaneTableType">
-                                    <children>
-                                        <Label text="Spindle Speed:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0"/>
-                                        <Label text="Feed Rate:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1"/>
-                                        <Label text="Plunge Rate:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2"/>
-                                        <Label styleClass="bold" text="Misc Data:" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.rowIndex="5"/>
-                                        <Label text="Collant:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="6"/>
-                                        <CheckBox id="cbCoolant" fx:id="iCoolant" mnemonicParsing="false" text="" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                                        <Label text="Spindle Direction:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-                                        <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                                            <children>
-                                                <CheckBox id="cbSpindleCC" fx:id="iCC" mnemonicParsing="false" text="CC"/>
-                                                <CheckBox id="cbSpindleCCW" mnemonicParsing="false" text="CCW">
-                                                    <HBox.margin>
-                                                        <Insets left="5.0"/>
-                                                    </HBox.margin>
-                                                </CheckBox>
-                                            </children>
-                                        </HBox>
-                                        <Label text="Axial Depth:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3"/>
-                                        <Label text="Radial Depth:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4"/>
-                                        <DimensionControl fx:id="iSpindleSpeed" dimensionType="RPM" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                                        <DimensionControl fx:id="iFeedRate" dimensionType="VELOCITY" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                        <DimensionControl fx:id="iPlungeRate" dimensionType="VELOCITY" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                                        <DimensionControl fx:id="iAxialDepth" dimensionType="LENGTH" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                                        <DimensionControl fx:id="iRadialDepth" dimensionType="LENGTH" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                    </children>
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="109.0"/>
-                                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="181.0" minWidth="0.0" prefWidth="181.0"/>
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                    </rowConstraints>
-                                </GridPane>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-    </children>
-    <stylesheets>
-        <URL value="@../CNCTools.css"/>
-    </stylesheets>
+<!--
+  ~ Copyright (c) 2013, R. van Twisk
+  ~ All rights reserved.
+  ~ Licensed under the The BSD 3-Clause License;
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at:
+  ~
+  ~ http://opensource.org/licenses/BSD-3-Clause
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions
+  ~ are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright
+  ~ notice, this list of conditions and the following disclaimer.
+  ~
+  ~ Redistributions in binary form must reproduce the above copyright
+  ~ notice, this list of conditions and the following disclaimer in the
+  ~ documentation and/or other materials provided with the distribution.
+  ~
+  ~ Neither the name of the aic-util nor the names of its
+  ~ contributors may be used to endorse or promote products derived from
+  ~ this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ~ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  ~ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  ~ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  ~ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  ~ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  ~ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+  ~ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+  ~ OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<fx:root type="javafx.scene.layout.AnchorPane" prefHeight="302.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+  <children>
+    <TabPane prefHeight="435.0" prefWidth="654.999755859375" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <tabs>
+        <Tab text="General">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="294.0" prefWidth="655.0">
+              <children>
+                <GridPane gridLinesVisible="false" prefHeight="-1.0" prefWidth="298.0" styleClass="gridPaneTableType" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <children>
+                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Name:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0" GridPane.vgrow="NEVER" />
+                    <TextField fx:id="iName" prefWidth="181.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="0" />
+                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Tool Type:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.vgrow="NEVER" />
+                    <ChoiceBox fx:id="cbToolType" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Units:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.vgrow="NEVER" />
+                    <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                      <children>
+                        <CheckBox id="cbUnitMM" mnemonicParsing="false" text="MM" />
+                        <CheckBox id="cbUnitInch" mnemonicParsing="false" text="Inch">
+                          <HBox.margin>
+                            <Insets left="5.0" />
+                          </HBox.margin>
+                        </CheckBox>
+                      </children>
+                    </HBox>
+                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="No. Futes:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
+                    <Label alignment="CENTER_RIGHT" text="Tool Number:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                    <ChoiceBox id="cbNoFlutes" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <TextField id="iName" fx:id="iToolnumber" prefWidth="182.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  </children>
+                  <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="106.0" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="132.0" minWidth="0.0" prefWidth="104.0" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="128.0" minWidth="0.0" prefWidth="68.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                </GridPane>
+                <VBox layoutX="298.0" layoutY="55.0" prefHeight="200.0" prefWidth="240.999755859375">
+                  <children>
+                    <Label alignment="CENTER" prefWidth="173.0" styleClass="bold" text="Tool geometry" textAlignment="CENTER" />
+                    <GridPane gridLinesVisible="false" prefHeight="-1.0" prefWidth="173.0" styleClass="gridPaneTableType">
+                      <children>
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefWidth="58.9998779296875" text="Diameter:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0" GridPane.vgrow="NEVER" />
+                        <DimensionControl fx:id="iDiameter" dimensionType="LENGTH" prefHeight="30.0" prefWidth="138.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="0" />
+                      </children>
+                      <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="85.0" />
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="146.0" minWidth="0.0" prefWidth="146.0" />
+                      </columnConstraints>
+                      <rowConstraints>
+                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                    </GridPane>
+                  </children>
+                </VBox>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="Cut Data">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="284.999755859375" prefWidth="560.0">
+              <children>
+                <GridPane alignment="CENTER" gridLinesVisible="false" layoutX="35.0" layoutY="7.0" prefHeight="-1.0" prefWidth="337.0" styleClass="gridPaneTableType">
+                  <children>
+                    <Label text="Spindle Speed:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                    <Label text="Feed Rate:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                    <Label text="Plunge Rate:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                    <Label styleClass="bold" text="Misc Data:" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.rowIndex="5" />
+                    <Label text="Collant:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                    <CheckBox id="cbCoolant" fx:id="iCoolant" mnemonicParsing="false" text="" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                    <Label text="Spindle Direction:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                    <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                      <children>
+                        <CheckBox id="cbSpindleCC" fx:id="iCC" mnemonicParsing="false" text="CC" />
+                        <CheckBox id="cbSpindleCCW" mnemonicParsing="false" text="CCW">
+                          <HBox.margin>
+                            <Insets left="5.0" />
+                          </HBox.margin>
+                        </CheckBox>
+                      </children>
+                    </HBox>
+                    <Label text="Axial Depth:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                    <Label text="Radial Depth:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                    <DimensionControl fx:id="iSpindleSpeed" dimensionType="RPM" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <DimensionControl fx:id="iFeedRate" dimensionType="VELOCITY" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <DimensionControl fx:id="iPlungeRate" dimensionType="VELOCITY" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <DimensionControl fx:id="iAxialDepth" dimensionType="LENGTH" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <DimensionControl fx:id="iRadialDepth" dimensionType="LENGTH" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  </children>
+                  <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="109.0" />
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="181.0" minWidth="0.0" prefWidth="181.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                </GridPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+  </children>
+  <stylesheets>
+    <URL value="@../CNCTools.css" />
+  </stylesheets>
 </fx:root>

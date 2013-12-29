@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.operations.interfaces;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.data.*;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import javafx.collections.ObservableList;
@@ -50,7 +50,7 @@ import javafx.collections.ObservableList;
  * Time: 2:08 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class MillTaskController extends DialogController {
+public abstract class MillTaskController extends AbstractController {
     public abstract void setProject(final Project p);
     public abstract void setToolDB(final ObservableList<ToolParameter> tooldb);
     public abstract void setTask(final Task task);

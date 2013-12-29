@@ -39,8 +39,8 @@
 package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.ScreensConfiguration;
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
-import com.rvantwisk.cnctools.controls.PostProcessorControl;
+import com.rvantwisk.cnctools.misc.AbstractController;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.data.*;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import com.rvantwisk.cnctools.misc.Dimensions;
@@ -53,7 +53,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.stage.FileChooser;
@@ -70,7 +69,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
@@ -84,7 +82,7 @@ import java.nio.file.StandardOpenOption;
  * Time: 6:11 PM
  * To change this template use File | Settings | File Templates.
  */
-public class CNCToolsController extends DialogController {
+public class CNCToolsController extends AbstractController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -117,7 +115,6 @@ public class CNCToolsController extends DialogController {
 
     BeanPathAdapter<Project> currentProjectBinding;
 
-    private FXMLDialog dialog;
     private ScreensConfiguration screens;
 
 
@@ -232,7 +229,7 @@ public class CNCToolsController extends DialogController {
     public void addMillTask(ActionEvent event) throws Exception {
         try {
             FXMLDialog mt = screens.millTaskDialog();
-            AddMillTaskController mtc = (AddMillTaskController) mt.getController();
+            AddMillTaskController mtc = mt.getController();
             mtc.setCurrentProject(v_projectList.getSelectionModel().getSelectedItem());
             mt.showAndWait();
         } catch (Exception e) {
@@ -272,11 +269,6 @@ public class CNCToolsController extends DialogController {
         }
     }
 
-
-    @Override
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
 
     private void addProjectDefaults() {
         Project p = new Project("Round stock 30mm", "Creates a round stock of 100mx30mm. Feedrate 2400");
@@ -479,7 +471,7 @@ public class CNCToolsController extends DialogController {
 
 
         // Save DB on exit
-        dialog.setOnHidden(new EventHandler<WindowEvent>() {
+        getDialog().setOnHidden(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 save(null);
             }
@@ -510,7 +502,7 @@ public class CNCToolsController extends DialogController {
         try {
             if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
                 final FXMLDialog dialog = screens.postProcessorsDialog();
-                PostProcessorsController controller = (PostProcessorsController) dialog.getController();
+                PostProcessorsController controller = dialog.getController();
                 controller.setMode(PostProcessorsController.Mode.SELECT);
                 dialog.showAndWait();
                 if (controller.getReturned() == Result.USE) {
@@ -538,14 +530,16 @@ public class CNCToolsController extends DialogController {
     public void handleException(Exception exception) {
         logger.error("generateGCode: General Exception", exception);
         FXMLDialog dialog = screens.errorDialog();
-        ErrorController controller = (ErrorController) dialog.getController();
+        ErrorController controller = dialog.getController();
         StringBuilder sb = new StringBuilder();
+
+        sb.append(exception.toString()).append("\n");
         for (StackTraceElement trace : exception.getStackTrace()) {
             if (trace.getClassName().startsWith("com.rvantwisk")) {
                 sb.append(trace.getClassName()).append(":").append(trace.getMethodName()).append(":").append(trace.getLineNumber()).append("\n");
             }
         }
-        controller.setMessage(exception.toString() + "\n" + sb.toString());
+        controller.setMessage(sb.toString());
         dialog.showAndWait();
     }
 }

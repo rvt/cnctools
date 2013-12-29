@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.operations.createRoundStock;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
@@ -59,8 +59,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -221,7 +222,6 @@ public class Controller extends MillTaskController {
         try {
 
             fillModal();
-            StringBuilder sb = new StringBuilder();
 
             PostProcessorConfig ppc;
 //            PostProcessorConfig ppc = project.getPostProcessor();
@@ -229,8 +229,11 @@ public class Controller extends MillTaskController {
             ppc = Factory.newPostProcessor();
 //            }
 
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            final PrintStream printStream = new PrintStream(os);
+
             RS274 gCodeGenerator = new RS274(ppc);
-            gCodeGenerator.setOutput(sb);
+            gCodeGenerator.setOutput(printStream);
             final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
             helper.setFinalSize(model.finalSizeProperty().getValue());  // Diameter
@@ -244,8 +247,8 @@ public class Controller extends MillTaskController {
 
             helper.calculate();
 
-            InputStream str = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
-            gCodeViewerControl.load(str);
+            InputStream in = new ByteArrayInputStream(os.toByteArray());
+            gCodeViewerControl.load(in);
 
         } catch (UnsupportedSimException e) {
             error = e.getMessage();

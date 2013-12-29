@@ -92,22 +92,27 @@ public class RoundStockHelper {
         gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0).Y(0.0));
 
         while ((calculateBase()) > -1) {
-            gCode.commentLarge("Angle at 0.0");
+            gCode.comment("Angle at 0.0");
             calculate(0.0);
-            gCode.commentLarge("Angle at 180.0");
+            gCode.comment("Angle at 180.0");
             calculate(180.0);
-            gCode.commentLarge("Angle at 270.0");
+            gCode.comment("Angle at 270.0");
             calculate(270.0);
-            gCode.commentLarge("Angle at 90.0");
+            gCode.comment("Angle at 90.0");
             calculate(90.0);
         }
         gCode.commentLarge("start final rounds");
         fullRoundMillSteps();
         gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
         gCode.addBlock(new GCodeBuilder().X(0.0));
+        // Reset A to 0 degrees
+        gCode.addBlock(new GCodeBuilder().G92("A", 0.0));
         gCode.commentLarge("Done");
     }
 
+    /**
+     * Rest milling around the full stock of wood
+     */
     private void fullRoundMillSteps() {
         Double offsetAngle = 0.0;
 
@@ -126,6 +131,10 @@ public class RoundStockHelper {
         fullRoundMillStep(offsetAngle);
     }
 
+
+    /**
+     * Rest milling around the full stock of wood at a offset angle
+     */
     private Double fullRoundMillStep(Double offsetAngle) {
         gCode.commentLarge("Full mill step at : Z=" + nextDepth);
 
@@ -142,7 +151,6 @@ public class RoundStockHelper {
     }
 
     private Double calculateBase() {
-
 
         pa = new Point(0.0, stockSize * Math.sqrt(2.0));
         pb = new Point(stockSize * Math.sqrt(2.0), 0.0);
@@ -180,8 +188,6 @@ public class RoundStockHelper {
     }
 
     private void calculate(Double angleOffset) {
-
-
         // Start mill operation
         Double currentAngle = Point.angleBetween2Lines(Point.zero, pa, Point.zero, millCenter) * (180.0 / Math.PI);
         Double startAngle = currentAngle;
@@ -221,7 +227,7 @@ public class RoundStockHelper {
      * @param currentMillAngle
      * @return
      */
-    private Boolean reachedEndOf(Double neededAngle, double currentMillAngle) {
+    private boolean reachedEndOf(Double neededAngle, double currentMillAngle) {
         Double A = currentMillAngle / (180.0 / Math.PI);
         Point testmillCenter = new Point(nextDepth * Math.sin(A), nextDepth * Math.cos(A));
         Point testmillPA = testmillCenter.rot90(true).normalize().mul(millSize / 2.0).add(testmillCenter);

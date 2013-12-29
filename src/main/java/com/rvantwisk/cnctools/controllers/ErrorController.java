@@ -38,11 +38,11 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
-public class ErrorController extends DialogController {
+public class ErrorController extends AbstractController {
 
     @FXML
     private TextArea message;

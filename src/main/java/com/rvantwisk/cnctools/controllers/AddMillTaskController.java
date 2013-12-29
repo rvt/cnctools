@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.data.AvailableTask;
 import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.data.Project;
@@ -56,7 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 9:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AddMillTaskController extends DialogController {
+public class AddMillTaskController extends AbstractController {
 
     @Autowired
     private DialogBuilder dialogBuilder;

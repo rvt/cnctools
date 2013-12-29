@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.rvantwisk.cnctools.controls.*?>
 <?import com.rvantwisk.cnctools.controls.ToolParametersControl?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -12,29 +13,27 @@
 <?import javafx.scene.text.Font?>
 <?scenebuilder-classpath-element ../../../../../../target/classes?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="417.0" prefWidth="544.0" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.ToolEditController">
-    <children>
-        <AnchorPane id="AnchorPane" prefHeight="422.0" prefWidth="554.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="60.0">
-            <children>
-                <ToolParametersControl fx:id="toolParameters" layoutY="70.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"/>
-                <HBox alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"/>
-                <HBox fx:id="closeAndUse" alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="1.0" AnchorPane.rightAnchor="5.0">
-                    <children>
-                        <Button fx:id="btnClose" cancelButton="true" mnemonicParsing="false" onAction="#onClose" text="Close"/>
-                        <Button id="bt_add" fx:id="btnUse" defaultButton="true" mnemonicParsing="false" onAction="#onUse" text="Use"/>
-                    </children>
-                </HBox>
-            </children>
-        </AnchorPane>
-        <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="504.0" styleClass="header" text="Edit Tool" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-               AnchorPane.topAnchor="0.0">
-            <font>
-                <Font size="28.0"/>
-            </font>
-        </Label>
-    </children>
-    <stylesheets>
-        <URL value="@CNCTools.css"/>
-    </stylesheets>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="417.0" prefWidth="598.0" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.controllers.ToolEditController">
+  <children>
+    <AnchorPane id="AnchorPane" prefHeight="422.0" prefWidth="554.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="60.0">
+      <children>
+        <ToolParametersControl fx:id="toolParameters" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <HBox alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+        <HBox fx:id="closeAndUse" alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="1.0" AnchorPane.rightAnchor="5.0">
+          <children>
+            <Button fx:id="btnClose" cancelButton="true" mnemonicParsing="false" onAction="#onClose" text="Close" />
+            <Button id="bt_add" fx:id="btnUse" defaultButton="true" mnemonicParsing="false" onAction="#onUse" text="Use" />
+          </children>
+        </HBox>
+      </children>
+    </AnchorPane>
+    <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="504.0" styleClass="header" text="Edit Tool" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <font>
+        <Font size="28.0" />
+      </font>
+    </Label>
+  </children>
+  <stylesheets>
+    <URL value="@CNCTools.css" />
+  </stylesheets>
 </AnchorPane>

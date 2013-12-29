@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -50,7 +50,7 @@ import java.net.URISyntaxException;
 /**
  * Created by rvt on 12/23/13.
  */
-public class AboutController extends DialogController {
+public class AboutController extends AbstractController {
 
     @FXML
     private Button close;

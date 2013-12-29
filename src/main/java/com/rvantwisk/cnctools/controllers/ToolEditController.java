@@ -1,6 +1,6 @@
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.ToolParametersControl;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import javafx.event.ActionEvent;
@@ -13,7 +13,7 @@ import javafx.fxml.FXML;
  * Time: 9:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ToolEditController extends DialogController {
+public class ToolEditController extends AbstractController {
 
     @FXML
     private ToolParametersControl toolParameters; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded

@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.operations.customgcode;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.Task;

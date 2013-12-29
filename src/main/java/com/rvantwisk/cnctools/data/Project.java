@@ -48,6 +48,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 public class Project {
 
     private final StringProperty name = new SimpleStringProperty();
@@ -121,8 +124,11 @@ public class Project {
     public StringBuilder getGCode() {
         final StringBuilder gcode = new StringBuilder();
 
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final PrintStream printStream = new PrintStream(os);
+
         final GCodeGenerator gCodeGenerator = Factory.getProcessorDialect(postProcessor.get());
-        gCodeGenerator.setOutput(gcode);
+        gCodeGenerator.setOutput(printStream);
 
         gCodeGenerator.startProgram();
         for (Task t : milltasks) {
@@ -130,7 +136,10 @@ public class Project {
             t.generateGCode(gCodeGenerator);
         }
         gCodeGenerator.endProgram();
-        return gcode;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(os.toString());
+        return sb;
     }
 
 }

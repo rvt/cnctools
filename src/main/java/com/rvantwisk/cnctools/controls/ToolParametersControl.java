@@ -38,10 +38,10 @@
 
 package com.rvantwisk.cnctools.controls;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
 import com.rvantwisk.cnctools.data.BallMill;
 import com.rvantwisk.cnctools.data.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.InputMaskChecker;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -50,7 +50,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.net.URL;
@@ -63,7 +63,7 @@ import java.util.ResourceBundle;
  * Time: 7:44 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ToolParametersControl extends HBox {
+public class ToolParametersControl extends AnchorPane {
 
     ObservableList tools = FXCollections.observableArrayList(
         "EndMill", "BallMill"
@@ -113,6 +113,7 @@ public class ToolParametersControl extends HBox {
     }
 
     public void applyToolParameters() {
+        if (tool==null) return;
         tool.nameProperty().setValue(iName.getText());
 
         tool.spindleSpeedProperty().set(iSpindleSpeed.dimensionProperty());

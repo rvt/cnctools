@@ -40,6 +40,8 @@ package com.rvantwisk.cnctools.gcodegenerator.interfaces;
 
 import com.rvantwisk.cnctools.gcodegenerator.GCodeBuilder;
 
+import java.io.PrintStream;
+
 public interface GCodeGenerator {
 
     /**
@@ -56,9 +58,9 @@ public interface GCodeGenerator {
 
     /**
      * Provide a output to write into
-     * @param b
+     * @param out
      */
-    public void setOutput(final StringBuilder b);
+    public void setOutput(final PrintStream out);
 
     /**
      * Add a new GCode block
@@ -72,6 +74,15 @@ public interface GCodeGenerator {
      */
     void addRaw(String s);
 
+    /**
+     * Add the start (preamble) of the GCode to the start of a program
+     * Execute this before any G-Code get's added
+     */
     void startProgram();
+
+    /**
+     * Add the end (postabmle) to the end of the program
+     * Execute this after all G-Code has been added, no G-Code can be added after endProgram is called
+     */
     void endProgram();
 }

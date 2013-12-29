@@ -39,6 +39,7 @@
 package com.rvantwisk.cnctools;
 
 import com.rvantwisk.cnctools.controllers.*;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.DialogBuilder;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -54,6 +55,15 @@ import org.springframework.context.annotation.Scope;
 public class ScreensConfiguration {
     private Stage primaryStage;
     private ApplicationContext context;
+    private static ScreensConfiguration screensConfiguration;
+
+    public ScreensConfiguration() {
+        screensConfiguration = this;
+    }
+
+    public static ScreensConfiguration getInstance() {
+        return screensConfiguration;
+    }
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -62,10 +72,6 @@ public class ScreensConfiguration {
 
     public void setContext(ApplicationContext context) {
         this.context = context;
-    }
-
-    public Stage getPrimaryStage() {
-        return primaryStage;
     }
 
     @Bean
@@ -178,7 +184,7 @@ public class ScreensConfiguration {
     @Scope("prototype")
     @Qualifier("aboutDialog")
     public FXMLDialog aboutDialog() {
-        return new FXMLDialog(aboutController(), getClass().getResource("About.fxml"), primaryStage, StageStyle.DECORATED);
+        return new FXMLDialog(aboutController(), getClass().getResource("About.fxml"), primaryStage, StageStyle.UNDECORATED);
     }
 
     @Bean

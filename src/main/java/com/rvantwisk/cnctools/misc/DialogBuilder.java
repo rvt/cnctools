@@ -38,7 +38,6 @@
 
 package com.rvantwisk.cnctools.misc;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
 import com.rvantwisk.cnctools.data.AvailableTask;
 import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.data.ToolParameter;

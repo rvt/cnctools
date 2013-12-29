@@ -42,7 +42,6 @@ import com.rvantwisk.cnctools.controls.opengl.GCodeRender;
 import com.rvantwisk.cnctools.controls.opengl.OpenGLMachineImpl;
 import com.rvantwisk.cnctools.controls.opengl.OpenGLMachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
-import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
 import com.rvantwisk.cnctools.opengl.OpenGLImage;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -171,7 +170,7 @@ public class GCodeViewerControl extends AnchorPane {
 
     }
 
-    public void load(final InputStream in) throws SimException, UnsupportedSimException {
+    public void load(final InputStream in) throws SimException {
 
         // If we decide to have other implementation of a OPenGL machine to view we can create them here, or even pass then in load, or make a configuration
         gCodeRender.load(new OpenGLMachineImpl(), new OpenGLMachineValidator(), in);

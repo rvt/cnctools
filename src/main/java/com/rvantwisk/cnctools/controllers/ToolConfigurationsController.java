@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.ToolParametersControl;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
@@ -69,7 +69,7 @@ import java.util.ResourceBundle;
  * Time: 8:11 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ToolConfigurationsController extends DialogController {
+public class ToolConfigurationsController extends AbstractController {
 
     private Mode mode;
 

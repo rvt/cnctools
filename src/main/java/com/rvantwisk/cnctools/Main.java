@@ -39,7 +39,7 @@
 package com.rvantwisk.cnctools;
 
 import com.rvantwisk.cnctools.controllers.CNCToolsController;
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
@@ -49,13 +49,8 @@ public class Main extends Application {
     private static Stage stage;
     CNCToolsController controller=null;
 
-    static public Stage getPrimaryStage() {
-        return stage;
-    }
-
     @Override
     public void start(Stage stage) throws Exception{
-
         ApplicationContext context = new AnnotationConfigApplicationContext(IndexerAppConfiguration.class);
         ScreensConfiguration screens = context.getBean(ScreensConfiguration.class);
         screens.setPrimaryStage(stage);
@@ -63,10 +58,8 @@ public class Main extends Application {
         screens.setContext(context);
 
         FXMLDialog dialog =  screens.cncTools();
-        controller = (CNCToolsController) dialog.getController();
+        controller = dialog.getController();
         dialog.show();
-
-
     }
 
 
@@ -75,21 +68,25 @@ public class Main extends Application {
     // http://docs.oracle.com/javafx/2/layout/style_css.htm
     // http://docs.oracle.com/javafx/2/ui_controls/jfxpub-ui_controls.htm
     // http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
-    //http://docs.oracle.com/javafx/2/fxml_get_started/jfxpub-fxml_get_started.htm
+    // http://docs.oracle.com/javafx/2/fxml_get_started/jfxpub-fxml_get_started.htm
     // http://fxexperience.com/wp-content/uploads/2011/08/Introducing-FXML.pdf
     // http://gopinathb4u.wordpress.com/2010/12/30/create-dynamic-spring-beans/
     // http://stackoverflow.com/questions/9705440/prefill-listview-in-an-application-with-fxml
     // http://www.scorchworks.com/Fengrave/fengrave.html#vcarve
+    // http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/datastore/xstream/XStreamDataStore.java.htm
 
     public static void main(String[] args) {
 
 
         // Detect OS/X and set AWT to that we can use OPenGL, this might not be needed fro Java 8
-        String osName = System.getProperty("os.name");
+        final String osName = System.getProperty("os.name");
+        final String javaVersion = System.getProperty("java.version");
         if (osName.contains("OS X")) {
-            System.setProperty("javafx.macosx.embedded", "true");
+            if (javaVersion.startsWith("1.7")) {
+                System.setProperty("javafx.macosx.embedded", "true");
+            }
             java.awt.Toolkit.getDefaultToolkit();
-        }
+         }
 
         launch(args);
     }

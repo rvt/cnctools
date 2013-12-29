@@ -36,55 +36,48 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.controllers;
+package com.rvantwisk.cnctools.misc;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
-import javafx.util.Callback;
-
-import java.io.IOException;
-import java.net.URL;
-
-public class FXMLDialog extends Stage {
-    public FXMLDialog(DialogController controller, URL fxml, Window owner) {
-        this(controller, fxml, owner, StageStyle.DECORATED);
+/**
+ * Abstract controller that all controller's need to extend if they want to use the FXMLDialog
+ */
+public abstract class AbstractController {
+    public enum Result {
+        CLOSE, USE, APPLY, SAVE, YES, NO, ACCEPT, USEMODIFIED, DISMISS
     }
 
-    private DialogController controller;
+    private Result returned;
+    private FXMLDialog dialog;
 
-    public FXMLDialog(final DialogController controller, URL fxml, Window owner, StageStyle style) {
-        super(style);
-        initModality(Modality.APPLICATION_MODAL);
-        initOwner(owner);
-
-        FXMLLoader loader = new FXMLLoader(fxml);
-        try {
-            loader.setControllerFactory(new Callback<Class<?>, Object>() {
-                @Override
-                public Object call(Class<?> aClass) {
-                    return controller;
-                }
-            });
-            controller.setDialog(this);
-            Scene s = new Scene((Parent) loader.load());
-            setScene(s);
-
-            this.controller = controller;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Get a handle of the dialog
+     * @return
+     */
+    public FXMLDialog getDialog() {
+        return dialog;
     }
 
-
-    public DialogController getController() {
-        return controller;
+    /**
+     * Set the dialog's reference in this controller
+     * @param dialog
+     */
+    protected void setDialog(FXMLDialog dialog) {
+        this.dialog = dialog;
     }
 
+    /**
+     * Return value from the dialog if needed to be checked
+     * @return
+     */
+    public Result getReturned() {
+        return returned;
+    }
 
+    /**
+     * Call this to set a specific return type that the caller can use
+     * @param returned
+     */
+    public void setReturned(Result returned) {
+        this.returned = returned;
+    }
 }

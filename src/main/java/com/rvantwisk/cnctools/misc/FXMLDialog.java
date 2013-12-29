@@ -36,31 +36,60 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.controllers.interfaces;
+package com.rvantwisk.cnctools.misc;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.util.Callback;
 
-public abstract class DialogController {
-    public enum Result {
-        CLOSE, USE, APPLY, SAVE, YES, NO, ACCEPT, USEMODIFIED, DISMISS
+import java.io.IOException;
+import java.net.URL;
+
+/**
+ * Generic dialog that can load a fxml and use a controller
+ */
+public class FXMLDialog extends Stage {
+    private final AbstractController controller;
+
+    public FXMLDialog(final AbstractController controller, final URL fxml, final Window owner) {
+        this(controller, fxml, owner, StageStyle.DECORATED);
     }
-    private FXMLDialog dialog;
 
-    public FXMLDialog getDialog() {
-        return dialog;
+    public FXMLDialog(final AbstractController controller, final URL fxml, final Window owner, final StageStyle style) {
+        super(style);
+        initModality(Modality.APPLICATION_MODAL);
+        initOwner(owner);
+
+        FXMLLoader loader = new FXMLLoader(fxml);
+        try {
+            loader.setControllerFactory(new Callback<Class<?>, Object>() {
+                @Override
+                public Object call(Class<?> aClass) {
+                    return controller;
+                }
+            });
+            Scene s = new Scene((Parent) loader.load());
+            setScene(s);
+
+            this.controller = controller;
+            controller.setDialog(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
-
-    private Result returned;
-
-    public Result getReturned() {
-        return returned;
-    }
-
-    public void setReturned(Result returned) {
-        this.returned = returned;
+    /**
+     * Return the controller associated with this dialog
+     *
+     * @param <T>   controlled that extends from AbstractController
+     * @return
+     */
+    public <T> T getController() {
+        return (T) controller;
     }
 }

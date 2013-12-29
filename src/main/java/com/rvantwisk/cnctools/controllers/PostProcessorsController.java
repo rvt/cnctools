@@ -38,11 +38,9 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.PostProcessorControl;
 import com.rvantwisk.cnctools.data.PostProcessorConfig;
-import com.rvantwisk.cnctools.data.StockToolParameter;
-import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import javafx.beans.value.ChangeListener;
@@ -61,7 +59,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * Created by rvt on 12/27/13.
  */
-public class PostProcessorsController extends DialogController {
+public class PostProcessorsController extends AbstractController {
     private Mode mode;
 
     private PostProcessorConfig postProcessConfig = null;

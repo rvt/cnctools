@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -46,7 +46,7 @@ import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public class AddProjectController extends DialogController {
+public class AddProjectController extends AbstractController {
     @Autowired
     @Qualifier("projectModel")
     private ProjectModel projectModel;

@@ -38,14 +38,14 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import javafx.fxml.FXML;
 
 /**
  * Created by rvt on 12/6/13.
  */
-public class GCodeViewerController extends DialogController {
+public class GCodeViewerController extends AbstractController {
 
     @FXML
     private GCodeViewerControl gCodeControl;

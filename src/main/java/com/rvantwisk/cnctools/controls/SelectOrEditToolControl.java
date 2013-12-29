@@ -38,11 +38,12 @@
 
 package com.rvantwisk.cnctools.controls;
 
-import com.rvantwisk.cnctools.controllers.FXMLDialog;
+import com.rvantwisk.cnctools.ScreensConfiguration;
 import com.rvantwisk.cnctools.controllers.ToolConfigurationsController;
 import com.rvantwisk.cnctools.controllers.ToolEditController;
-import com.rvantwisk.cnctools.controllers.interfaces.DialogController;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.data.ToolParameter;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -53,8 +54,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
 
@@ -76,6 +75,8 @@ public class SelectOrEditToolControl extends VBox {
     @FXML
     private Button btnEdit;
 
+    private FXMLDialog toolConfigurationsDialog;
+    private FXMLDialog toolEditDialog;
 
     private final ObjectProperty<ToolParameter> tool = new SimpleObjectProperty<>();
 
@@ -90,20 +91,13 @@ public class SelectOrEditToolControl extends VBox {
         }
     }
 
-    @Autowired
-    @Qualifier("toolConfigurationsDialog")
-    private FXMLDialog toolConfigurationsDialog;
-
-    @Autowired
-    @Qualifier("toolEditDialog")
-    private FXMLDialog toolEditDialog;
 
     @FXML
     void onEdit(ActionEvent event) {
-        ToolEditController tec = (ToolEditController) toolEditDialog.getController();
+        ToolEditController tec = toolEditDialog.getController();
         tec.setTool(ProjectModel.<ToolParameter>deepCopy((tool.get())));
-        ToolEditController tcc = (ToolEditController) toolEditDialog.getController();
-        if (tcc.getResult() != DialogController.Result.DISMISS) {
+        ToolEditController tcc = toolEditDialog.getController();
+        if (tcc.getResult() != AbstractController.Result.DISMISS) {
             setTool(tcc.getTool());
         }
         toolEditDialog.showAndWait();
@@ -112,15 +106,16 @@ public class SelectOrEditToolControl extends VBox {
     @FXML
     void initialize() {
         btnEdit.disableProperty().bind(tool.isNull());
-
+        toolConfigurationsDialog = ScreensConfiguration.getInstance().toolConfigurationsDialog();
+        toolEditDialog = ScreensConfiguration.getInstance().toolEditDialog();
     }
 
 
     @FXML
     void onSelect(ActionEvent event) {
-        ToolConfigurationsController tcc = (ToolConfigurationsController) toolConfigurationsDialog.getController();
+        ToolConfigurationsController tcc = toolConfigurationsDialog.getController();
         toolConfigurationsDialog.showAndWait();
-        if (tcc.getReturned() != DialogController.Result.DISMISS) {
+        if (tcc.getReturned() != AbstractController.Result.DISMISS) {
             setTool(tcc.getTool());
         }
     }
