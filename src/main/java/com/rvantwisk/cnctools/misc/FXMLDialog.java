@@ -73,11 +73,11 @@ public class FXMLDialog extends Stage {
                     return controller;
                 }
             });
+            controller.setDialog(this);
+            this.controller = controller;
             Scene s = new Scene((Parent) loader.load());
             setScene(s);
 
-            this.controller = controller;
-            controller.setDialog(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +89,7 @@ public class FXMLDialog extends Stage {
      * @param <T>   controlled that extends from AbstractController
      * @return
      */
-    public <T> T getController() {
+    public <T extends AbstractController> T getController() {
         return (T) controller;
     }
 }

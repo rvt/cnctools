@@ -1,8 +1,8 @@
 package com.rvantwisk.cnctools.controls.opengl;
 
+import com.rvantwisk.cnctools.gcodeparser.AbstractMachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.MachineStatus;
-import com.rvantwisk.cnctools.gcodeparser.MachineStatus2;
-import com.rvantwisk.cnctools.gcodeparser.MachineValidator;
+import com.rvantwisk.cnctools.gcodeparser.MachineStatusHelper;
 import com.rvantwisk.cnctools.gcodeparser.ParsedWord;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimValidationException;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by rvt on 12/21/13.
  */
-public class OpenGLMachineValidator extends MachineValidator {
+public class OpenGLMachineValidator extends AbstractMachineValidator {
 
 
     @Override
@@ -93,7 +93,7 @@ public class OpenGLMachineValidator extends MachineValidator {
             throw new SimValidationException("Cannot use G53 with cutter compensation.");
         }
 
-        MachineStatus2 machine=new MachineStatus2();
+        MachineStatusHelper machine=new MachineStatusHelper();
         machine.setMachineStatus(machineStatus);
 
         if (machine.getActivePlane() != ActivePlane.G17 && hasAny(machineStatus.getModals(), new String[]{"G2", "G3"})) {

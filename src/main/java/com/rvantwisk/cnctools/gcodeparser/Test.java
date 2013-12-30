@@ -117,7 +117,7 @@ public class Test {
     private void processFile() throws SimException, UnsupportedSimException {
         try {
 
-            final MachineStatus2 machine = new MachineStatus2();
+            final MachineStatusHelper machine = new MachineStatusHelper();
             final BufferedWriter br = Files.newBufferedWriter(new File("/Volumes/out.tap").toPath(),
                     Charset.forName("UTF-8"),
                     new OpenOption[]{StandardOpenOption.CREATE});

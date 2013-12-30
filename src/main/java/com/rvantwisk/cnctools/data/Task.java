@@ -68,8 +68,8 @@ public class Task extends AbstractTask  {
         return enabled;
     }
 
-    public AbstractOperation getMilltaskModel() {
-        return milltaskModel.get();
+    public <T extends AbstractOperation> T getMilltaskModel() {
+        return (T) milltaskModel.get();
     }
 
     public ObjectProperty<AbstractOperation> milltaskModelProperty() {

@@ -38,16 +38,16 @@
 
 package com.rvantwisk.cnctools.gcodeparser.validators;
 
+import com.rvantwisk.cnctools.gcodeparser.AbstractMachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.MachineStatus;
-import com.rvantwisk.cnctools.gcodeparser.MachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.ParsedWord;
 
 import java.util.Map;
 
 /**
- * Created by rvt on 12/21/13.
+ * Machine validator that doesn't actually validate anything
  */
-public class NopMachineValidator extends MachineValidator {
+public class NopMachineValidator extends AbstractMachineValidator {
     @Override
     public void preVerify(Map<String, ParsedWord> block) {
 

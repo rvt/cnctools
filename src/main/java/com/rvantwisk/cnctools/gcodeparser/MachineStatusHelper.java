@@ -51,7 +51,7 @@ import java.util.Set;
  * Date: 12/3/13
  * Time: 9:03 AM
  */
-public class MachineStatus2 {
+public class MachineStatusHelper {
 
     MachineStatus machineStatus = new MachineStatus();
 

@@ -43,9 +43,7 @@ import com.rvantwisk.cnctools.data.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
@@ -63,9 +61,6 @@ public class RoundStockOperation extends AbstractOperation {
     private final DimensionProperty finalLength = new DimensionProperty();
     private final DimensionProperty finalSize = new DimensionProperty();
 
-    private final DoubleProperty rapidClearance= new SimpleDoubleProperty();
-    private final DoubleProperty stockClearance = new SimpleDoubleProperty();
-
     public RoundStockOperation() {
     }
 
@@ -74,8 +69,6 @@ public class RoundStockOperation extends AbstractOperation {
         this.finalLength.set(finalLengthProperty);
         this.stockSize.set(stockSizeProperty);
         this.finalSize.set(finalSizeProperty);
-        this.rapidClearance.set(((EndMill) tool.getToolType()).diameterProperty().getValue() / 2.0);
-        this.stockClearance.set(((EndMill) tool.getToolType()).diameterProperty().getValue() / 2.0);
     }
 
     public ToolParameter getToolParameters() {
@@ -98,30 +91,6 @@ public class RoundStockOperation extends AbstractOperation {
         return finalLength;
     }
 
-    public double getRapidClearance() {
-        return rapidClearance.get();
-    }
-
-    public DoubleProperty rapidClearanceProperty() {
-        return rapidClearance;
-    }
-
-    public void setRapidClearance(double rapidClearance) {
-        this.rapidClearance.set(rapidClearance);
-    }
-
-    public double getStockClearance() {
-        return stockClearance.get();
-    }
-
-    public DoubleProperty stockClearanceProperty() {
-        return stockClearance;
-    }
-
-    public void setStockClearance(double stockClearance) {
-        this.stockClearance.set(stockClearance);
-    }
-
     public DimensionProperty finalSizeProperty() {
         return finalSize;
     }
@@ -131,17 +100,17 @@ public class RoundStockOperation extends AbstractOperation {
     public void generateGCode(final GCodeGenerator gCodeGenerator) {
         final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
-//        helper.setClearancebeforeFinal(2.0);
-        helper.setFinalSize(finalSize.getValue());  // Diameter
-        helper.setStockSize(21.0); // Diameter
-        helper.setStockLength(100.0);
-        helper.setMillSize(8.0);
-        helper.setRadialDepth(toolParameters.get().radialDepthProperty().getValue());
-        helper.setAxialDepth(toolParameters.get().axialDepthProperty().getValue());
-        helper.setFeedRate(toolParameters.get().feedRateProperty().getValue());
+        EndMill em = toolParameters.get().getToolType();
 
-//        graph.getChildren().clear();
-//        graph.getChildren().add(canvas);
+        helper.setFinalSize(gCodeGenerator.convert(finalSize).getValue());
+        helper.setStockSize(gCodeGenerator.convert(stockSize).getValue());
+        helper.setStockLength(gCodeGenerator.convert(finalLength).getValue());
+        helper.setMillSize(gCodeGenerator.convert(em.diameterProperty()).getValue());
+        helper.setRadialDepth(gCodeGenerator.convert(toolParameters.get().radialDepthProperty()).getValue());
+        helper.setAxialDepth(gCodeGenerator.convert(toolParameters.get().axialDepthProperty()).getValue());
+        helper.setFeedRate(gCodeGenerator.convert(toolParameters.get().feedRateProperty()).getValue());
+        helper.setRapidClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
+        helper.setStockClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
 
         helper.calculate();
     }

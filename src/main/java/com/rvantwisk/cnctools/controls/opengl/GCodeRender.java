@@ -38,8 +38,8 @@
 
 package com.rvantwisk.cnctools.controls.opengl;
 
+import com.rvantwisk.cnctools.gcodeparser.AbstractMachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.GCodeParser;
-import com.rvantwisk.cnctools.gcodeparser.MachineValidator;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
 import com.rvantwisk.cnctools.opengl.AbstractOpenGLRenderer;
@@ -170,7 +170,7 @@ final public class GCodeRender extends AbstractOpenGLRenderer {
         vboHelper.destroy();
     }
 
-    public void load(final OpenGLMachineController machine, final MachineValidator machineValidator, final InputStream file) throws SimException, UnsupportedSimException {
+    public void load(final OpenGLMachineController machine, final AbstractMachineValidator machineValidator, final InputStream file) throws SimException, UnsupportedSimException {
         GCodeParser parser = new GCodeParser(machine, machineValidator, file);
         VBOHelper.VBOInfo vboInfo = VBOHelper.createVBO(machine.getVBOData().toArray(), machine.getNumWords(), true);
         getMessageQueue().add(new Message("CLEARVBO", null));

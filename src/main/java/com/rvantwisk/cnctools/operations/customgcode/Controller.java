@@ -94,7 +94,7 @@ public class Controller extends MillTaskController {
     @Override
     public void setTask(Task task) {
         this.task = task;
-        model = (GCodeOperation) task.getMilltaskModel();
+        model = task.getMilltaskModel();
         if (model == null) {
             model = new GCodeOperation();
             task.setMilltaskModel(model);

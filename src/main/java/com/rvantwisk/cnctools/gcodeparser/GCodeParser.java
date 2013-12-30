@@ -76,7 +76,7 @@ public class GCodeParser {
     private final MachineStatus intermediateStatus = new MachineStatus();   // Keeps tracking of machine status during block processing
     private final MachineController machineController;                      // A machine controller to send parsed block's + machine status into
     private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
-    private final MachineValidator machineValidator;                      // A machine controller to send parsed block's + machine status into
+    private final AbstractMachineValidator machineValidator;                      // A machine controller to send parsed block's + machine status into
     private final Pattern GCODEPATTERN = Pattern.compile("([GXYZABCDFHIJKLMNPQRSTUVW]o?)\\s*([0-9.+-]+)?(\\s*/?\\s*)([0-9.+-]+)?");
     private final Pattern COMMENTS1 = Pattern.compile("\\(.*\\)");
     private final Pattern COMMENTS2 = Pattern.compile("\\;.*");
@@ -86,7 +86,7 @@ public class GCodeParser {
 
     private final Map<Character, Pattern> patternCache = new HashMap<>();   //Ereg Pattern cache
 
-    public GCodeParser(final MachineController machineController, final MachineValidator machineValidator, final InputStream input) throws SimException {
+    public GCodeParser(final MachineController machineController, final AbstractMachineValidator machineValidator, final InputStream input) throws SimException {
         this.machineController = machineController;
         this.machineValidator = machineValidator;
         Charset charset = Charset.forName("UTF-8");

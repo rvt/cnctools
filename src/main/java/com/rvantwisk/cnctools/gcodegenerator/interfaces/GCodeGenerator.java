@@ -39,6 +39,8 @@
 package com.rvantwisk.cnctools.gcodegenerator.interfaces;
 
 import com.rvantwisk.cnctools.gcodegenerator.GCodeBuilder;
+import com.rvantwisk.cnctools.misc.DimensionProperty;
+import com.rvantwisk.cnctools.misc.Dimensions;
 
 import java.io.PrintStream;
 
@@ -85,4 +87,17 @@ public interface GCodeGenerator {
      * Execute this after all G-Code has been added, no G-Code can be added after endProgram is called
      */
     void endProgram();
+
+
+    /**
+     * Machine specific conversions
+     *
+     * @param dimensionProperty
+     */
+    DimensionProperty convert(final DimensionProperty dimensionProperty);
+
+
+    Dimensions.Dim getLengthDimension();
+    Dimensions.Dim getVelocityDimension();
+
 }

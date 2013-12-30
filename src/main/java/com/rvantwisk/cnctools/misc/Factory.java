@@ -131,7 +131,7 @@ public class Factory {
     }
 
     /**
-     * Retreive a postprocessor dialect from a post processor configuration
+     * Retrieve a postprocessor dialect from a post processor configuration
      * @param pc    PostProcessorConfiguration
      * @return
      *

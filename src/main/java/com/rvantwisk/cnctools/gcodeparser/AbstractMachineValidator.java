@@ -43,7 +43,7 @@ import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class MachineValidator {
+public abstract class AbstractMachineValidator {
 
 
     public abstract void preVerify(Map<String, ParsedWord> block) throws SimException;

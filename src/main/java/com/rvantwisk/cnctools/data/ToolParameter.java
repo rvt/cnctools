@@ -146,8 +146,8 @@ public class ToolParameter {
         this.spindleDirection.set(spindleDirection.toString());
     }
 
-    public ITool getToolType() {
-        return toolType.get();
+    public <T extends AbstractTool> T getToolType() {
+        return (T) toolType.get();
     }
 
     public ObjectProperty<ITool> toolTypeProperty() {

@@ -2,7 +2,7 @@ package com.rvantwisk.cnctools.controls.opengl;
 
 import com.rvantwisk.cnctools.gcodeparser.GCodeParser;
 import com.rvantwisk.cnctools.gcodeparser.MachineStatus;
-import com.rvantwisk.cnctools.gcodeparser.MachineStatus2;
+import com.rvantwisk.cnctools.gcodeparser.MachineStatusHelper;
 import com.rvantwisk.cnctools.gcodeparser.ParsedWord;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.gcodes.MotionMode;
@@ -22,8 +22,10 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
 
     public static double curveSectionMM = 1.0;
     public static double AAXISSTEPDEGREES = 1.0; // When A axis rotaties, simulate it in this number of degrees
+    public static int AXISMAXSTEPS = 5000; // When A axis rotates with other axis, limit the number of steps to 5000
+
     public static double curveSectionInches = curveSectionMM / 25.4;
-    final MachineStatus2 machine = new MachineStatus2();
+    final MachineStatusHelper machine = new MachineStatusHelper();
 
     private MotionMode prevMotionMode = MotionMode.G0;
     private static int ROWSIZE = 7;
@@ -95,12 +97,12 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
         double a = machine.getA();
 
         int steps = Math.abs((int) (Math.floor(a - lastA) / AAXISSTEPDEGREES));
+        steps = Math.min(steps, AXISMAXSTEPS);
+
         double stepSize = (a - lastA) / steps;
         double stepZSize = (machine.getZ() - lastZ) / steps;
         double stepXSize = (machine.getX() - lastX) / steps;
         double stepYSize = (machine.getY() - lastY) / steps;
-
-
 
         for (int i = 0; i < steps; i++) {
 

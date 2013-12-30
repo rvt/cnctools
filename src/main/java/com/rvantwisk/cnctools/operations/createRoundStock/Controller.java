@@ -38,14 +38,17 @@
 
 package com.rvantwisk.cnctools.operations.createRoundStock;
 
-import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
-import com.rvantwisk.cnctools.data.*;
+import com.rvantwisk.cnctools.data.PostProcessorConfig;
+import com.rvantwisk.cnctools.data.Project;
+import com.rvantwisk.cnctools.data.Task;
+import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcodegenerator.dialects.RS274;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import javafx.beans.value.ChangeListener;
@@ -107,7 +110,7 @@ public class Controller extends MillTaskController {
     @Override
     public void setTask(Task task) {
         this.task = task;
-        model = (RoundStockOperation) task.getMilltaskModel();
+        model = task.getMilltaskModel();
         if (model == null) {
             model = new RoundStockOperation();
             task.setMilltaskModel(model);
@@ -146,36 +149,6 @@ public class Controller extends MillTaskController {
         return null;
     }
 
-/*
-
-    public void onGenerate() {
-        gcode.clear();
-
-        Canvas canvas = new Canvas(800, 800);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        graph.getChildren().clear();
-        graph.getChildren().add(canvas);
-
-        gCode = new LinuxCNCIndexer();
-
-        StringBuffer b = new StringBuffer();
-        gCode.setOutput(b);
-        RoundStockHelper rs = new RoundStockHelper(gCode);
-        rs.setClearancebeforeFinal(2.0);
-        rs.setFinalSize(16.0);  // Diameter
-        rs.setStockSize(21.0); // Diameter
-        rs.setMillSize(8.0);
-        rs.setStepOver(3.0);
-        rs.setStepDepth(3.0);
-        rs.setStockLength(100.0);
-        rs.setFeedRate(2400.0);
-
-        rs.calculate(gc);
-
-        gcode.appendText(b.toString());
-    } */
-
     @Override
     public void setDialog(FXMLDialog dialog) {
         this.dialog = dialog;
@@ -213,7 +186,6 @@ public class Controller extends MillTaskController {
             }
         });
 
-
         generateGCode();
     }
 
@@ -234,18 +206,8 @@ public class Controller extends MillTaskController {
 
             RS274 gCodeGenerator = new RS274(ppc);
             gCodeGenerator.setOutput(printStream);
-            final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
-            helper.setFinalSize(model.finalSizeProperty().getValue());  // Diameter
-            helper.setStockSize(model.stockSizeProperty().getValue()); // Diameter
-            helper.setStockLength(model.finalLengthProperty().getValue());
-            EndMill e = (EndMill) model.toolParametersProperty().get().getToolType();
-            helper.setMillSize(e.diameterProperty().getValue());
-            helper.setRadialDepth(model.toolParametersProperty().get().radialDepthProperty().getValue());
-            helper.setAxialDepth(model.toolParametersProperty().get().axialDepthProperty().getValue());
-            helper.setFeedRate(model.toolParametersProperty().get().feedRateProperty().getValue());
-
-            helper.calculate();
+            model.generateGCode(gCodeGenerator);
 
             InputStream in = new ByteArrayInputStream(os.toByteArray());
             gCodeViewerControl.load(in);

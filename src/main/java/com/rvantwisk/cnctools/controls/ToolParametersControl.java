@@ -125,10 +125,10 @@ public class ToolParametersControl extends AnchorPane {
 
 
         if (tool.getToolType() instanceof EndMill) {
-            EndMill em = (EndMill) tool.getToolType();
+            EndMill em = tool.getToolType();
             em.diameterProperty().set(iDiameter.dimensionProperty());
         } else if (tool.getToolType() instanceof BallMill) {
-            BallMill em = (BallMill) tool.getToolType();
+            BallMill em = tool.getToolType();
             em.diameterProperty().set(iDiameter.dimensionProperty());
         }
 
@@ -183,11 +183,11 @@ public class ToolParametersControl extends AnchorPane {
         iToolnumber.textProperty().setValue(String.valueOf(tool.getToolNumber()));
 
         if (tool.getToolType() instanceof EndMill) {
-            EndMill em = (EndMill) tool.getToolType();
+            EndMill em = tool.getToolType();
             iDiameter.dimensionProperty().set(em.diameterProperty());
 
         } else if (tool.getToolType() instanceof BallMill) {
-            BallMill em = (BallMill) tool.getToolType();
+            BallMill em = tool.getToolType();
             iDiameter.dimensionProperty().set(em.diameterProperty());
         }
         cbToolType.getSelectionModel().select(tool.getToolType().getClass().getSimpleName());

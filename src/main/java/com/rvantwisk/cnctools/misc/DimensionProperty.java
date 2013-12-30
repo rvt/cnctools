@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2013, R. van Twisk
  * All rights reserved.
@@ -40,58 +39,109 @@
 package com.rvantwisk.cnctools.misc;
 
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
-public class DimensionProperty  {
+
+public class DimensionProperty {
 
 
     private final DoubleProperty value = new SimpleDoubleProperty();
-    private final StringProperty dimension = new SimpleStringProperty();
+    private final ObjectProperty<Dimensions.Dim> dimension = new SimpleObjectProperty<>();
+    boolean block=false;
 
     public DimensionProperty() {
+        listeners();
     }
 
-    public static DimensionProperty DimMM(final Double value) {
-        return new DimensionProperty(value, Dimensions.Dim.MM);
+    public DimensionProperty(DimensionProperty dimensionProperty) {
+        value.set(dimensionProperty.getValue());
+        dimension.set(dimensionProperty.getDimension());
+        listeners();
     }
-    public static DimensionProperty DimInch(final Double value) {
-        return new DimensionProperty(value, Dimensions.Dim.INCH);
-    }
-    public static DimensionProperty DimRPM(final Double value) {
-        return new DimensionProperty(value, Dimensions.Dim.RPM);
+
+    private void listeners() {
+
+        value.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+//                fireValueChangedEvent();
+            }
+        });
+        dimension.addListener(new ChangeListener<Dimensions.Dim>() {
+            @Override
+            public void changed(ObservableValue<? extends Dimensions.Dim> observableValue, Dimensions.Dim dim, Dimensions.Dim dim2) {
+                if (dim != null && block==false) {
+                    value.set(Dimensions.convert(value.get(), dim, dim2));
+                }
+            }
+        });
     }
 
     public DimensionProperty(final Double value, final Dimensions.Dim dimension) {
         this.value.setValue(value);
-        this.dimension.setValue(dimension.toString());
+        this.dimension.set(dimension);
+        listeners();
     }
 
-    public void set(final DimensionProperty dimensionProperty) {
-        value.setValue(dimensionProperty.value.get());
-        dimension.setValue(dimensionProperty.dimension.get());
+
+    public static DimensionProperty DimMM(final Double value) {
+        return new DimensionProperty(value, Dimensions.Dim.MM);
+    }
+
+    public static DimensionProperty DimInch(final Double value) {
+        return new DimensionProperty(value, Dimensions.Dim.INCH);
+    }
+
+    public static DimensionProperty DimRPM(final Double value) {
+        return new DimensionProperty(value, Dimensions.Dim.RPM);
     }
 
     public double getValue() {
         return value.get();
     }
 
+    /**
+     * Get the value's property, be carefull setting the values as under some conditions you might want to prevent change even't beeing fired
+     * @return
+     */
     public DoubleProperty valueProperty() {
         return value;
     }
 
     public void setValue(double value) {
+        //     block=true;
         this.value.set(value);
+        //     block=false;
     }
 
     public Dimensions.Dim getDimension() {
-        return Dimensions.Dim.valueOf(dimension.get());
+        return dimension.get();
     }
 
-    public StringProperty dimensionProperty() {
+    /**
+     * get the dimension's property be carefull setting the values as under some conditions you might want to prevent change even't beeing fired
+     *
+     * @return
+     */
+    public ObjectProperty<Dimensions.Dim> dimensionProperty() {
         return dimension;
     }
 
     public void setDimension(Dimensions.Dim dimension) {
-        this.dimension.set(dimension.toString());
+   //     block=true;
+        this.dimension.set(dimension);
+        //     block=false;
     }
 
+    public DimensionProperty convert(final Dimensions.Dim toDimention) {
+        return new DimensionProperty(Dimensions.convert(this.getValue(), this.getDimension(), toDimention), toDimention);
+    }
+
+    public void set(final DimensionProperty dimensionProperty) {
+        block=true;
+        value.setValue(dimensionProperty.value.get());
+        dimension.setValue(dimensionProperty.dimension.get());
+        block=false;
+    }
 }

@@ -32,8 +32,9 @@ public class DimensionControl extends HBox {
 
     @FXML
     private ComboBox iDimension;
-    private final DimensionProperty dimension = new DimensionProperty();
     private Dimensions.Type dimensionType = Dimensions.Type.LENGTH;
+
+    private final DimensionProperty dimension = new DimensionProperty();
 
     public DimensionControl() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Dimension.fxml"));
@@ -80,10 +81,10 @@ public class DimensionControl extends HBox {
             }
         });
 
-        // When dimenstion property is updated, select the correct combobox item
-        dimension.dimensionProperty().addListener(new ChangeListener<String>() {
+        // When dimension property is updated, select the correct combobox item
+        dimension.dimensionProperty().addListener(new ChangeListener<Dimensions.Dim>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String s2) {
+            public void changed(ObservableValue<? extends Dimensions.Dim> observableValue, Dimensions.Dim dim, Dimensions.Dim dim2) {
                 final int i = Dimensions.getIndex(dimensionType, dimension.getDimension());
                 iDimension.getSelectionModel().select(i);
             }

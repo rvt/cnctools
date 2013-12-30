@@ -54,7 +54,6 @@ import java.util.TreeMap;
  */
 public class Dimensions {
 
-
     public enum Type {
         LENGTH,
         VELOCITY,
@@ -63,23 +62,34 @@ public class Dimensions {
     }
 
     public enum Dim {
-        MM,
-        CM,
-        DEC,
-        M,
-        INCH,
-        FOOT,
-        MM_SEC,
-        MM_MINUTE,
-        FOOT_MINUTE,
-        INCH_MINUTE,
-        INCH_SEC,
-        RPM,
-        SEC,
-        MINUTE
+        MM(Type.LENGTH),
+        CM(Type.LENGTH),
+        DEC(Type.LENGTH),
+        M(Type.LENGTH),
+        INCH(Type.LENGTH),
+        FOOT(Type.LENGTH),
+        MM_SEC(Type.VELOCITY),
+        MM_MINUTE(Type.VELOCITY),
+        FOOT_SEC(Type.VELOCITY),
+        FOOT_MINUTE(Type.VELOCITY),
+        INCH_MINUTE(Type.VELOCITY),
+        INCH_SEC(Type.VELOCITY),
+        RPM(Type.RPM),
+        SEC(Type.TIME),
+        MINUTE(Type.TIME),
+        HOUR(Type.TIME);
+
+        private Type type;
+        Dim(Type type) {
+            this.type = type;
+        }
+
+        public Type getType() {
+            return type;
+        }
     }
 
-    private static final Map<Dim, Double> cLength;
+    private static final Map<Dim, Double> conversionRatios;
     static {
         Map<Dim, Double> aMap = new TreeMap<>();
         aMap.put(Dim.MM, 1.0);
@@ -88,27 +98,18 @@ public class Dimensions {
         aMap.put(Dim.M, 1000.0);
         aMap.put(Dim.INCH, 25.4);
         aMap.put(Dim.FOOT, 304.8);
-        cLength = Collections.unmodifiableMap(aMap);
-    }
 
-    private static final Map<Dim, Double> cTime;
-    static {
-        Map<Dim, Double> aMap = new TreeMap<>();
         aMap.put(Dim.SEC, 1.0);
         aMap.put(Dim.MINUTE, 60.0);
-        cTime = Collections.unmodifiableMap(aMap);
-    }
+        aMap.put(Dim.HOUR, 3600.0);
 
-
-    private static final Map<Dim, Double> cVelocity;
-    static {
-        Map<Dim, Double> aMap = new TreeMap<>();
         aMap.put(Dim.MM_SEC, 1.0);
-        aMap.put(Dim.MM_MINUTE, 60.0);
-        aMap.put(Dim.FOOT_MINUTE, 25.4);
+        aMap.put(Dim.MM_MINUTE, 1.0/60.0);
+        aMap.put(Dim.FOOT_SEC, 304.8);
+        aMap.put(Dim.FOOT_MINUTE, 304.8/60.0);
         aMap.put(Dim.INCH_SEC, 25.4);
-        aMap.put(Dim.INCH_MINUTE, 25.4*60.0);
-        cVelocity = Collections.unmodifiableMap(aMap);
+        aMap.put(Dim.INCH_MINUTE, 25.4/60.0);
+        conversionRatios = Collections.unmodifiableMap(aMap);
     }
 
     public final static class Item implements Map.Entry<Dim, String> {
@@ -135,7 +136,7 @@ public class Dimensions {
         }
 
         @Override
-        public java.lang.String setValue(java.lang.String value) {
+        public String setValue(String value) {
             String old = this.value;
             this.value = value;
             return old;
@@ -159,15 +160,23 @@ public class Dimensions {
         }
     }
 
+    /**
+     * List if rotational units
+     */
     private static final ObservableList<Item> RPMLIST = FXCollections.observableArrayList(new Item(Dim.RPM, "RPM"));
 
-
+    /**
+     * List of velocity units
+     */
     private static final ObservableList<Item> VELOCITYLIST = FXCollections.observableArrayList(
             new Item(Dim.MM_SEC, "mm/sec"),
             new Item(Dim.MM_MINUTE, "mm/minute"),
             new Item(Dim.INCH_SEC, "inch/sec"),
             new Item(Dim.INCH_MINUTE, "inch/minute"));
 
+    /**
+     * List of Length units
+     */
     private static final ObservableList<Item> LENGTHLIST = FXCollections.observableArrayList(
             new Item(Dim.MM, "mm"),
             new Item(Dim.CM, "cm"),
@@ -175,10 +184,6 @@ public class Dimensions {
             new Item(Dim.M, "m"),
             new Item(Dim.INCH, "inch"),
             new Item(Dim.FOOT, "foot"));
-
-
-
-
 
     public static ObservableList<Item> getList(final Type dimType) {
         switch (dimType) {
@@ -192,9 +197,22 @@ public class Dimensions {
         return null;
     }
 
-
     public static int getIndex(final Type dimType, Dim dimension) {
         return getList(dimType).indexOf(new Item(dimension));
+    }
+
+    /**
+     * Convert between two dimension within the same group
+     * @param value
+     * @param fromDimention
+     * @param toDimention
+     * @return
+     */
+    public static double convert(double value, Dim fromDimention, Dim toDimention) {
+        if (fromDimention.type != toDimention.type) {
+            throw new IllegalArgumentException("To dimension and from dimension must be equal while converting.");
+        }
+        return conversionRatios.get(fromDimention) / conversionRatios.get(toDimention) * value;
     }
 
 }
