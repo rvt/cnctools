@@ -3,8 +3,6 @@
 sudo bash
 export JAVA_HOME=$(/usr/libexec/java_home -v1.7)
 mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath
-
-http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/datastore/xstream/XStreamDataStore.java.htm
 -->
 
 
@@ -23,6 +21,11 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
         small tool.
     </description>
 
+    <properties>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+    </properties>
+
     <organization>
         <name>R. van Twisk</name>
     </organization>
@@ -32,7 +35,14 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
             <id>oss-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
+
+        <!--repository>
+            <id>nuxeo-kabeja</id>
+            <url>https://maven-eu.nuxeo.org/</url>
+        </repository-->
+
     </repositories>
+
 
     <build>
         <plugins>
@@ -44,7 +54,6 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
                     <goalPrefix>jfx</goalPrefix>
                 </configuration>
             </plugin>
-
 
             <plugin>
                 <groupId>com.zenjava</groupId>
@@ -60,8 +69,8 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${maven.compiler.target}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
 
@@ -80,47 +89,45 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
                 </executions>
             </plugin>
 
-            <!--plugin>
-                <groupId>org.apache.openjpa</groupId>
-                <artifactId>openjpa-maven-plugin</artifactId>
-                <version>2.2.2</version>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
                 <configuration>
-                    <includes>com/rvantwisk/indexertools/data/*.class</includes>
-                    <excludes>com/rvantwisk/indexertools/data/XML*.class</excludes>
-                    <addDefaultConstructor>true</addDefaultConstructor>
-                    <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
+                    <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                    <docletArtifact>
+                        <groupId>org.umlgraph</groupId>
+                        <artifactId>umlgraph</artifactId>
+                        <version>5.6</version>
+                    </docletArtifact>
+                    <additionalparam>-views -all</additionalparam>
+                    <useStandardDocletOptions>true</useStandardDocletOptions>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>enhancer</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>enhance</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14.1</version>
                 <dependencies>
                     <dependency>
-                        <groupId>org.apache.openjpa</groupId>
-                        <artifactId>openjpa</artifactId>
-                        <version>2.2.2</version>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>common-junit48</artifactId>
+                        <version>2.11</version>
                     </dependency>
                 </dependencies>
-            </plugin-->
-
-
+            </plugin>
         </plugins>
-
-
     </build>
 
-    <properties>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
-    </properties>
 
     <dependencies>
-
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -130,19 +137,12 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
-            <version>2.2.2</version>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>3.2.2.RELEASE</version>
-            <exclusions>
-                <!--Exclude Commons Logging in favor of SLF4j-->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -185,19 +185,11 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
             <version>1.6.1</version>
         </dependency>
 
-
         <!-- These to are added to enable rapid prototyping -->
         <dependency>
             <groupId>com.panemu</groupId>
             <artifactId>tiwulfx</artifactId>
             <version>1.1</version>
-            <exclusions>
-                <!--Exclude Commons Logging in favor of SLF4j-->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -253,19 +245,20 @@ http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>11.0.2</version>
-        </dependency>
 
-        <!-- to restricted in the forms you can make -->
         <!--dependency>
-            <groupId>com.dooapp.fxform2</groupId>
-            <artifactId>core</artifactId>
-            <version>0.2.2</version>
+            <groupId>org.kabeja</groupId>
+            <artifactId>kabeja</artifactId>
+            <version>0.4</version>
         </dependency-->
 
+        <!-- Pretend that common-s logging is provided, while jcl take's over -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
