@@ -48,9 +48,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -66,25 +69,20 @@ import java.util.ResourceBundle;
 public class ToolParametersControl extends AnchorPane {
 
     ObservableList tools = FXCollections.observableArrayList(
-        "EndMill", "BallMill"
+            "EndMill", "BallMill"
     );
 
     private FXMLDialog dialog;
-
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
-
     @FXML
     private TextField iName;
     @FXML
     private DimensionControl iDiameter;
-
     @FXML
     private TextField iToolnumber;
-
     @FXML
     private DimensionControl iAxialDepth;
     @FXML
@@ -95,13 +93,21 @@ public class ToolParametersControl extends AnchorPane {
     private DimensionControl iFeedRate;
     @FXML
     private DimensionControl iPlungeRate;
+    @FXML
+    private CheckBox iCoolant;
+    @FXML
+    private RadioButton iSPindleCW;
+    @FXML
+    private RadioButton iSPindleCCW;
+    @FXML
+    private ChoiceBox<String> ddNumFlutes;
 
     @FXML
     private ChoiceBox cbToolType;
 
     private ToolParameter tool;
 
-    public ToolParametersControl()  {
+    public ToolParametersControl() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ToolParameters.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
@@ -112,28 +118,6 @@ public class ToolParametersControl extends AnchorPane {
         }
     }
 
-    public void applyToolParameters() {
-        if (tool==null) return;
-        tool.nameProperty().setValue(iName.getText());
-
-        tool.spindleSpeedProperty().set(iSpindleSpeed.dimensionProperty());
-        tool.axialDepthProperty().set(iAxialDepth.dimensionProperty());
-        tool.radialDepthProperty().set(iRadialDepth.dimensionProperty());
-        tool.feedRateProperty().set(iFeedRate.dimensionProperty());
-        tool.plungeRateProperty().set(iPlungeRate.dimensionProperty());
-        tool.setToolNumber(Integer.valueOf(iToolnumber.getText()));
-
-
-        if (tool.getToolType() instanceof EndMill) {
-            EndMill em = tool.getToolType();
-            em.diameterProperty().set(iDiameter.dimensionProperty());
-        } else if (tool.getToolType() instanceof BallMill) {
-            BallMill em = tool.getToolType();
-            em.diameterProperty().set(iDiameter.dimensionProperty());
-        }
-
-    }
-
 
     @FXML
     void initialize() {
@@ -142,7 +126,7 @@ public class ToolParametersControl extends AnchorPane {
 
 
         final InputMaskChecker listener1 = new InputMaskChecker(InputMaskChecker.NOTEMPTY, iName);
-       // final InputMaskChecker listener2 = new InputMaskChecker(InputMaskChecker.NOTEMPTY, iDiameter);
+        // final InputMaskChecker listener2 = new InputMaskChecker(InputMaskChecker.NOTEMPTY, iDiameter);
 
         iName.textProperty().addListener(listener1);
         //iDiameter.textProperty().addListener(listener2);
@@ -151,7 +135,7 @@ public class ToolParametersControl extends AnchorPane {
 
         final BooleanBinding binding = new BooleanBinding() {
             {
-          //      super.bind(listener1.erroneous, listener2.erroneous);
+                //      super.bind(listener1.erroneous, listener2.erroneous);
             }
 
             @Override
@@ -170,6 +154,7 @@ public class ToolParametersControl extends AnchorPane {
     }
 
     public void setTool(ToolParameter tool) {
+        if (tool==null) return;
         this.tool = tool;
 
         iName.textProperty().setValue(tool.getName());
@@ -179,8 +164,12 @@ public class ToolParametersControl extends AnchorPane {
         iSpindleSpeed.dimensionProperty().set(tool.spindleSpeedProperty());
         iFeedRate.dimensionProperty().set(tool.feedRateProperty());
         iPlungeRate.dimensionProperty().set(tool.plungeRateProperty());
-
+        iCoolant.setSelected(tool.getCoolant());
         iToolnumber.textProperty().setValue(String.valueOf(tool.getToolNumber()));
+        iSPindleCW.setSelected(tool.getSpindleDirection() == ToolParameter.SpindleDirection.CW);
+        iSPindleCCW.setSelected(tool.getSpindleDirection() != ToolParameter.SpindleDirection.CW);
+
+        ddNumFlutes.getSelectionModel().select(tool.getNumberOfFlutes() != null ? tool.getNumberOfFlutes().intValue() : 0);
 
         if (tool.getToolType() instanceof EndMill) {
             EndMill em = tool.getToolType();
@@ -191,6 +180,32 @@ public class ToolParametersControl extends AnchorPane {
             iDiameter.dimensionProperty().set(em.diameterProperty());
         }
         cbToolType.getSelectionModel().select(tool.getToolType().getClass().getSimpleName());
+    }
+
+    public void applyToolParameters() {
+        if (tool == null) return;
+
+        tool.nameProperty().setValue(iName.getText());
+        tool.spindleSpeedProperty().set(iSpindleSpeed.dimensionProperty());
+        tool.axialDepthProperty().set(iAxialDepth.dimensionProperty());
+        tool.radialDepthProperty().set(iRadialDepth.dimensionProperty());
+        tool.feedRateProperty().set(iFeedRate.dimensionProperty());
+        tool.plungeRateProperty().set(iPlungeRate.dimensionProperty());
+        tool.setToolNumber(Integer.valueOf(iToolnumber.getText()));
+        tool.setCoolant(iCoolant.isSelected());
+        tool.setSpindleDirection(iSPindleCW.isSelected() ? ToolParameter.SpindleDirection.CW : ToolParameter.SpindleDirection.CCW);
+
+        String numFlutes = ddNumFlutes.selectionModelProperty().get().getSelectedItem();
+        tool.setNumberOfFlutes(StringUtils.isEmpty(numFlutes)?null:Integer.valueOf(numFlutes));
+
+        if (tool.getToolType() instanceof EndMill) {
+            EndMill em = tool.getToolType();
+            em.diameterProperty().set(iDiameter.dimensionProperty());
+        } else if (tool.getToolType() instanceof BallMill) {
+            BallMill em = tool.getToolType();
+            em.diameterProperty().set(iDiameter.dimensionProperty());
+        }
+
     }
 
 }

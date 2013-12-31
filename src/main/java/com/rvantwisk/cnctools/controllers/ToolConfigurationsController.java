@@ -44,6 +44,7 @@ import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ProjectModel;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -73,9 +74,7 @@ public class ToolConfigurationsController extends AbstractController {
 
     private Mode mode;
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
-    }
+
 
     public Mode getMode() {
         return mode;
@@ -89,8 +88,7 @@ public class ToolConfigurationsController extends AbstractController {
     private final StringProperty closeButtonText = new SimpleStringProperty();
 
     @Autowired
-    @Qualifier("projectModel")
-    private ProjectModel projectModel;
+    private ToolDBManager toolDBManager;
 
     @FXML
     private ToolParametersControl toolParameters; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded
@@ -123,7 +121,7 @@ public class ToolConfigurationsController extends AbstractController {
             dialog.setMessage("Are you sure you want to delete this tool?");
             if (dialog.show() == MonologFXButton.Type.YES) {
                 ToolParameter p = v_toolsList.getSelectionModel().getSelectedItem();
-                projectModel.toolDBProperty().remove(p);
+                toolDBManager.remove(p.getId());
                 v_toolsList.getSelectionModel().clearSelection();
             }
         }
@@ -133,8 +131,8 @@ public class ToolConfigurationsController extends AbstractController {
 
     void onNew(ActionEvent event) {
         StockToolParameter tp = Factory.newStockTool();
-        projectModel.toolDBProperty().add(tp);
-        int i = projectModel.toolDBProperty().indexOf(tp);
+        toolDBManager.getToolDB().add(tp);
+        int i = toolDBManager.getToolDB().indexOf(tp);
         v_toolsList.getSelectionModel().selectIndices(i);
     }
 
@@ -159,19 +157,15 @@ public class ToolConfigurationsController extends AbstractController {
 
     @FXML
     void onUse(ActionEvent event) {
-        setReturned(Result.USEMODIFIED);
+        setReturned(Result.USE);
         getDialog().close();
     }
 
     @FXML
     void initialize() {
-        v_toolsList.setItems(projectModel.toolDBProperty());
+        v_toolsList.setItems(toolDBManager.getToolDB());
 
-        if (mode == Mode.EDIT) {
-            btnUse.setVisible(true);
-        } else {
-            btnUse.setVisible(false);
-        }
+        setMode(this.mode);
 
         //    toolConfig.con
         toolParameters.disableProperty().bind(v_toolsList.getSelectionModel().selectedItemProperty().isNull());
@@ -219,5 +213,15 @@ public class ToolConfigurationsController extends AbstractController {
 
     public void setCloseButtonText(String closeButtonText) {
         this.closeButtonText.set(closeButtonText);
+    }
+
+    public void setMode(Mode mode) {
+        if (btnUse!=null) {
+            if (mode == Mode.EDIT) {
+                btnUse.setVisible(false);
+            } else {
+                btnUse.setVisible(true);
+            }
+        }
     }
 }

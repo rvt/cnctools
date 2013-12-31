@@ -41,10 +41,11 @@ package com.rvantwisk.cnctools.controls;
 import com.rvantwisk.cnctools.ScreensConfiguration;
 import com.rvantwisk.cnctools.controllers.ToolConfigurationsController;
 import com.rvantwisk.cnctools.controllers.ToolEditController;
-import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.data.ToolParameter;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.ProjectModel;
+import com.rvantwisk.events.ToolChangedEvent;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -52,7 +53,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -65,18 +65,10 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class SelectOrEditToolControl extends VBox {
-
-
     @FXML
     private Label iName;
-
-    @FXML
-    private AnchorPane apRoot;
     @FXML
     private Button btnEdit;
-
-    private FXMLDialog toolConfigurationsDialog;
-    private FXMLDialog toolEditDialog;
 
     private final ObjectProperty<ToolParameter> tool = new SimpleObjectProperty<>();
 
@@ -91,33 +83,35 @@ public class SelectOrEditToolControl extends VBox {
         }
     }
 
-
-    @FXML
-    void onEdit(ActionEvent event) {
-        ToolEditController tec = toolEditDialog.getController();
-        tec.setTool(ProjectModel.<ToolParameter>deepCopy((tool.get())));
-        ToolEditController tcc = toolEditDialog.getController();
-        if (tcc.getResult() != AbstractController.Result.DISMISS) {
-            setTool(tcc.getTool());
-        }
-        toolEditDialog.showAndWait();
-    }
-
     @FXML
     void initialize() {
         btnEdit.disableProperty().bind(tool.isNull());
-        toolConfigurationsDialog = ScreensConfiguration.getInstance().toolConfigurationsDialog();
-        toolEditDialog = ScreensConfiguration.getInstance().toolEditDialog();
     }
 
 
     @FXML
     void onSelect(ActionEvent event) {
+        final FXMLDialog toolConfigurationsDialog= ScreensConfiguration.getInstance().toolConfigurationsDialog();
         ToolConfigurationsController tcc = toolConfigurationsDialog.getController();
+        tcc.setMode(ToolConfigurationsController.Mode.SELECT);
         toolConfigurationsDialog.showAndWait();
         if (tcc.getReturned() != AbstractController.Result.DISMISS) {
             setTool(tcc.getTool());
+            fireEvent(new ToolChangedEvent(ToolChangedEvent.TOOL_CHANGED_EVENT));
         }
+    }
+
+    @FXML
+    void onEdit(ActionEvent event) {
+        final FXMLDialog toolEditDialog = ScreensConfiguration.getInstance().toolEditDialog();
+        ToolEditController tec = toolEditDialog.getController();
+        tec.setTool(ProjectModel.<ToolParameter>deepCopy((tool.get())));
+        ToolEditController tcc = toolEditDialog.getController();
+        if (tcc.getResult() != AbstractController.Result.DISMISS) {
+            setTool(tcc.getTool());
+            fireEvent(new ToolChangedEvent(ToolChangedEvent.TOOL_CHANGED_EVENT));
+        }
+        toolEditDialog.showAndWait();
     }
 
     public  ToolParameter getTool() {
@@ -134,4 +128,5 @@ public class SelectOrEditToolControl extends VBox {
         }
         this.tool.set(tool);
     }
+
 }

@@ -46,11 +46,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 11/26/13
- * Time: 6:26 PM
- * To change this template use File | Settings | File Templates.
+ * File util that loa'ds and saves a file
  */
 public class FileUtil {
 
@@ -67,16 +63,15 @@ public class FileUtil {
      * @throws IOException thrown if an I/O error occurs opening the file
      */
     public static String readFile(File file) throws IOException {
-        StringBuffer stringBuffer = new StringBuffer();
+        final StringBuffer stringBuffer = new StringBuffer();
 
-        BufferedReader reader = Files.newBufferedReader(file.toPath(), CHARSET);
-
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            stringBuffer.append(line);
-        }
-
-        reader.close();
+        try (BufferedReader reader = Files.newBufferedReader(file.toPath(), CHARSET)) {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            reader.close();
+        };
 
         return stringBuffer.toString();
     }
@@ -89,8 +84,9 @@ public class FileUtil {
      * @throws IOException thrown if an I/O error occurs opening or creating the file
      */
     public static void saveFile(String content, File file) throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(file.toPath(), CHARSET);
-        writer.write(content, 0, content.length());
-        writer.close();
+        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), CHARSET)) {
+            writer.write(content, 0, content.length());
+            writer.close();
+        }
     }
 }

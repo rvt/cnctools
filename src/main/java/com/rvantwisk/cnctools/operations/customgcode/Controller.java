@@ -38,14 +38,15 @@
 
 package com.rvantwisk.cnctools.operations.customgcode;
 
-import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.data.ToolParameter;
-import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.cnctools.misc.FXMLDialog;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
+import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -80,16 +81,17 @@ public class Controller extends MillTaskController {
     private GCodeOperation model;
     private Task task;
 
+    private ToolDBManager toolDBManager;
 
     public void setProject(Project project) {
         this.project = project;
     }
 
     @Override
-    public void setToolDB(ObservableList<ToolParameter> tooldb) {
-        toolDB.clear();
-        toolDB.addAll(tooldb);
+    public void setToolDBManager(ToolDBManager toolDBManager) {
+        this.toolDBManager = toolDBManager;
     }
+
 
     @Override
     public void setTask(Task task) {

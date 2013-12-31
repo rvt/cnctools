@@ -54,7 +54,8 @@ import java.net.URL;
  * Generic dialog that can load a fxml and use a controller
  */
 public class FXMLDialog extends Stage {
-    private final AbstractController controller;
+
+    private final FXMLLoader loader;
 
     public FXMLDialog(final AbstractController controller, final URL fxml, final Window owner) {
         this(controller, fxml, owner, StageStyle.DECORATED);
@@ -64,9 +65,8 @@ public class FXMLDialog extends Stage {
         super(style);
         initModality(Modality.APPLICATION_MODAL);
         initOwner(owner);
-
-        FXMLLoader loader = new FXMLLoader(fxml);
         try {
+            loader = new FXMLLoader(fxml);
             loader.setControllerFactory(new Callback<Class<?>, Object>() {
                 @Override
                 public Object call(Class<?> aClass) {
@@ -74,10 +74,8 @@ public class FXMLDialog extends Stage {
                 }
             });
             controller.setDialog(this);
-            this.controller = controller;
             Scene s = new Scene((Parent) loader.load());
             setScene(s);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -90,6 +88,6 @@ public class FXMLDialog extends Stage {
      * @return
      */
     public <T extends AbstractController> T getController() {
-        return (T) controller;
+        return (T) loader.getController();
     }
 }

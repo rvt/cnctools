@@ -38,10 +38,10 @@
 
 package com.rvantwisk.cnctools.operations.interfaces;
 
+import com.rvantwisk.cnctools.data.Project;
+import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.misc.AbstractController;
-import com.rvantwisk.cnctools.data.*;
-import com.rvantwisk.cnctools.data.ToolParameter;
-import javafx.collections.ObservableList;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,6 +52,6 @@ import javafx.collections.ObservableList;
  */
 public abstract class MillTaskController extends AbstractController {
     public abstract void setProject(final Project p);
-    public abstract void setToolDB(final ObservableList<ToolParameter> tooldb);
+    public abstract void setToolDBManager(ToolDBManager toolDBManager);
     public abstract void setTask(final Task task);
 }

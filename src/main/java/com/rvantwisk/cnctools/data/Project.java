@@ -40,6 +40,7 @@ package com.rvantwisk.cnctools.data;
 
 import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.cnctools.misc.Factory;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -121,7 +122,7 @@ public class Project {
         this.postProcessor.set(postProcessor);
     }
 
-    public StringBuilder getGCode() {
+    public StringBuilder getGCode(ToolDBManager toolDBManager) {
         final StringBuilder gcode = new StringBuilder();
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -133,7 +134,7 @@ public class Project {
         gCodeGenerator.startProgram();
         for (Task t : milltasks) {
             gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + t.getName(), 50, "-"));
-            t.generateGCode(gCodeGenerator);
+            t.generateGCode(toolDBManager, gCodeGenerator);
         }
         gCodeGenerator.endProgram();
 

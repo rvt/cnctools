@@ -39,9 +39,8 @@
 package com.rvantwisk.cnctools.misc;
 
 import com.rvantwisk.cnctools.data.AvailableTask;
-import com.rvantwisk.cnctools.data.Task;
-import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.data.Project;
+import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -105,7 +104,7 @@ public class DialogBuilder {
     /**
      * Create a new OPeration's dialog
      * @param project
-     * @param tooldb
+     * @param toolDBManager
      * @param task
      * @return
      * @throws ClassNotFoundException
@@ -114,7 +113,7 @@ public class DialogBuilder {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public FXMLDialog getOperationDialog(final Project project, final ObservableList<ToolParameter> tooldb, final Task task) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public FXMLDialog getOperationDialog(final Project project, final ToolDBManager toolDBManager, final Task task) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         registerBean(task.getClassName());
         MillTaskController instance = (MillTaskController) context.getBean(task.getClassName());
@@ -122,7 +121,7 @@ public class DialogBuilder {
         // Init dialog with needed parameters so it can operate on this project
         instance.setTask(task);
         instance.setProject(project);
-        instance.setToolDB(tooldb);
+        instance.setToolDBManager(toolDBManager);
 
         // get the resource path of the main class for this MillTask
         List<String> path = new ArrayList<>(Arrays.asList(task.getClassName().split("\\.")));

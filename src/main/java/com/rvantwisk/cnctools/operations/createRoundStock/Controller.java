@@ -44,17 +44,17 @@ import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
 import com.rvantwisk.cnctools.data.PostProcessorConfig;
 import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.Task;
-import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcodegenerator.dialects.RS274;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.SimException;
 import com.rvantwisk.cnctools.gcodeparser.exceptions.UnsupportedSimException;
 import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.Factory;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
+import com.rvantwisk.events.ToolChangedEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -73,7 +73,7 @@ public class Controller extends MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Project project;
-    final private ObservableList<ToolParameter> toolDB = FXCollections.observableArrayList();
+    private ToolDBManager toolDBManager;
 
     @FXML
     private SelectOrEditToolControl selectOrEditTool;
@@ -102,9 +102,8 @@ public class Controller extends MillTaskController {
     }
 
     @Override
-    public void setToolDB(ObservableList<ToolParameter> tooldb) {
-        toolDB.clear();
-        toolDB.addAll(tooldb);
+    public void setToolDBManager(ToolDBManager toolDBManager) {
+        this.toolDBManager = toolDBManager;
     }
 
     @Override
@@ -132,7 +131,7 @@ public class Controller extends MillTaskController {
     }
 
     private void fillModal() {
-        model.setToolParameters(this.selectOrEditTool.getTool());
+        model.setToolID(this.selectOrEditTool.getTool().getId());
         model.finalSizeProperty().set(iFinalSize.dimensionProperty());
         model.finalLengthProperty().set(iFinalLength.dimensionProperty());
         model.stockSizeProperty().set(iStockSize.dimensionProperty());
@@ -160,11 +159,18 @@ public class Controller extends MillTaskController {
     void initialize() {
 
         iName.textProperty().setValue(task.getName());
-        selectOrEditTool.setTool(model.getToolParameters());
+        selectOrEditTool.setTool(toolDBManager.getByID(model.getToolID()));
 
         iFinalLength.dimensionProperty().set(model.finalLengthProperty());
         iFinalSize.dimensionProperty().set(model.finalSizeProperty());
         iStockSize.dimensionProperty().set(model.stockSizeProperty());
+
+        selectOrEditTool.addEventHandler(ToolChangedEvent.TOOL_CHANGED_EVENT, new EventHandler<ToolChangedEvent>() {
+            @Override
+            public void handle(ToolChangedEvent toolChangedEvent) {
+                generateGCode();
+            }
+        });
 
 
         iFinalLength.dimensionProperty().valueProperty().addListener(new ChangeListener<Number>() {
@@ -207,7 +213,7 @@ public class Controller extends MillTaskController {
             RS274 gCodeGenerator = new RS274(ppc);
             gCodeGenerator.setOutput(printStream);
 
-            model.generateGCode(gCodeGenerator);
+            model.generateGCode(toolDBManager, gCodeGenerator);
 
             InputStream in = new ByteArrayInputStream(os.toByteArray());
             gCodeViewerControl.load(in);

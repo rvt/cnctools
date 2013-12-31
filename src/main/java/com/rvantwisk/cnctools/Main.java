@@ -74,6 +74,8 @@ public class Main extends Application {
     // http://stackoverflow.com/questions/9705440/prefill-listview-in-an-application-with-fxml
     // http://www.scorchworks.com/Fengrave/fengrave.html#vcarve
     // http://www.java2s.com/Open-Source/Java/Project-Management/ThinkingRock-2.2.1/tr/datastore/xstream/XStreamDataStore.java.htm
+    // http://docs.oracle.com/javafx/2/fxml_get_started/jfxpub-fxml_get_started.htm
+    // http://docs.oracle.com/javafx/2/api/javafx/fxml/doc-files/introduction_to_fxml.html
 
     public static void main(String[] args) {
 

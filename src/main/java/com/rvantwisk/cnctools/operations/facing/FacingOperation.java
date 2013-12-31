@@ -36,54 +36,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
-
-import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+package com.rvantwisk.cnctools.operations.facing;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/8/13
- * Time: 2:05 PM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 12/30/13.
  */
-public class Task extends AbstractTask  {
-
-    private BooleanProperty enabled = new SimpleBooleanProperty();
-    private ObjectProperty<AbstractOperation> milltaskModel = new SimpleObjectProperty<AbstractOperation>();
-
-    public Task(String name, String description, String className, String fxmlFileName) {
-        super(name,description,className,fxmlFileName);
-        this.enabled.set(Boolean.TRUE);
-    }
-
-    public Task() {
-    }
-
-    public BooleanProperty enabledProperty() {
-        return enabled;
-    }
-
-    public <T extends AbstractOperation> T getMilltaskModel() {
-        return (T) milltaskModel.get();
-    }
-
-    public ObjectProperty<AbstractOperation> milltaskModelProperty() {
-        return milltaskModel;
-    }
-
-    public void setMilltaskModel(AbstractOperation milltaskModel) {
-        this.milltaskModel.set(milltaskModel);
-    }
-
-    public void generateGCode(final ToolDBManager toolDBManager, final GCodeGenerator gCodeGenerator) {
-        if (enabled.get()==true) {
-            milltaskModel.get().generateGCode(toolDBManager, gCodeGenerator);
-        }
-    };
+public class FacingOperation {
 }

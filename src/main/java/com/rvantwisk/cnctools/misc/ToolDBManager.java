@@ -36,54 +36,49 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
+package com.rvantwisk.cnctools.misc;
 
-import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import com.rvantwisk.cnctools.data.ToolParameter;
+import javafx.collections.ObservableList;
+
+import java.util.Iterator;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/8/13
- * Time: 2:05 PM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 12/30/13.
  */
-public class Task extends AbstractTask  {
+public class ToolDBManager {
+    final private ObservableList<ToolParameter> toolDB;
 
-    private BooleanProperty enabled = new SimpleBooleanProperty();
-    private ObjectProperty<AbstractOperation> milltaskModel = new SimpleObjectProperty<AbstractOperation>();
-
-    public Task(String name, String description, String className, String fxmlFileName) {
-        super(name,description,className,fxmlFileName);
-        this.enabled.set(Boolean.TRUE);
+    public ToolDBManager(ObservableList<ToolParameter> toolDBProperty) {
+        this.toolDB = toolDBProperty;
     }
 
-    public Task() {
-    }
-
-    public BooleanProperty enabledProperty() {
-        return enabled;
-    }
-
-    public <T extends AbstractOperation> T getMilltaskModel() {
-        return (T) milltaskModel.get();
-    }
-
-    public ObjectProperty<AbstractOperation> milltaskModelProperty() {
-        return milltaskModel;
-    }
-
-    public void setMilltaskModel(AbstractOperation milltaskModel) {
-        this.milltaskModel.set(milltaskModel);
-    }
-
-    public void generateGCode(final ToolDBManager toolDBManager, final GCodeGenerator gCodeGenerator) {
-        if (enabled.get()==true) {
-            milltaskModel.get().generateGCode(toolDBManager, gCodeGenerator);
+    /**
+     * get a tool by ID
+     * @param id
+     * @return
+     */
+    public ToolParameter getByID(final String id) {
+        for (ToolParameter tp : toolDB) {
+            if (tp.getId().equals(id)) {
+                return tp;
+            }
         }
-    };
+        return null;
+    }
+
+    public ObservableList<ToolParameter> getToolDB() {
+        return toolDB;
+    }
+
+    public void remove(final String id) {
+        Iterator<ToolParameter> iter = toolDB.iterator();
+        ToolParameter tp;
+        while ((tp = iter.next())!=null) {
+            if (tp.getId().equals(id)) {
+                iter.remove();
+                return;
+            }
+        }
+    }
 }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.rvantwisk.cnctools.controls.*?>
+<?import com.rvantwisk.cnctools.controls.DimensionControl?>
+<?import com.rvantwisk.cnctools.controls.SelectOrEditToolControl?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+<?scenebuilder-classpath-element ../../../../../../../../target/classes?>
+
+<!--
+  ~ Copyright (c) 2013, R. van Twisk
+  ~ All rights reserved.
+  ~ Licensed under the The BSD 3-Clause License;
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at:
+  ~
+  ~ http://opensource.org/licenses/BSD-3-Clause
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions
+  ~ are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright
+  ~ notice, this list of conditions and the following disclaimer.
+  ~
+  ~ Redistributions in binary form must reproduce the above copyright
+  ~ notice, this list of conditions and the following disclaimer in the
+  ~ documentation and/or other materials provided with the distribution.
+  ~
+  ~ Neither the name of the aic-util nor the names of its
+  ~ contributors may be used to endorse or promote products derived from
+  ~ this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ~ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  ~ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  ~ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  ~ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  ~ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  ~ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+  ~ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+  ~ OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="448.999755859375" prefWidth="702.999755859375"
+            styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.operations.createRoundStock.Controller">
+    <children>
+        <Separator prefWidth="503.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="26.0"/>
+        <Separator prefWidth="483.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0"/>
+        <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="768.999755859375" styleClass="header" text="Create Round Stock" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0"
+               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <font>
+                <Font size="28.0"/>
+            </font>
+        </Label>
+        <HBox alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="314.999755859375" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+            <children>
+                <Button cancelButton="true" mnemonicParsing="false" onAction="#onCancel" text="Cancel"/>
+                <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#onSave" text="Save"/>
+            </children>
+        </HBox>
+        <AnchorPane prefHeight="309.0" prefWidth="353.0" AnchorPane.bottomAnchor="75.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="65.0">
+            <children>
+                <GridPane alignment="TOP_LEFT" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" prefWidth="355.0">
+                    <children>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1000.0" text="Size of stock:" GridPane.columnIndex="0" GridPane.hgrow="NEVER" GridPane.rowIndex="2"/>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1000.0" text="Final Size:" GridPane.columnIndex="0" GridPane.hgrow="NEVER" GridPane.rowIndex="3"/>
+                        <DimensionControl fx:id="iStockSize" dimensionType="LENGTH" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <DimensionControl fx:id="iFinalSize" dimensionType="LENGTH" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <DimensionControl fx:id="iFinalLength" dimensionType="LENGTH" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1000.0" text="Final Length:" GridPane.columnIndex="0" GridPane.hgrow="NEVER" GridPane.rowIndex="4"/>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1000.0" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="iName" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </children>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="141.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="208.0" minWidth="10.0" prefWidth="204.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="0.0" minHeight="0.0" percentHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                </GridPane>
+                <SelectOrEditToolControl fx:id="selectOrEditTool" layoutX="161.0" layoutY="137.0" style=""/>
+            </children>
+        </AnchorPane>
+        <GCodeViewerControl id="gCodeControl" fx:id="gCodeViewerControl" prefHeight="309.0" prefWidth="321.999755859375" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="361.0"
+                            AnchorPane.topAnchor="65.0"/>
+    </children>
+    <stylesheets>
+        <URL value="@../../CNCTools.css"/>
+    </stylesheets>
+</AnchorPane>

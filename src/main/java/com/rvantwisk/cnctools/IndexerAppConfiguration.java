@@ -39,6 +39,7 @@
 package com.rvantwisk.cnctools;
 
 import com.rvantwisk.cnctools.misc.ProjectModel;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,5 +64,11 @@ public class IndexerAppConfiguration {
     @Bean(name = "allOperations")
     public List<Class<? extends RoundStockHelper>> getAllOperations()  {
         return operations;
+    }
+
+
+    @Bean
+    public ToolDBManager toolDBManager() {
+        return this.projectModel().getToolDBManager();
     }
 }

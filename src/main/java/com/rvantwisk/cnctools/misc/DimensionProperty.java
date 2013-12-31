@@ -42,7 +42,10 @@ import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-
+/**
+ * A property that stores both the value and it's dimension in one property
+ * If the dimension changes, the value wil automatically be changed aswell
+ */
 public class DimensionProperty {
 
 

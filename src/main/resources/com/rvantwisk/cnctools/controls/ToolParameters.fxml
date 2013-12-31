@@ -13,7 +13,6 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
 <?scenebuilder-classpath-element ../../../../../../../target/classes?>
-
 <!--
   ~ Copyright (c) 2013, R. van Twisk
   ~ All rights reserved.
@@ -66,25 +65,18 @@
                     <TextField fx:id="iName" prefWidth="181.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="0" />
                     <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Tool Type:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.vgrow="NEVER" />
                     <ChoiceBox fx:id="cbToolType" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="Units:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.vgrow="NEVER" />
-                    <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                      <children>
-                        <CheckBox id="cbUnitMM" mnemonicParsing="false" text="MM" />
-                        <CheckBox id="cbUnitInch" mnemonicParsing="false" text="Inch">
-                          <HBox.margin>
-                            <Insets left="5.0" />
-                          </HBox.margin>
-                        </CheckBox>
-                      </children>
-                    </HBox>
-                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="No. Futes:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
+                    <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" text="No. Futes:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.vgrow="NEVER" />
                     <Label alignment="CENTER_RIGHT" text="Tool Number:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                    <ChoiceBox id="cbNoFlutes" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <ChoiceBox fx:id="ddNumFlutes" GridPane.columnIndex="1" GridPane.rowIndex="3">
                       <items>
                         <FXCollections fx:factory="observableArrayList">
-                          <String fx:value="Item 1" />
-                          <String fx:value="Item 2" />
-                          <String fx:value="Item 3" />
+                          <String fx:value="" fx:id="0" />
+                            <String fx:value="1" fx:id="1" />
+                            <String fx:value="2" fx:id="2" />
+                          <String fx:value="3" fx:id="3" />
+                          <String fx:value="4" fx:id="4" />
+                          <String fx:value="5" fx:id="5" />
+                          <String fx:value="6" fx:id="6" />
                         </FXCollections>
                       </items>
                     </ChoiceBox>
@@ -99,7 +91,6 @@
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   </rowConstraints>
                 </GridPane>
@@ -140,12 +131,12 @@
                     <Label text="Spindle Direction:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
                     <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
                       <children>
-                        <CheckBox id="cbSpindleCC" fx:id="iCC" mnemonicParsing="false" text="CC" />
-                        <CheckBox id="cbSpindleCCW" mnemonicParsing="false" text="CCW">
-                          <HBox.margin>
-                            <Insets left="5.0" />
-                          </HBox.margin>
-                        </CheckBox>
+                        <RadioButton id="iSPindleCC" fx:id="iSPindleCW" mnemonicParsing="false" text="CW">
+                          <toggleGroup>
+                            <ToggleGroup fx:id="spindleDirection" />
+                          </toggleGroup>
+                        </RadioButton>
+                        <RadioButton id="iSpindleCCW" fx:id="iSPindleCCW" mnemonicParsing="false" text="CCW" toggleGroup="$spindleDirection" />
                       </children>
                     </HBox>
                     <Label text="Axial Depth:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
@@ -166,7 +157,7 @@
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="17.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   </rowConstraints>

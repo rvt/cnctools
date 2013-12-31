@@ -17,6 +17,7 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +27,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class DimensionControl extends HBox {
+    private final DecimalFormat SHORTESTFORMATTER = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
 
     @FXML
     private RestrictiveTextField iValue;
@@ -72,7 +74,7 @@ public class DimensionControl extends HBox {
         iValue.textProperty().bindBidirectional(dimension.valueProperty(), new StringConverter<Number>() {
             @Override
             public String toString(Number t) {
-                return t.toString();
+                return SHORTESTFORMATTER.format(t.doubleValue());
             }
 
             @Override
@@ -136,4 +138,5 @@ public class DimensionControl extends HBox {
         this.dimensionType = dimensionType;
         showDimention();
     }
+
 }

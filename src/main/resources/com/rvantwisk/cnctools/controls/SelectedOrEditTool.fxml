@@ -55,7 +55,7 @@
         <HBox alignment="CENTER" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <Button fx:id="bntSelect" defaultButton="false" mnemonicParsing="false" onAction="#onSelect" prefWidth="60.0" text="Select"/>
-                <Button fx:id="btnEdit" mnemonicParsing="false" prefWidth="60.0" text="Edit" onAction="#onEdit"/>
+                <Button fx:id="btnEdit" mnemonicParsing="false" prefWidth="60.0" text="Edit" onAction="#onEdit" visible="false"/>
             </children>
         </HBox>
     </children>

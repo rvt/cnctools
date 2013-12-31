@@ -72,6 +72,15 @@ public class ProjectModel {
     final private ObservableList<ToolParameter> toolDBProperty = FXCollections.observableArrayList();
     final private ObservableList<PostProcessorConfig> postProcessors = FXCollections.observableArrayList();
 
+    private transient ToolDBManager toolDBManager;
+
+    public ToolDBManager getToolDBManager() {
+        if (toolDBManager==null) {
+            toolDBManager = new ToolDBManager(toolDBProperty);
+        }
+        return toolDBManager;
+    }
+
     public ObservableList<Project> projectsProperty() {
         return projectsProperty;
     }

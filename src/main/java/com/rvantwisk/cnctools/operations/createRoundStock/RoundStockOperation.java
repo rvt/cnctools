@@ -43,8 +43,9 @@ import com.rvantwisk.cnctools.data.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,32 +56,32 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class RoundStockOperation extends AbstractOperation {
 
-    private final ObjectProperty<ToolParameter> toolParameters = new SimpleObjectProperty<>();
 
     private final DimensionProperty stockSize= new DimensionProperty();
     private final DimensionProperty finalLength = new DimensionProperty();
     private final DimensionProperty finalSize = new DimensionProperty();
+    private final StringProperty toolID = new SimpleStringProperty();
 
     public RoundStockOperation() {
     }
 
-    public RoundStockOperation(ToolParameter tool, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
-        this.toolParameters.set(tool);
+    public RoundStockOperation(StringProperty toolID, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
+        this.toolID.set(toolID.get());
         this.finalLength.set(finalLengthProperty);
         this.stockSize.set(stockSizeProperty);
         this.finalSize.set(finalSizeProperty);
     }
 
-    public ToolParameter getToolParameters() {
-        return toolParameters.get();
+    public String getToolID() {
+        return toolID.get();
     }
 
-    public ObjectProperty<ToolParameter> toolParametersProperty() {
-        return toolParameters;
+    public StringProperty toolIDProperty() {
+        return toolID;
     }
 
-    public void setToolParameters(ToolParameter toolParameters) {
-        this.toolParameters.set(toolParameters);
+    public void setToolID(String toolID) {
+        this.toolID.set(toolID);
     }
 
     public DimensionProperty stockSizeProperty() {
@@ -97,21 +98,24 @@ public class RoundStockOperation extends AbstractOperation {
 
 
     @Override
-    public void generateGCode(final GCodeGenerator gCodeGenerator) {
+    public void generateGCode(final ToolDBManager toolDBManager, final GCodeGenerator gCodeGenerator) {
         final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
-        EndMill em = toolParameters.get().getToolType();
+        ToolParameter tp = toolDBManager.getByID(getToolID());
+
+        EndMill em = tp.getToolType();
 
         helper.setFinalSize(gCodeGenerator.convert(finalSize).getValue());
         helper.setStockSize(gCodeGenerator.convert(stockSize).getValue());
         helper.setStockLength(gCodeGenerator.convert(finalLength).getValue());
         helper.setMillSize(gCodeGenerator.convert(em.diameterProperty()).getValue());
-        helper.setRadialDepth(gCodeGenerator.convert(toolParameters.get().radialDepthProperty()).getValue());
-        helper.setAxialDepth(gCodeGenerator.convert(toolParameters.get().axialDepthProperty()).getValue());
-        helper.setFeedRate(gCodeGenerator.convert(toolParameters.get().feedRateProperty()).getValue());
+        helper.setRadialDepth(gCodeGenerator.convert(tp.radialDepthProperty()).getValue());
+        helper.setAxialDepth(gCodeGenerator.convert(tp.axialDepthProperty()).getValue());
+        helper.setFeedRate(gCodeGenerator.convert(tp.feedRateProperty()).getValue());
         helper.setRapidClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
         helper.setStockClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
 
         helper.calculate();
     }
+
 }

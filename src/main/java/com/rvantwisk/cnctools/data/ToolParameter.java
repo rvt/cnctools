@@ -42,7 +42,11 @@ import com.rvantwisk.cnctools.data.interfaces.ITool;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import javafx.beans.property.*;
 
+import java.util.UUID;
+
 public class ToolParameter {
+
+    private final StringProperty id = new SimpleStringProperty();
 
     // General
     private final StringProperty name = new SimpleStringProperty();
@@ -62,6 +66,7 @@ public class ToolParameter {
     private final ObjectProperty<ITool> toolType = new SimpleObjectProperty<>();
 
     public ToolParameter(final String name, final Integer toolNumber, final Integer numberOfFlutes, final DimensionProperty spindleSpeed, final double feedRate, final Double plungeRate, final double axialDepth, final double radialDepth, final Boolean coolant, final SpindleDirection spindleDirection, final ITool toolType) {
+        this.id.set(UUID.randomUUID().toString());
         this.name.setValue(name);
         this.toolNumber.setValue(toolNumber);
         this.numberOfFlutes.setValue(numberOfFlutes);
@@ -75,11 +80,20 @@ public class ToolParameter {
         this.toolType.setValue(toolType);
     }
 
+    public String getId() {
+        return id.get();
+    }
+
+    public StringProperty idProperty() {
+        return id;
+    }
+
     public enum SpindleDirection {
         CW, CCW
     }
 
     public ToolParameter() {
+        this.id.set(UUID.randomUUID().toString());
     }
 
     public String getName() {
@@ -115,7 +129,7 @@ public class ToolParameter {
     }
 
     public void setNumberOfFlutes(Integer numberOfFlutes) {
-        this.numberOfFlutes.set(numberOfFlutes);
+        this.numberOfFlutes.setValue(numberOfFlutes);
     }
 
     public DimensionProperty spindleSpeedProperty() {

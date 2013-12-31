@@ -39,6 +39,7 @@
 package com.rvantwisk.cnctools.data;
 
 import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,5 +51,5 @@ import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 
 public abstract class AbstractOperation {
 
-    abstract public void generateGCode(final GCodeGenerator gCodeGenerator);
+    abstract public void generateGCode(final ToolDBManager toolDBManager, final GCodeGenerator gCodeGenerator);
 }

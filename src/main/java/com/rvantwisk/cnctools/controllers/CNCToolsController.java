@@ -39,14 +39,10 @@
 package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.ScreensConfiguration;
-import com.rvantwisk.cnctools.misc.AbstractController;
-import com.rvantwisk.cnctools.misc.FXMLDialog;
+import com.rvantwisk.cnctools.misc.*;
 import com.rvantwisk.cnctools.data.*;
-import com.rvantwisk.cnctools.misc.DimensionProperty;
-import com.rvantwisk.cnctools.misc.Dimensions;
-import com.rvantwisk.cnctools.misc.Factory;
-import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockOperation;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -88,6 +84,9 @@ public class CNCToolsController extends AbstractController {
     @Autowired
     @Qualifier("projectModel")
     private ProjectModel projectModel;
+
+    @Autowired
+    private ToolDBManager toolDBManager;
 
     @FXML
     TextArea descriptionValue;
@@ -162,7 +161,7 @@ public class CNCToolsController extends AbstractController {
                     dialog.show();
                 } else {
 
-                    final StringBuilder gCode = p.getGCode();
+                    final StringBuilder gCode = p.getGCode(toolDBManager);
 
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.getExtensionFilters().addAll(
@@ -260,7 +259,7 @@ public class CNCToolsController extends AbstractController {
             Task task = (Task) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
             FXMLDialog dialog = screens.milltaskFactory().getOperationDialog(
                     v_projectList.getSelectionModel().getSelectedItem(),
-                    projectModel.toolDBProperty(),
+                    toolDBManager,
                     task);
 
             dialog.showAndWait();
@@ -277,7 +276,7 @@ public class CNCToolsController extends AbstractController {
 
         ToolParameter nt = Factory.newTool();
         nt.setName("6MM end Mill");
-        mt.setMilltaskModel(new RoundStockOperation(nt, DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
         mt = new Task("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.Controller", "CreateRoundStock.fxml");
@@ -286,7 +285,7 @@ public class CNCToolsController extends AbstractController {
         nt.radialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.setToolType(new EndMill(new DimensionProperty(8.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockOperation(nt, DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
 
@@ -297,7 +296,7 @@ public class CNCToolsController extends AbstractController {
         nt.radialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.setToolType(new EndMill(new DimensionProperty(10.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockOperation(nt, DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
         projectModel.addProject(p);
 

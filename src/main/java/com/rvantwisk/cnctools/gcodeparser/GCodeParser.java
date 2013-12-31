@@ -78,13 +78,11 @@ public class GCodeParser {
     private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
     private final AbstractMachineValidator machineValidator;                      // A machine controller to send parsed block's + machine status into
     private final Pattern GCODEPATTERN = Pattern.compile("([GXYZABCDFHIJKLMNPQRSTUVW]o?)\\s*([0-9.+-]+)?(\\s*/?\\s*)([0-9.+-]+)?");
-    private final Pattern COMMENTS1 = Pattern.compile("\\(.*\\)");
-    private final Pattern COMMENTS2 = Pattern.compile("\\;.*");
+    private final Pattern COMMENTS1 = Pattern.compile("\\(.*\\)"); // Comment between ()
+    private final Pattern COMMENTS2 = Pattern.compile("\\;.*"); // comment after ;
 
     private String currentLine = ""; // Hold's the current line between begin and endblock calls
-    private int currentLineNumber;
-
-    private final Map<Character, Pattern> patternCache = new HashMap<>();   //Ereg Pattern cache
+    private int currentLineNumber=1;
 
     public GCodeParser(final MachineController machineController, final AbstractMachineValidator machineValidator, final InputStream input) throws SimException {
         this.machineController = machineController;
@@ -112,7 +110,7 @@ public class GCodeParser {
         final StringBuilder parsedLine = new StringBuilder(COMMENTS2.matcher(COMMENTS1.matcher(currentLine).replaceAll("")).replaceAll(""));
 
         // A map that holds all parsed codes
-        Map<String, ParsedWord> block = new HashMap<>();
+        Map<String, ParsedWord> block = new HashMap<>(10);
 
         // Hold's the current parsed word
         ParsedWord thisWord;
@@ -270,5 +268,7 @@ public class GCodeParser {
         return currentLine;
     }
 
-
+    public int getCurrentLineNumber() {
+        return currentLineNumber;
+    }
 }

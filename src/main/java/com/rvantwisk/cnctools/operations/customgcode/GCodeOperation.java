@@ -40,6 +40,7 @@ package com.rvantwisk.cnctools.operations.customgcode;
 
 import com.rvantwisk.cnctools.data.AbstractOperation;
 import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
+import com.rvantwisk.cnctools.misc.ToolDBManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -51,7 +52,7 @@ public class GCodeOperation extends AbstractOperation {
     private final StringProperty gcode= new SimpleStringProperty();
 
     @Override
-    public void generateGCode(GCodeGenerator gCodeGenerator) {
+    public void generateGCode(final ToolDBManager toolDBManager,GCodeGenerator gCodeGenerator) {
         gCodeGenerator.addRaw(gcode.get());
     }
 

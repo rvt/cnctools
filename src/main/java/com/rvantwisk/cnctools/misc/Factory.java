@@ -55,9 +55,7 @@ import com.rvantwisk.cnctools.gcodegenerator.interfaces.GCodeGenerator;
 public class Factory {
 
     private Factory() {
-
     }
-
 
     public static StockToolParameter newStockTool() {
         final StockToolParameter nt = new StockToolParameter();
