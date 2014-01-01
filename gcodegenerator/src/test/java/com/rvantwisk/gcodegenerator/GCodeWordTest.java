@@ -36,68 +36,25 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.gcodegenerator.interfaces;
+package com.rvantwisk.gcodegenerator;
 
-import com.rvantwisk.gcodegenerator.GCodeBuilder;
+import org.junit.Test;
 
-import java.io.PrintStream;
+import static org.junit.Assert.assertTrue;
 
-public interface GCodeGenerator {
+/**
+ * Created by rvt on 12/31/13.
+ */
+public class GCodeWordTest {
 
-    /**
-     * Add a small comtent on the next line
-     *
-     * @param comment
-     */
-    public void comment(final String comment);
+    @Test
+    public void equalityTest() {
+        GCodeWord t1 = new GCodeWord("G4", null);
+        GCodeWord t2 = new GCodeWord("G4", null);
+        assertTrue("Same GCode must return equal", t1.equals(t2));
 
-    /**
-     * Add a large comment on the next line(s)
-     *
-     * @param comment
-     */
-    public void commentLarge(final String comment);
-
-    /**
-     * Provide a output to write into
-     *
-     * @param out
-     */
-    public void setOutput(final PrintStream out);
-
-    /**
-     * Add a new GCode block
-     *
-     * @param GCodeBuilder
-     */
-    public void addBlock(final GCodeBuilder GCodeBuilder);
-
-    /**
-     * Add raw gcode, be carefull using raw code, not all dialect's might support what you are trying to accomplish
-     *
-     * @param s
-     */
-    void addRaw(String s);
-
-    /**
-     * Add the start (preamble) of the GCode to the start of a program
-     * Execute this before any G-Code get's added
-     */
-    void startProgram();
-
-    /**
-     * Add the end (postabmle) to the end of the program
-     * Execute this after all G-Code has been added, no G-Code can be added after endProgram is called
-     */
-    void endProgram();
-
-    /**
-     * Return the associated post processor configuration
-     *
-     * @param <T>
-     * @return
-     */
-    public <T extends PostProcessorConfig> T getPostProcessorConfig();
-
-
+        t1 = new GCodeWord("G4", 12.0);
+        t2 = new GCodeWord("G4", 13.0);
+        assertTrue("Same GCode must return equal", t1.equals(t2));
+    }
 }
