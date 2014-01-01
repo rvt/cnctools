@@ -70,7 +70,7 @@ public class ProjectModel {
     private static final String POSTPROCESSORS_XML = "postprocessors.xml";
     final private ObservableList<Project> projectsProperty = FXCollections.observableArrayList();
     final private ObservableList<ToolParameter> toolDBProperty = FXCollections.observableArrayList();
-    final private ObservableList<PostProcessorConfig> postProcessors = FXCollections.observableArrayList();
+    final private ObservableList<CNCToolsPostProcessConfig> postProcessors = FXCollections.observableArrayList();
 
     private transient ToolDBManager toolDBManager;
 
@@ -88,7 +88,7 @@ public class ProjectModel {
     public ObservableList<ToolParameter> toolDBProperty() {
         return toolDBProperty;
     }
-    public ObservableList<PostProcessorConfig> postProcessorsProperty() {
+    public ObservableList<CNCToolsPostProcessConfig> postProcessorsProperty() {
         return postProcessors;
     }
 
@@ -226,7 +226,7 @@ public class ProjectModel {
         try {
 
             File file = new File(POSTPROCESSORS_XML);
-            ArrayList<PostProcessorConfig> data = (ArrayList<PostProcessorConfig>) xstream.fromXML(readFileIntoString(file).toString());
+            ArrayList<CNCToolsPostProcessConfig> data = (ArrayList<CNCToolsPostProcessConfig>) xstream.fromXML(readFileIntoString(file).toString());
             postProcessors.clear();
             postProcessors.addAll(data);
         } catch (Exception e) { // catches ANY exception

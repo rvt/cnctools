@@ -1,7 +1,9 @@
 package com.rvantwisk.cnctools.gcode;
 
+import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import com.rvantwisk.cnctools.misc.Dimensions;
+import com.rvantwisk.gcodegenerator.GCodeBuilder;
 import com.rvantwisk.gcodegenerator.dialects.RS274;
 import com.rvantwisk.gcodegenerator.interfaces.PostProcessorConfig;
 
@@ -40,6 +42,28 @@ public class CncToolsRS274 extends RS274 implements CncToolsGCodegenerator {
             return Dimensions.Dim.INCH_MINUTE;
         } else {
             throw new RuntimeException("Invalid dimension for length found, no suitable velocity is available.");
+        }
+    }
+
+    @Override
+    public void addTool(ToolParameter tool) {
+        // Add tool if this machine has a tool changer
+        if (this.getPostProcessorConfig().isHasToolChanger() && tool.toolNumberProperty().getValue()!=null) {
+            this.addBlock(new GCodeBuilder().M6(tool.getToolNumber()));
+        }
+
+        // Add feedrate
+        if (tool.feedRateProperty().valueProperty().getValue()!=null) {
+            this.addBlock(new GCodeBuilder().F(convert(tool.feedRateProperty()).getValue()));
+        }
+
+        // Add spindle speed
+        if (tool.spindleSpeedProperty().valueProperty().getValue()!=null) {
+            if (ToolParameter.SpindleDirection.CW.toString().equals(tool.spindleDirectionProperty().get())) {
+                this.addBlock(new GCodeBuilder().M3(convert(tool.spindleSpeedProperty()).getValue()));
+            } else {
+                this.addBlock(new GCodeBuilder().M4(convert(tool.spindleSpeedProperty()).getValue()));
+            }
         }
     }
 }

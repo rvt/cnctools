@@ -38,9 +38,9 @@
 
 package com.rvantwisk.cnctools.controllers;
 
+import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.PostProcessorControl;
-import com.rvantwisk.cnctools.data.PostProcessorConfig;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import javafx.beans.value.ChangeListener;
@@ -62,7 +62,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class PostProcessorsController extends AbstractController {
     private Mode mode;
 
-    private PostProcessorConfig postProcessConfig = null;
+    private CNCToolsPostProcessConfig postProcessConfig = null;
 
 
     @FXML
@@ -86,7 +86,7 @@ public class PostProcessorsController extends AbstractController {
     }
 
     @FXML
-    private ListView<PostProcessorConfig> v_postprocessorList;
+    private ListView<CNCToolsPostProcessConfig> v_postprocessorList;
 
     @Autowired
     @Qualifier("projectModel")
@@ -107,7 +107,7 @@ public class PostProcessorsController extends AbstractController {
             dialog.setTitleText("Deleting a postprocessor");
             dialog.setMessage("Are you sure you want to delete this post processor?");
             if (dialog.show() == MonologFXButton.Type.YES) {
-                PostProcessorConfig p = v_postprocessorList.getSelectionModel().getSelectedItem();
+                CNCToolsPostProcessConfig p = v_postprocessorList.getSelectionModel().getSelectedItem();
                 projectModel.postProcessorsProperty().remove(p);
                 v_postprocessorList.getSelectionModel().clearSelection();
             }
@@ -135,17 +135,17 @@ public class PostProcessorsController extends AbstractController {
 
     @FXML
     public void onNew(ActionEvent actionEvent) {
-        PostProcessorConfig tp = Factory.newPostProcessor();
+        CNCToolsPostProcessConfig tp = Factory.newPostProcessor();
         projectModel.postProcessorsProperty().add(tp);
         int i = projectModel.postProcessorsProperty().indexOf(tp);
         v_postprocessorList.getSelectionModel().selectIndices(i);
     }
 
-    public PostProcessorConfig getPostProcessConfig() {
+    public CNCToolsPostProcessConfig getPostProcessConfig() {
         return postProcessConfig;
     }
 
-    public void setPostProcessConfig(PostProcessorConfig postProcessConfig) {
+    public void setPostProcessConfig(CNCToolsPostProcessConfig postProcessConfig) {
         this.postProcessConfig = postProcessConfig;
     }
 
@@ -165,9 +165,9 @@ public class PostProcessorsController extends AbstractController {
         btnDelete.disableProperty().bind(v_postprocessorList.getSelectionModel().selectedItemProperty().isNull());
 
         // When the user selects a item in the list then update the tool panel
-        v_postprocessorList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<PostProcessorConfig>() {
+        v_postprocessorList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<CNCToolsPostProcessConfig>() {
             @Override
-            public void changed(ObservableValue<? extends PostProcessorConfig> observable, PostProcessorConfig oldValue, PostProcessorConfig newValue) {
+            public void changed(ObservableValue<? extends CNCToolsPostProcessConfig> observable, CNCToolsPostProcessConfig oldValue, CNCToolsPostProcessConfig newValue) {
                 if (v_postprocessorList.getSelectionModel().selectedItemProperty().get() == null) {
                     postProcessor.setData(null);
                     //    toolParametersController.setTool(new ToolParameter("", ToolParameter.Units.MM, new EndMill(6.0)));
@@ -179,12 +179,12 @@ public class PostProcessorsController extends AbstractController {
 
 
         // Set text in ListView
-        v_postprocessorList.setCellFactory(new Callback<ListView<PostProcessorConfig>, ListCell<PostProcessorConfig>>() {
+        v_postprocessorList.setCellFactory(new Callback<ListView<CNCToolsPostProcessConfig>, ListCell<CNCToolsPostProcessConfig>>() {
             @Override
-            public ListCell<PostProcessorConfig> call(ListView<PostProcessorConfig> p) {
-                ListCell<PostProcessorConfig> cell = new ListCell<PostProcessorConfig>() {
+            public ListCell<CNCToolsPostProcessConfig> call(ListView<CNCToolsPostProcessConfig> p) {
+                ListCell<CNCToolsPostProcessConfig> cell = new ListCell<CNCToolsPostProcessConfig>() {
                     @Override
-                    protected void updateItem(PostProcessorConfig t, boolean bln) {
+                    protected void updateItem(CNCToolsPostProcessConfig t, boolean bln) {
                         super.updateItem(t, bln);
                         this.textProperty().unbind();
                         if (t != null) {

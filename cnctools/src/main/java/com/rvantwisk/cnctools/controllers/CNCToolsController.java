@@ -352,7 +352,7 @@ public class CNCToolsController extends AbstractController {
 
     private void addDefaultPostprocessorSet() {
         // Defaul't MM post processor
-        PostProcessorConfig ppc = Factory.newPostProcessor();
+        CNCToolsPostProcessConfig ppc = Factory.newPostProcessor();
         ppc.setName("LinuxCNC (mm)");
         ppc.preabmleProperty().set("%\n" +
                 "G17 G21 G40 G49\n" +
@@ -506,7 +506,7 @@ public class CNCToolsController extends AbstractController {
                 dialog.showAndWait();
                 if (controller.getReturned() == Result.USE) {
                     Project P = v_projectList.getSelectionModel().getSelectedItem();
-                    P.setPostProcessor(ProjectModel.<PostProcessorConfig>deepCopy(controller.getPostProcessConfig()));
+                    P.setPostProcessor(ProjectModel.<CNCToolsPostProcessConfig>deepCopy(controller.getPostProcessConfig()));
                 }
             }
         } catch (Exception e) {

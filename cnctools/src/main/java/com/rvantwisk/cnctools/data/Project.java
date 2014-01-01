@@ -57,7 +57,7 @@ public class Project {
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty description = new SimpleStringProperty();
     private final ObservableList<Task> milltasks = FXCollections.observableArrayList();
-    private  ObjectProperty<PostProcessorConfig> postProcessor = new SimpleObjectProperty<>();
+    private  ObjectProperty<CNCToolsPostProcessConfig> postProcessor = new SimpleObjectProperty<>();
 
     public Project() {
     }
@@ -110,15 +110,15 @@ public class Project {
         this.description.set(description);
     }
 
-    public PostProcessorConfig getPostProcessor() {
+    public CNCToolsPostProcessConfig getPostProcessor() {
         return postProcessor.get();
     }
 
-    public ObjectProperty<PostProcessorConfig> postProcessorProperty() {
+    public ObjectProperty<CNCToolsPostProcessConfig> postProcessorProperty() {
         return postProcessor;
     }
 
-    public void setPostProcessor(PostProcessorConfig postProcessor) {
+    public void setPostProcessor(CNCToolsPostProcessConfig postProcessor) {
         this.postProcessor.set(postProcessor);
     }
 

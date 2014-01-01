@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.controls;
 
-import com.rvantwisk.cnctools.data.PostProcessorConfig;
+import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -164,7 +164,7 @@ public class PostProcessorControl extends AnchorPane {
         assert toolchange != null : "fx:id=\"toolchange\" was not injected: check your FXML file 'PostProcessorConfig.fxml'.";
     }
 
-    private PostProcessorConfig data;
+    private CNCToolsPostProcessConfig data;
 
     public PostProcessorControl() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PostProcessorConfig.fxml"));
@@ -177,7 +177,7 @@ public class PostProcessorControl extends AnchorPane {
         }
     }
 
-    public void setData(PostProcessorConfig data) {
+    public void setData(CNCToolsPostProcessConfig data) {
         this.data = data;
 
         if (data ==null) return;
@@ -210,11 +210,11 @@ public class PostProcessorControl extends AnchorPane {
         axisY.setText(data.axisMappingProperty().get("Y"));
         axisZ.setText(data.axisMappingProperty().get("Z"));
 
-        preamble.setText(data.getPreabmle());
+        preamble.setText(data.getPreamble());
         postamble.setText(data.getPostamble());
     }
 
-    public PostProcessorConfig getData() {
+    public CNCToolsPostProcessConfig getData() {
         applyData();
 
         return data;

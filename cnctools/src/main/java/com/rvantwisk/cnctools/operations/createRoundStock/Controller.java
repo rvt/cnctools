@@ -41,7 +41,7 @@ package com.rvantwisk.cnctools.operations.createRoundStock;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
-import com.rvantwisk.cnctools.data.PostProcessorConfig;
+import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
@@ -201,7 +201,7 @@ public class Controller extends MillTaskController {
 
             fillModal();
 
-            PostProcessorConfig ppc;
+            CNCToolsPostProcessConfig ppc;
 //            PostProcessorConfig ppc = project.getPostProcessor();
 //            if (ppc==null) {
             ppc = Factory.newPostProcessor();

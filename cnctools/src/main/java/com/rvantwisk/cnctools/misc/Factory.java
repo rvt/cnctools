@@ -38,8 +38,8 @@
 
 package com.rvantwisk.cnctools.misc;
 
+import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.data.EndMill;
-import com.rvantwisk.cnctools.data.PostProcessorConfig;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
@@ -93,8 +93,8 @@ public class Factory {
     }
 
 
-    public static PostProcessorConfig newPostProcessor() {
-        final PostProcessorConfig nt = new PostProcessorConfig();
+    public static CNCToolsPostProcessConfig newPostProcessor() {
+        final CNCToolsPostProcessConfig nt = new CNCToolsPostProcessConfig();
         nt.setName("New");
         nt.setSpaceBetweenWords(false);
         nt.decimalsFProperty().set(2);
@@ -135,13 +135,7 @@ public class Factory {
      *
      * TODO: Need to change this to use enum's or class name, for now we just have one dialect
      */
-    public static CncToolsGCodegenerator getProcessorDialect(final PostProcessorConfig pc) {
-        switch (pc.getDialect())
-        {
-            case "RS274":
-                return new CncToolsRS274(pc);
-            default:
-                throw new RuntimeException("Dialect ["+pc.getDialect()+"] not found");
-        }
+    public static CncToolsGCodegenerator getProcessorDialect(final CNCToolsPostProcessConfig pc) {
+        return new CncToolsRS274(pc);
     }
 }

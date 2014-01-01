@@ -38,6 +38,7 @@
 
 package com.rvantwisk.cnctools.data;
 
+import com.rvantwisk.gcodegenerator.interfaces.PostProcessorConfig;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -48,7 +49,7 @@ import java.util.Map;
 /**
  * Created by rvt on 12/27/13.
  */
-public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfaces.PostProcessorConfig{
+public class CNCToolsPostProcessConfig implements PostProcessorConfig {
 
     // General
     private final StringProperty name = new SimpleStringProperty();
@@ -67,6 +68,10 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
         dialect.setValue("RS274");
     }
 
+    public String getName() {
+        return name.get();
+    }
+
     public Object readResolve() {
         dialect = new SimpleStringProperty();
         if (dialect==null) {
@@ -76,11 +81,6 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
             dialect.set("RS274");
         }
         return this;
-    }
-
-    @Override
-    public String getName() {
-        return name.get();
     }
 
     public StringProperty nameProperty() {
@@ -99,11 +99,6 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
         return axisDecimals;
     }
 
-    @Override
-    public boolean getHasToolChanger() {
-        return hasToolChanger.get();
-    }
-
     public BooleanProperty hasToolChangerProperty() {
         return hasToolChanger;
     }
@@ -113,7 +108,7 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
     }
 
     @Override
-    public String getPreabmle() {
+    public String getPreamble() {
         return preabmle.get();
     }
 
@@ -123,6 +118,11 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
 
     public void setPreabmle(String preabmle) {
         this.preabmle.set(preabmle);
+    }
+
+    @Override
+    public boolean isHasToolChanger() {
+        return hasToolChanger.get();
     }
 
     @Override
@@ -177,22 +177,12 @@ public class PostProcessorConfig implements com.rvantwisk.gcodegenerator.interfa
         this.decimalsOthers.set(decimalsOthers);
     }
 
-    @Override
-    public String getDialect() {
-        return dialect.get();
-    }
-
     public StringProperty dialectProperty() {
         return dialect;
     }
 
     public void setDialect(String dialect) {
         this.dialect.set(dialect);
-    }
-
-    @Override
-    public boolean getSpaceBetweenWords() {
-        return spaceBetweenWords.get();
     }
 
     @Override

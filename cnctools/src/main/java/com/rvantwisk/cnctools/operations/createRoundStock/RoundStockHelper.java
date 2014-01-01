@@ -38,10 +38,10 @@
 
 package com.rvantwisk.cnctools.operations.createRoundStock;
 
-import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
 import com.rvantwisk.cnctools.operations.math.Intersect;
 import com.rvantwisk.cnctools.operations.math.Point;
 import com.rvantwisk.gcodegenerator.GCodeBuilder;
+import com.rvantwisk.gcodegenerator.interfaces.GCodeGenerator;
 
 import java.util.List;
 
@@ -57,9 +57,9 @@ public class RoundStockHelper {
     private Double radialDepth = 0.0; // Step over
     private Double axialDepth = 0.0; // STep Depth
     private Double millSize = 0.0; // Size of endmill
-    private Double feedRate = 600.0; // in mm/minute
     private Double rapidClearance = 1.0;
     private Double stockClearance = 5.0;
+    private Double feedRate = 600.0;
 
     private Double stockSize = 0.0; // Stock size square
     private Double finalSize = 0.0; // Stock Size final
@@ -77,16 +77,16 @@ public class RoundStockHelper {
     private Double nextDepth;
     private Point startPoint;
 
-    final CncToolsGCodegenerator gCode;
+    final GCodeGenerator gCode;
 
-    public RoundStockHelper(CncToolsGCodegenerator gcodeGenerator) {
+    public RoundStockHelper(GCodeGenerator gcodeGenerator) {
         gCode = gcodeGenerator;
     }
 
     public void calculate() {
         nextDepth = stockSize * Math.sqrt(2);
 
-        gCode.addBlock(new GCodeBuilder().F(feedRate));
+        // gCode.addBlock(new GCodeBuilder().F(feedRate));
 
         gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
         gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0).Y(0.0));
