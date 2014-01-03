@@ -107,7 +107,7 @@ public class SelectOrEditToolControl extends VBox {
         ToolEditController tec = toolEditDialog.getController();
         tec.setTool(ProjectModel.<ToolParameter>deepCopy((tool.get())));
         ToolEditController tcc = toolEditDialog.getController();
-        if (tcc.getResult() != AbstractController.Result.DISMISS) {
+        if (tcc.getReturned() != AbstractController.Result.DISMISS) {
             setTool(tcc.getTool());
             fireEvent(new ToolChangedEvent(ToolChangedEvent.TOOL_CHANGED_EVENT));
         }

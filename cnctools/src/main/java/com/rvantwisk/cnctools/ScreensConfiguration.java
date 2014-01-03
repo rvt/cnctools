@@ -40,26 +40,32 @@ package com.rvantwisk.cnctools;
 
 import com.rvantwisk.cnctools.controllers.*;
 import com.rvantwisk.cnctools.misc.FXMLDialog;
-import com.rvantwisk.cnctools.misc.DialogBuilder;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
-@Configuration
+import java.util.HashMap;
+import java.util.Map;
+
 @Lazy
+@Configuration
 public class ScreensConfiguration {
     private Stage primaryStage;
-    private ApplicationContext context;
+    private ApplicationContext applicationContext;
     private static ScreensConfiguration screensConfiguration;
 
     public ScreensConfiguration() {
         screensConfiguration = this;
     }
+
+    private Map<String, Boolean> registeredbeans = new HashMap<>();
 
     public static ScreensConfiguration getInstance() {
         return screensConfiguration;
@@ -70,41 +76,45 @@ public class ScreensConfiguration {
     }
 
 
-    public void setContext(ApplicationContext context) {
-        this.context = context;
-    }
-
-    @Bean
-    @Scope("prototype")
-    public DialogBuilder milltaskFactory() {
-        return new DialogBuilder(primaryStage, context);
+    public void setContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     /**
-     * ***************************** cncTools *******************************
+     * Add's a new bean to Spring's context
+     *
+     * @param name
      */
-    @Bean
-    @Scope("prototype")
-    public FXMLDialog cncTools() {
-        return new FXMLDialog(indexerController(), getClass().getResource("CNCTools.fxml"), primaryStage);
+    public void registerBean(final String name) {
+        if (registeredbeans.containsKey(name)) {
+            return;
+        }
+        GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+        beanDefinition.setBeanClassName(name);
+        beanDefinition.setAutowireCandidate(true);
+        AutowireCapableBeanFactory factory = applicationContext.getAutowireCapableBeanFactory();
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) factory;
+        registry.registerBeanDefinition(name, beanDefinition);
+        factory.autowireBeanProperties(this,
+                AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+        registeredbeans.put(name, Boolean.TRUE);
     }
 
-    @Bean
-    @Scope("prototype")
-    public CNCToolsController indexerController() {
-        return new CNCToolsController(this);
+    public ApplicationContext getContext() {
+        return applicationContext;
     }
+
 
     /**
      * ***************************** errorDialog *******************************
      */
-    @Bean
+    @Bean(name = "errorDialog")
     @Scope("prototype")
     public FXMLDialog errorDialog() {
         return new FXMLDialog(errorController(), getClass().getResource("Error.fxml"), primaryStage, StageStyle.UNDECORATED);
     }
 
-    @Bean
+    @Bean(name = "errorController")
     @Scope("prototype")
     public ErrorController errorController() {
         return new ErrorController();
@@ -114,13 +124,13 @@ public class ScreensConfiguration {
     /**
      * ***************************** projectDialog *******************************
      */
-    @Bean
+    @Bean(name = "projectDialog")
     @Scope("prototype")
     public FXMLDialog projectDialog() {
         return new FXMLDialog(projectController(), getClass().getResource("AddProject.fxml"), primaryStage);
     }
 
-    @Bean
+    @Bean(name = "projectController")
     @Scope("prototype")
     public AddProjectController projectController() {
         return new AddProjectController();
@@ -129,13 +139,14 @@ public class ScreensConfiguration {
     /**
      * ***************************** millTaskDialog *******************************
      */
-    @Bean
+    @Bean(name = "millTaskDialog")
     @Scope("prototype")
+
     public FXMLDialog millTaskDialog() {
         return new FXMLDialog(millTaskController(), getClass().getResource("AddMillTask.fxml"), primaryStage);
     }
 
-    @Bean
+    @Bean(name = "millTaskController")
     @Scope("prototype")
     public AddMillTaskController millTaskController() {
         return new AddMillTaskController();
@@ -145,16 +156,16 @@ public class ScreensConfiguration {
     /**
      * ***************************** Tools configuration *******************************
      */
-    @Bean
+    @Bean(name = "toolConfigurationsDialog")
     @Scope("prototype")
-    @Qualifier("toolConfigurationsDialog")
+
     public FXMLDialog toolConfigurationsDialog() {
         ToolConfigurationsController tcc = new ToolConfigurationsController();
         tcc.setMode(ToolConfigurationsController.Mode.EDIT);
         return new FXMLDialog(toolConfigurationsController(), getClass().getResource("ToolConfigurations.fxml"), primaryStage);
     }
 
-    @Bean
+    @Bean(name = "toolConfigurationsController")
     @Scope("prototype")
     public ToolConfigurationsController toolConfigurationsController() {
         return new ToolConfigurationsController();
@@ -163,16 +174,15 @@ public class ScreensConfiguration {
     /**
      * ***************************** Edit Tool *******************************
      */
-    @Bean
+    @Bean(name = "toolEditDialog")
     @Scope("prototype")
-    @Qualifier("toolEditDialog")
+
     public FXMLDialog toolEditDialog() {
         return new FXMLDialog(toolEditController(), getClass().getResource("ToolEdit.fxml"), primaryStage);
     }
 
-    @Bean
+    @Bean(name = "toolEditController")
     @Scope("prototype")
-    @Qualifier("toolEditController")
     public ToolEditController toolEditController() {
         return new ToolEditController();
     }
@@ -180,16 +190,14 @@ public class ScreensConfiguration {
     /**
      * ***************************** About Tool *******************************
      */
-    @Bean
-    @Scope("prototype")
-    @Qualifier("aboutDialog")
+    @Bean(name = "aboutDialog")
+
     public FXMLDialog aboutDialog() {
         return new FXMLDialog(aboutController(), getClass().getResource("About.fxml"), primaryStage, StageStyle.UNDECORATED);
     }
 
-    @Bean
+    @Bean(name = "aboutController")
     @Scope("prototype")
-    @Qualifier("aboutDialogController")
     public AboutController aboutController() {
         return new AboutController();
     }
@@ -197,36 +205,49 @@ public class ScreensConfiguration {
     /**
      * ***************************** GCodeEditor Tool *******************************
      */
-    @Bean
+    @Bean(name = "postProcessorsDialog")
     @Scope("prototype")
-    @Qualifier("gCodeEditor")
-    public FXMLDialog gCodeEditorDialog() {
-        return new FXMLDialog(gCodeEditorController(), getClass().getResource("GCodeViewerDialog.fxml"), primaryStage);
-    }
 
-    @Bean
-    @Scope("prototype")
-    @Qualifier("gCodeEditorController")
-    public GCodeViewerController gCodeEditorController() {
-        return new GCodeViewerController();
-    }
-
-    /**
-     * ***************************** GCodeEditor Tool *******************************
-     */
-    @Bean
-    @Scope("prototype")
-    @Qualifier("postProcessorsDialog")
     public FXMLDialog postProcessorsDialog() {
         return new FXMLDialog(postProcessorsController(), getClass().getResource("PostProcessors.fxml"), primaryStage);
     }
 
-    @Bean
+    @Bean(name = "postProcessorsController")
     @Scope("prototype")
-    @Qualifier("postProcessorsController")
     public PostProcessorsController postProcessorsController() {
         return new PostProcessorsController();
     }
 
+    /**
+     * ***************************** Task Edit Controller *******************************
+     */
+    @Bean(name = "taskEditDialog")
+    @Scope("prototype")
+
+    public FXMLDialog taskEditDialog() {
+        return new FXMLDialog(taskEditController(), getClass().getResource("TaskEdit.fxml"), primaryStage);
+    }
+
+    @Bean(name = "taskEditController")
+    @Scope("prototype")
+    public TaskEditController taskEditController() {
+        return new TaskEditController();
+    }
+
+    /**
+     * ***************************** cncTools *******************************
+     */
+    @Bean(name = "cncTools")
+    @Scope("prototype")
+
+    public FXMLDialog cncTools() {
+        return new FXMLDialog(cncToolsController(), getClass().getResource("CNCTools.fxml"), primaryStage);
+    }
+
+    @Bean(name = "cncToolsController")
+    @Scope("prototype")
+    public CNCToolsController cncToolsController() {
+        return new CNCToolsController(this);
+    }
 
 }

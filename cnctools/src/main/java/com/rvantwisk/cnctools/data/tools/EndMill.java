@@ -36,20 +36,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
+package com.rvantwisk.cnctools.data.tools;
 
-import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
+import com.rvantwisk.cnctools.data.interfaces.Toolbase;
+import com.rvantwisk.cnctools.misc.DimensionProperty;
 
-/**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/11/13
- * Time: 4:13 PM
- * To change this template use File | Settings | File Templates.
- */
+public class EndMill extends Toolbase {
 
-public abstract class AbstractOperation {
+    private final DimensionProperty diameter = new DimensionProperty();
 
-    abstract public void generateGCode(final ToolDBManager toolDBManager, final CncToolsGCodegenerator gCodeGenerator);
+    public EndMill() {
+    }
+
+    public EndMill(DimensionProperty diameter) {
+        this.diameter.set(diameter);
+    }
+
+    public DimensionProperty diameterProperty() {
+        return diameter;
+    }
 }

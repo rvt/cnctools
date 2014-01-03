@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.rvantwisk.cnctools.controls.*?>
-<?import com.rvantwisk.cnctools.controls.DimensionControl?>
 <?import com.rvantwisk.cnctools.controls.GCodeViewerControl?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -12,29 +11,20 @@
 <?import javafx.scene.text.Font?>
 <?scenebuilder-classpath-element ../../../../../../../../target/classes?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="448.9998558593725" prefWidth="702.9996337890625" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.operations.createRoundStock.Controller">
-    <children>
-        <Separator prefWidth="503.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="26.0"/>
-        <Separator prefWidth="483.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0"/>
-        <Label alignment="CENTER" contentDisplay="LEFT" prefHeight="50.0" prefWidth="768.999755859375" styleClass="header" text="G-Code" textAlignment="LEFT" textOverrun="ELLIPSIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-               AnchorPane.topAnchor="0.0">
-            <font>
-                <Font size="28.0"/>
-            </font>
-        </Label>
-        <GCodeViewerControl id="gCodeControl" fx:id="gCodeViewerControl" minHeight="279.0" minWidth="296.0" prefHeight="304.0" prefWidth="315.0000999999975" AnchorPane.bottomAnchor="72.0" AnchorPane.leftAnchor="20.0"
-                            AnchorPane.rightAnchor="366.0" AnchorPane.topAnchor="72.0"/>
-        <HBox alignment="CENTER_RIGHT" prefHeight="-1.0" prefWidth="314.999755859375" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
-            <children>
-                <Button cancelButton="true" mnemonicParsing="false" onAction="#onCancel" text="Cancel"/>
-                <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#onSave" text="Save"/>
-            </children>
-        </HBox>
-        <TextArea fx:id="gCodeText" prefHeight="280.9998558593725" prefWidth="344.0" wrapText="true" AnchorPane.bottomAnchor="96.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="72.0"/>
-        <Label fx:id="errors" prefWidth="337.9996337890625" text="" textFill="RED" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="14.0"/>
-    </children>
-    <stylesheets>
-        <URL value="@../../CNCTools.css"/>
-    </stylesheets>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="448.9998558593725" prefWidth="702.9996337890625" styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController">
+  <children>
+    <GCodeViewerControl id="gCodeControl" fx:id="gCodeViewerControl" minHeight="279.0" minWidth="296.0" prefHeight="448.9998558593725" prefWidth="344.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="359.0" AnchorPane.topAnchor="0.0" />
+    <TextArea fx:id="gCodeText" prefHeight="373.9998558593725" prefWidth="344.0" wrapText="true" AnchorPane.bottomAnchor="27.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="48.0" />
+    <HBox prefHeight="18.0" prefWidth="344.0" AnchorPane.bottomAnchor="431.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+        <TextField fx:id="iFileName" editable="false" minHeight="-Infinity" prefWidth="280.9996337890625" />
+        <Button mnemonicParsing="false" onAction="#selectFile" prefWidth="78.0" text="Select..." />
+      </children>
+    </HBox>
+    <CheckBox fx:id="iKeepReference" mnemonicParsing="false" onAction="#onKeepReference" text="Keep reference only" AnchorPane.rightAnchor="214.0" AnchorPane.topAnchor="27.0" />
+    <TextField id="iFileName" fx:id="errors" editable="false" prefWidth="344.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+  </children>
+  <stylesheets>
+    <URL value="@../../CNCTools.css" />
+  </stylesheets>
 </AnchorPane>

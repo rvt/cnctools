@@ -47,7 +47,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -123,8 +122,6 @@ public class Project {
     }
 
     public StringBuilder getGCode(ToolDBManager toolDBManager) {
-        final StringBuilder gcode = new StringBuilder();
-
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream(os);
 
@@ -133,7 +130,6 @@ public class Project {
 
         gCodeGenerator.startProgram();
         for (Task t : milltasks) {
-            gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + t.getName(), 50, "-"));
             t.generateGCode(toolDBManager, gCodeGenerator);
         }
         gCodeGenerator.endProgram();

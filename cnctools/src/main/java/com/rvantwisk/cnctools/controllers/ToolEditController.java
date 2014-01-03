@@ -18,22 +18,16 @@ public class ToolEditController extends AbstractController {
     @FXML
     private ToolParametersControl toolParameters; // if you are wondering why this controller is injected, it's becaused it's the <fx:id> name + Controller appeneded
 
-    private Result result;
-
     @FXML
     void onClose(ActionEvent event) {
-        result = Result.DISMISS;
+        setReturned(Result.DISMISS);
         getDialog().close();
     }
 
     @FXML
     void onUse(ActionEvent event) {
-        result = Result.USE;
+        setReturned(Result.USE);
         getDialog().close();
-    }
-
-    public Result getResult() {
-        return result;
     }
 
     public ToolParameter getTool() {

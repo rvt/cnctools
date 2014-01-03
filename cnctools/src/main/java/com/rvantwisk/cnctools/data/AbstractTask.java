@@ -38,6 +38,7 @@
 
 package com.rvantwisk.cnctools.data;
 
+import com.rvantwisk.cnctools.data.interfaces.Copyable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -49,7 +50,7 @@ import javafx.beans.property.StringProperty;
  * To change this template use File | Settings | File Templates.
  */
 
-public abstract class AbstractTask {
+public abstract class AbstractTask implements Copyable<AbstractTask> {
 
     private StringProperty name = new SimpleStringProperty();
     private StringProperty description = new SimpleStringProperty();
@@ -114,4 +115,5 @@ public abstract class AbstractTask {
     public void setFxmlFileName(String fxmlFileName) {
         this.fxmlFileName.set(fxmlFileName);
     }
+
 }

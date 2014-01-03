@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,17 +36,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
+package com.rvantwisk.cnctools.data.interfaces;
 
-
-public class AvailableTask extends AbstractTask {
-
-
-    public AvailableTask(String name, String description, String className, String fxmlFileName) {
-        super(name, description, className, fxmlFileName);
-    }
-
-    public AvailableTask() {
-        super();
-    }
+/**
+ * Created by rvt on 1/2/14.
+ */
+public interface Copyable<T> {
+    T copy();
 }

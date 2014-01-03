@@ -39,9 +39,11 @@
 package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.ScreensConfiguration;
-import com.rvantwisk.cnctools.misc.*;
 import com.rvantwisk.cnctools.data.*;
-import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockOperation;
+import com.rvantwisk.cnctools.data.tools.BallMill;
+import com.rvantwisk.cnctools.data.tools.EndMill;
+import com.rvantwisk.cnctools.misc.*;
+import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockTaskModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -60,7 +62,6 @@ import jfxtras.labs.scene.control.BeanPathAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -78,11 +79,11 @@ import java.nio.file.StandardOpenOption;
  * Time: 6:11 PM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 public class CNCToolsController extends AbstractController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    @Qualifier("projectModel")
     private ProjectModel projectModel;
 
     @Autowired
@@ -257,12 +258,19 @@ public class CNCToolsController extends AbstractController {
     public void editMillTask(ActionEvent event) throws Exception {
         try {
             Task task = (Task) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
-            FXMLDialog dialog = screens.milltaskFactory().getOperationDialog(
-                    v_projectList.getSelectionModel().getSelectedItem(),
-                    toolDBManager,
-                    task);
-
+            screens.registerBean(task.getClassName());
+            FXMLDialog dialog = screens.taskEditDialog();
+            TaskEditController controller = dialog.getController();
+            controller.setTask(task.copy());
             dialog.showAndWait();
+            if (controller.getReturned() == Result.SAVE) {
+                Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
+                int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
+                Task modified = controller.getTask();
+                project.millTasksProperty().add(index, modified);
+                project.millTasksProperty().remove(tbl_millTasks.getItems().indexOf(task));
+                tbl_millTasks.getSelectionModel().select(modified);
+            }
         } catch (Exception e) {
             handleException(e);
         }
@@ -272,31 +280,31 @@ public class CNCToolsController extends AbstractController {
     private void addProjectDefaults() {
         Project p = new Project("Round stock 30mm", "Creates a round stock of 100mx30mm. Feedrate 2400");
         projectModel.addProject(p);
-        Task mt = new Task("Make Round", "Make square stock round (invalid milltask)", "com.rvantwisk.cnctools.operations.createRoundStock.Controller", "CreateRoundStock.fxml");
+        Task mt = new Task("Make Round", "Make square stock round (invalid milltask)", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
 
         ToolParameter nt = Factory.newTool();
         nt.setName("6MM end Mill");
-        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
-        mt = new Task("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.Controller", "CreateRoundStock.fxml");
+        mt = new Task("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
         nt = Factory.newTool();
         nt.setName("8MM end Mill");
         nt.radialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.setToolType(new EndMill(new DimensionProperty(8.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
 
         p = new Project("Facing 30mmx30mm", "Facing of wood. Feedrate 2400");
-        mt = new Task("Make Round Form Square", "Make feed edge", "com.rvantwisk.cnctools.operations.createRoundStock.Controller", "CreateRoundStock.fxml");
+        mt = new Task("Make Round Form Square", "Make feed edge", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
         nt = Factory.newTool();
         nt.setName("10mm end Mill");
         nt.radialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.setToolType(new EndMill(new DimensionProperty(10.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockOperation(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
         projectModel.addProject(p);
 
@@ -528,7 +536,7 @@ public class CNCToolsController extends AbstractController {
      */
     public void handleException(Exception exception) {
         logger.error("generateGCode: General Exception", exception);
-        FXMLDialog dialog = screens.errorDialog();
+        final FXMLDialog dialog = screens.errorDialog();
         ErrorController controller = dialog.getController();
         StringBuilder sb = new StringBuilder();
 

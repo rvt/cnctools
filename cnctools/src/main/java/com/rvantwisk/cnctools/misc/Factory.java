@@ -39,7 +39,7 @@
 package com.rvantwisk.cnctools.misc;
 
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
-import com.rvantwisk.cnctools.data.EndMill;
+import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;

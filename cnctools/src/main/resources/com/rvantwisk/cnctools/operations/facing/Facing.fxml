@@ -51,7 +51,7 @@
   -->
 
 <AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="448.999755859375" prefWidth="702.999755859375"
-            styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.operations.createRoundStock.Controller">
+            styleClass="theme" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController">
     <children>
         <Separator prefWidth="503.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="26.0"/>
         <Separator prefWidth="483.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0"/>

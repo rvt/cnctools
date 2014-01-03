@@ -38,12 +38,11 @@
 
 package com.rvantwisk.cnctools.data;
 
+import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,38 +51,57 @@ import javafx.beans.property.SimpleObjectProperty;
  * Time: 2:05 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Task extends AbstractTask  {
+public class Task extends AbstractTask {
 
     private BooleanProperty enabled = new SimpleBooleanProperty();
-    private ObjectProperty<AbstractOperation> milltaskModel = new SimpleObjectProperty<AbstractOperation>();
+    private ObjectProperty<TaskModel> milltaskModel = new SimpleObjectProperty<TaskModel>();
 
     public Task(String name, String description, String className, String fxmlFileName) {
-        super(name,description,className,fxmlFileName);
+        super(name, description, className, fxmlFileName);
         this.enabled.set(Boolean.TRUE);
     }
 
-    public Task() {
+
+    public boolean getEnabled() {
+        return enabled.get();
     }
 
     public BooleanProperty enabledProperty() {
         return enabled;
     }
 
-    public <T extends AbstractOperation> T getMilltaskModel() {
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
+    }
+
+    public <T extends TaskModel> T getMilltaskModel() {
         return (T) milltaskModel.get();
     }
 
-    public ObjectProperty<AbstractOperation> milltaskModelProperty() {
+    public ObjectProperty<TaskModel> milltaskModelProperty() {
         return milltaskModel;
     }
 
-    public void setMilltaskModel(AbstractOperation milltaskModel) {
+    public void setMilltaskModel(TaskModel milltaskModel) {
         this.milltaskModel.set(milltaskModel);
     }
 
     public void generateGCode(final ToolDBManager toolDBManager, final CncToolsGCodegenerator gCodeGenerator) {
-        if (enabled.get()==true) {
+        if (enabled.get() == true) {
+            gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + getName(), 50, "-"));
             milltaskModel.get().generateGCode(toolDBManager, gCodeGenerator);
+        } else {
+            gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + getName() + " (disabled)", 50, "-"));
         }
-    };
+    }
+
+    @Override
+    public Task copy() {
+        Task t = new Task(this.getName(), this.getDescription(), this.classNameProperty().get(), this.fxmlFileNameProperty().get());
+        this.enabled.set(this.getEnabled());
+        if (milltaskModel.get()!=null) {
+            t.milltaskModel.set(milltaskModel.get().copy());
+        }
+        return t;
+    }
 }

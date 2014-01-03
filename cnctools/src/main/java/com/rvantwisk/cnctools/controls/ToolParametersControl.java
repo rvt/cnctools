@@ -38,10 +38,9 @@
 
 package com.rvantwisk.cnctools.controls;
 
-import com.rvantwisk.cnctools.data.BallMill;
-import com.rvantwisk.cnctools.data.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
-import com.rvantwisk.cnctools.misc.FXMLDialog;
+import com.rvantwisk.cnctools.data.tools.BallMill;
+import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.rvantwisk.cnctools.misc.InputMaskChecker;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -72,7 +71,6 @@ public class ToolParametersControl extends AnchorPane {
             "EndMill", "BallMill"
     );
 
-    private FXMLDialog dialog;
     @FXML
     private ResourceBundle resources;
     @FXML

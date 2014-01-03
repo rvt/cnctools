@@ -42,10 +42,8 @@ import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
-import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.data.Task;
+import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
-import com.rvantwisk.cnctools.misc.FXMLDialog;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
@@ -60,21 +58,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Locale;
 
-public class Controller extends MillTaskController {
+@Component
+@Qualifier("RoundStockController")
+public class CreateRoundStockController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private Project project;
+    private RoundStockTaskModel model;
+    @Autowired
     private ToolDBManager toolDBManager;
-
     @FXML
     private SelectOrEditToolControl selectOrEditTool;
     @FXML
@@ -91,79 +91,40 @@ public class Controller extends MillTaskController {
     private TextField iName;
 
 
-    private FXMLDialog dialog;
-
-    private RoundStockOperation model;
-    private Task task;
-
-
-    public void setProject(Project project) {
-        this.project = project;
+    @Override
+    public void setModel(TaskModel model) {
+        this.model = (RoundStockTaskModel) model;
     }
 
     @Override
-    public void setToolDBManager(ToolDBManager toolDBManager) {
-        this.toolDBManager = toolDBManager;
-    }
-
-    @Override
-    public void setTask(Task task) {
-        this.task = task;
-        model = task.getMilltaskModel();
-        if (model == null) {
-            model = new RoundStockOperation();
-            task.setMilltaskModel(model);
-        }
+    public <T extends TaskModel> T createNewModel() {
+        return (T) new RoundStockTaskModel();
     }
 
     @FXML
-    public void onCancel() {
-        dialog.close();
+    public TaskModel getModel() {
+        formToModel();
+        return model;
     }
 
-    @FXML
-    public void onSave() throws ParseException {
-        task.setName(iName.textProperty().getValue());
-
-        fillModal();
-
-        dialog.close();
-    }
-
-    private void fillModal() {
+    private void formToModel() {
         model.setToolID(this.selectOrEditTool.getTool().getId());
         model.finalSizeProperty().set(iFinalSize.dimensionProperty());
         model.finalLengthProperty().set(iFinalLength.dimensionProperty());
         model.stockSizeProperty().set(iStockSize.dimensionProperty());
     }
 
-    Double toDouble(String value) {
-        NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
-        try {
-            return nf.parse(value).doubleValue();
-        } catch (ParseException e) {
-            logger.warn("Invalid number conversion", e);
-
-        }
-        return null;
-    }
-
-    @Override
-    public void setDialog(FXMLDialog dialog) {
-        this.dialog = dialog;
-    }
-
-
-    @FXML
-        // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-
-        iName.textProperty().setValue(task.getName());
+    private void modelToForm() {
         selectOrEditTool.setTool(toolDBManager.getByID(model.getToolID()));
-
         iFinalLength.dimensionProperty().set(model.finalLengthProperty());
         iFinalSize.dimensionProperty().set(model.finalSizeProperty());
         iStockSize.dimensionProperty().set(model.stockSizeProperty());
+    }
+
+    @FXML
+    void initialize() {
+
+       // iName.textProperty().setValue(task.getName());
 
         selectOrEditTool.addEventHandler(ToolChangedEvent.TOOL_CHANGED_EVENT, new EventHandler<ToolChangedEvent>() {
             @Override
@@ -192,6 +153,7 @@ public class Controller extends MillTaskController {
             }
         });
 
+        modelToForm();
         generateGCode();
     }
 
@@ -199,7 +161,7 @@ public class Controller extends MillTaskController {
         String error = "";
         try {
 
-            fillModal();
+            formToModel();
 
             CNCToolsPostProcessConfig ppc;
 //            PostProcessorConfig ppc = project.getPostProcessor();

@@ -38,10 +38,7 @@
 
 package com.rvantwisk.cnctools.operations.interfaces;
 
-import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.data.Task;
-import com.rvantwisk.cnctools.misc.AbstractController;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
+import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,8 +47,8 @@ import com.rvantwisk.cnctools.misc.ToolDBManager;
  * Time: 2:08 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class MillTaskController extends AbstractController {
-    public abstract void setProject(final Project p);
-    public abstract void setToolDBManager(ToolDBManager toolDBManager);
-    public abstract void setTask(final Task task);
+public interface MillTaskController  {
+    public abstract void setModel(final TaskModel model);
+    public abstract TaskModel getModel();
+    public abstract <T extends TaskModel> T createNewModel();
 }

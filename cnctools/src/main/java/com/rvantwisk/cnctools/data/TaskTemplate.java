@@ -38,16 +38,23 @@
 
 package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.cnctools.data.interfaces.ITool;
-
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/10/13
- * Time: 5:41 PM
- * To change this template use File | Settings | File Templates.
+ * T
  */
-public abstract class AbstractTool implements ITool {
+public class TaskTemplate extends AbstractTask {
 
 
+    public TaskTemplate(String name, String description, String className, String fxmlFileName) {
+        super(name, description, className, fxmlFileName);
+    }
+
+    public TaskTemplate() {
+        super();
+    }
+
+    @Override
+    public AbstractTask copy() {
+        Task t = new Task(this.getName(), this.getDescription(), this.classNameProperty().get(), this.fxmlFileNameProperty().get());
+        return t;
+    }
 }

@@ -113,9 +113,7 @@ public class DimensionProperty {
     }
 
     public void setValue(double value) {
-        //     block=true;
         this.value.set(value);
-        //     block=false;
     }
 
     public Dimensions.Dim getDimension() {
@@ -132,9 +130,7 @@ public class DimensionProperty {
     }
 
     public void setDimension(Dimensions.Dim dimension) {
-   //     block=true;
         this.dimension.set(dimension);
-        //     block=false;
     }
 
     public DimensionProperty convert(final Dimensions.Dim toDimention) {

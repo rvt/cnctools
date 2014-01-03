@@ -46,6 +46,7 @@ import java.util.Iterator;
 /**
  * Created by rvt on 12/30/13.
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 public class ToolDBManager {
     final private ObservableList<ToolParameter> toolDB;
 

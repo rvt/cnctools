@@ -38,9 +38,9 @@
 
 package com.rvantwisk.cnctools.controllers;
 
+import com.rvantwisk.cnctools.controls.PostProcessorControl;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.misc.AbstractController;
-import com.rvantwisk.cnctools.controls.PostProcessorControl;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import javafx.beans.value.ChangeListener;
@@ -54,7 +54,6 @@ import javafx.util.Callback;
 import jfxtras.labs.dialogs.MonologFX;
 import jfxtras.labs.dialogs.MonologFXButton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Created by rvt on 12/27/13.
@@ -76,20 +75,11 @@ public class PostProcessorsController extends AbstractController {
         EDIT, // Mode to just close teh dialog box
         SELECT // Mode to show a close button and a 'USE' button
     }
-    public void setMode(Mode mode) {
-        this.mode = mode;
-        if (mode == Mode.SELECT) {
-            btnUse.setVisible(true);
-        } else {
-            btnUse.setVisible(false);
-        }
-    }
 
     @FXML
     private ListView<CNCToolsPostProcessConfig> v_postprocessorList;
 
     @Autowired
-    @Qualifier("projectModel")
     private ProjectModel projectModel;
 
     @FXML
@@ -197,7 +187,14 @@ public class PostProcessorsController extends AbstractController {
                 return cell;
             }
         });
+    }
 
-
+    public void setMode(Mode mode) {
+        this.mode = mode;
+        if (mode == Mode.SELECT) {
+            btnUse.setVisible(true);
+        } else {
+            btnUse.setVisible(false);
+        }
     }
 }

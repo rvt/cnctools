@@ -38,7 +38,7 @@
 
 package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.cnctools.data.interfaces.ITool;
+import com.rvantwisk.cnctools.data.interfaces.Toolbase;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
 import javafx.beans.property.*;
 
@@ -63,9 +63,9 @@ public class ToolParameter {
     // Misc Data
     private final BooleanProperty coolant = new SimpleBooleanProperty();
     private final StringProperty spindleDirection = new SimpleStringProperty();
-    private final ObjectProperty<ITool> toolType = new SimpleObjectProperty<>();
+    private final ObjectProperty<Toolbase> toolType = new SimpleObjectProperty<>();
 
-    public ToolParameter(final String name, final Integer toolNumber, final Integer numberOfFlutes, final DimensionProperty spindleSpeed, final double feedRate, final Double plungeRate, final double axialDepth, final double radialDepth, final Boolean coolant, final SpindleDirection spindleDirection, final ITool toolType) {
+    public ToolParameter(final String name, final Integer toolNumber, final Integer numberOfFlutes, final DimensionProperty spindleSpeed, final double feedRate, final Double plungeRate, final double axialDepth, final double radialDepth, final Boolean coolant, final SpindleDirection spindleDirection, final Toolbase toolType) {
         this.id.set(UUID.randomUUID().toString());
         this.name.setValue(name);
         this.toolNumber.setValue(toolNumber);
@@ -160,15 +160,15 @@ public class ToolParameter {
         this.spindleDirection.set(spindleDirection.toString());
     }
 
-    public <T extends AbstractTool> T getToolType() {
+    public <T extends Toolbase> T getToolType() {
         return (T) toolType.get();
     }
 
-    public ObjectProperty<ITool> toolTypeProperty() {
+    public ObjectProperty<Toolbase> toolTypeProperty() {
         return toolType;
     }
 
-    public void setToolType(ITool toolType) {
+    public void setToolType(Toolbase toolType) {
         this.toolType.set(toolType);
     }
 

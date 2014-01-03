@@ -43,7 +43,7 @@ package com.rvantwisk.cnctools.misc;
  */
 public abstract class AbstractController {
     public enum Result {
-        CLOSE, USE, APPLY, SAVE, YES, NO, ACCEPT, USEMODIFIED, DISMISS
+        CLOSE, USE, APPLY, SAVE, YES, NO, ACCEPT, USEMODIFIED, DISMISS, CANCEL
     }
 
     private Result returned;

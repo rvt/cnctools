@@ -38,8 +38,8 @@
 
 package com.rvantwisk.cnctools.operations.createRoundStock;
 
-import com.rvantwisk.cnctools.data.AbstractOperation;
-import com.rvantwisk.cnctools.data.EndMill;
+import com.rvantwisk.cnctools.data.interfaces.TaskModel;
+import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.rvantwisk.cnctools.data.ToolParameter;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
 import com.rvantwisk.cnctools.misc.DimensionProperty;
@@ -54,7 +54,7 @@ import javafx.beans.property.StringProperty;
  * Time: 3:56 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RoundStockOperation extends AbstractOperation {
+public class RoundStockTaskModel implements TaskModel {
 
 
     private final DimensionProperty stockSize= new DimensionProperty();
@@ -62,10 +62,10 @@ public class RoundStockOperation extends AbstractOperation {
     private final DimensionProperty finalSize = new DimensionProperty();
     private final StringProperty toolID = new SimpleStringProperty();
 
-    public RoundStockOperation() {
+    public RoundStockTaskModel() {
     }
 
-    public RoundStockOperation(StringProperty toolID, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
+    public RoundStockTaskModel(StringProperty toolID, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
         this.toolID.set(toolID.get());
         this.finalLength.set(finalLengthProperty);
         this.stockSize.set(stockSizeProperty);
@@ -119,5 +119,14 @@ public class RoundStockOperation extends AbstractOperation {
         helper.calculate();
     }
 
+    @Override
+    public TaskModel copy() {
+        RoundStockTaskModel n = new RoundStockTaskModel();
+        n.stockSizeProperty().set(this.stockSizeProperty());
+        n.finalLengthProperty().set(this.finalLengthProperty());
+        n.finalSizeProperty().set(this.finalSizeProperty());
+        n.toolIDProperty().set(this.toolIDProperty().get());
+        return n;
+    }
 
 }

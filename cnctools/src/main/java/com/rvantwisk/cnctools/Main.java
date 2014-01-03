@@ -38,27 +38,25 @@
 
 package com.rvantwisk.cnctools;
 
-import com.rvantwisk.cnctools.controllers.CNCToolsController;
 import com.rvantwisk.cnctools.misc.FXMLDialog;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 public class Main extends Application {
 
     private static Stage stage;
-    CNCToolsController controller=null;
 
     @Override
     public void start(Stage stage) throws Exception{
-        ApplicationContext context = new AnnotationConfigApplicationContext(IndexerAppConfiguration.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext("com.rvantwisk.cnctools");
         ScreensConfiguration screens = context.getBean(ScreensConfiguration.class);
         screens.setPrimaryStage(stage);
         this.stage = stage;
         screens.setContext(context);
 
         FXMLDialog dialog =  screens.cncTools();
-        controller = dialog.getController();
         dialog.show();
     }
 

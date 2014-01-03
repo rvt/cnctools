@@ -36,31 +36,24 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.operations.customgcode;
+package com.rvantwisk.cnctools.data.tools;
 
-import com.rvantwisk.cnctools.data.AbstractOperation;
-import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.rvantwisk.cnctools.data.interfaces.Toolbase;
+import com.rvantwisk.cnctools.misc.DimensionProperty;
 
-/**
- * Created by rvt on 12/13/13.
- */
-public class GCodeOperation extends AbstractOperation {
+public class BallMill extends Toolbase {
 
-    private final StringProperty gcode= new SimpleStringProperty();
+    private final DimensionProperty diameter = new DimensionProperty();
 
-    @Override
-    public void generateGCode(final ToolDBManager toolDBManager,CncToolsGCodegenerator gCodeGenerator) {
-        gCodeGenerator.addRaw(gcode.get());
+    public BallMill() {
     }
 
-    public String getGcode() {
-        return gcode.get();
+    public BallMill(DimensionProperty diameter) {
+        this.diameter.set(diameter);
     }
 
-    public StringProperty gcodeProperty() {
-        return gcode;
+    public DimensionProperty diameterProperty() {
+        return diameter;
     }
+
 }

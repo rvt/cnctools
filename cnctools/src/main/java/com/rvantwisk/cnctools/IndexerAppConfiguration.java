@@ -38,37 +38,40 @@
 
 package com.rvantwisk.cnctools;
 
+import com.rvantwisk.cnctools.data.TaskTemplate;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
-import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Lazy
 @Configuration
 @Import(ScreensConfiguration.class)
-//@ImportResource("spring/spring-db.xml")
 public class IndexerAppConfiguration {
 
-    private static List<Class<? extends RoundStockHelper>> operations=new ArrayList<Class<? extends RoundStockHelper>>();
-
-    @Bean(name = "projectModel")
+    @Bean
     public ProjectModel projectModel()  {
         ProjectModel customerModel = new ProjectModel();
         return customerModel;
     }
 
-    @Bean(name = "allOperations")
-    public List<Class<? extends RoundStockHelper>> getAllOperations()  {
-        return operations;
-    }
-
-
     @Bean
     public ToolDBManager toolDBManager() {
         return this.projectModel().getToolDBManager();
+    }
+
+    @Bean(name="applicapableMillTasks")
+    public List<TaskTemplate> applicapableMillTasks() {
+        List<TaskTemplate> allOperations = new ArrayList<>();
+
+        //THis is currently hard coded, but needs to move into a register base
+        allOperations.add(new TaskTemplate("Create round stock", "Take's from a square material round stock on your indexer.", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml"));
+        allOperations.add(new TaskTemplate("Custom G-Code", "Let's you create your own G-Code.", "com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController", "CustomGCode.fxml"));
+        return allOperations;
     }
 }

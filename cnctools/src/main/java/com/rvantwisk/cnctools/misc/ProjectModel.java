@@ -40,6 +40,8 @@ package com.rvantwisk.cnctools.misc;
 
 import com.dooapp.xstreamfx.*;
 import com.rvantwisk.cnctools.data.*;
+import com.rvantwisk.cnctools.data.tools.BallMill;
+import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.sun.javafx.collections.ObservableListWrapper;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -64,6 +66,7 @@ import java.util.ArrayList;
 public class ProjectModel {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static String SEPARATOR = System.getProperty("line.separator");
 
     private static final String PROJECTS_XML = "projects.xml";
     private static final String TOOLS_XML = "tools.xml";
@@ -148,7 +151,7 @@ public class ProjectModel {
         xStream.alias("StockToolParameter", StockToolParameter.class);
         xStream.alias("EndMill", EndMill.class);
         xStream.alias("BallMill", BallMill.class);
-        xStream.alias("AvailableTask", AvailableTask.class);
+        xStream.alias("AvailableTask", TaskTemplate.class);
         xStream.alias("ToolParameter", ToolParameter.class);
 
         String contents = "<tag>my data conents</tag>";
@@ -234,18 +237,19 @@ public class ProjectModel {
         }
     }
 
-    public static String readFileIntoString(File file) {
+    /**
+     * Read a file into a String
+     * @param file
+     * @return
+     */
+    public static String readFileIntoString(File file) throws IOException {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(file.getPath())))
         {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
-                sb.append(sCurrentLine);
-                sb.append("\n");
+                sb.append(sCurrentLine).append(SEPARATOR);
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return sb.toString();
     }

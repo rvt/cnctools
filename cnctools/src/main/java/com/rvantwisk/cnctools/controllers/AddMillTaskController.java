@@ -38,16 +38,17 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.misc.AbstractController;
-import com.rvantwisk.cnctools.data.AvailableTask;
-import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.misc.DialogBuilder;
+import com.rvantwisk.cnctools.data.Task;
+import com.rvantwisk.cnctools.data.TaskTemplate;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,8 +59,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AddMillTaskController extends AbstractController {
 
-    @Autowired
-    private DialogBuilder dialogBuilder;
+    @Resource(name = "applicapableMillTasks")
+    private List<TaskTemplate> applicapableMillTasks;
 
     @FXML TableView tbl_assignedMillTasks;
     @FXML TextField tv_taskName;
@@ -69,7 +70,7 @@ public class AddMillTaskController extends AbstractController {
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        tbl_assignedMillTasks.setItems(dialogBuilder.getApplicapableMillTasks());
+        tbl_assignedMillTasks.getItems().addAll(applicapableMillTasks);
         tv_taskName.setText("");
         bt_add.disableProperty().bind(tbl_assignedMillTasks.getSelectionModel().selectedItemProperty().isNull());
 
@@ -82,7 +83,7 @@ public class AddMillTaskController extends AbstractController {
     @FXML
     public void add() {
         if (tbl_assignedMillTasks.getSelectionModel().selectedItemProperty().get()!=null) {
-            AvailableTask mt = (AvailableTask)tbl_assignedMillTasks.getSelectionModel().getSelectedItem();
+            TaskTemplate mt = (TaskTemplate)tbl_assignedMillTasks.getSelectionModel().getSelectedItem();
             currentProject.millTasksProperty().add(new Task(tv_taskName.getText(), mt.getDescription(), mt.getClassName(), mt.getFxmlFileName()));
             getDialog().close();
         }
