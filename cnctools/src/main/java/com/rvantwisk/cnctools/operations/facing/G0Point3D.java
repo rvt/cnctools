@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,13 @@
 
 package com.rvantwisk.cnctools.operations.facing;
 
+import math.geom3d.Point3D;
+
 /**
- * Created by rvt on 12/30/13.
+ * Created by rvt on 1/5/14.
  */
-public class Controller {
+public class G0Point3D extends Point3D {
+    public G0Point3D(double x, double y, double z) {
+        super(x,y,z);
+    }
 }

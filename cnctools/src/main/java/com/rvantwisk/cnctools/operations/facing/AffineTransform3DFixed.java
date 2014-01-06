@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,43 +36,46 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools;
+package com.rvantwisk.cnctools.operations.facing;
 
-import com.rvantwisk.cnctools.data.TaskTemplate;
-import com.rvantwisk.cnctools.misc.ProjectModel;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
+import math.geom3d.Point3D;
+import math.geom3d.transform.AffineTransform3D;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Created by rvt on 1/6/14.
+ */
+public class AffineTransform3DFixed extends AffineTransform3D {
 
-@Lazy
-@Configuration
-@Import(ScreensConfiguration.class)
-public class IndexerAppConfiguration {
 
-    @Bean
-    public ProjectModel projectModel()  {
-        ProjectModel customerModel = new ProjectModel();
-        return customerModel;
+    public AffineTransform3DFixed(double[] coefficients) {
+        super(coefficients);
     }
 
-    @Bean
-    public ToolDBManager toolDBManager() {
-        return this.projectModel().getToolDBManager();
+    @Override
+    public Point3D[] transformPoints(Point3D[] src, Point3D[] dst) {
+        if (dst==null)
+            dst = new Point3D[src.length];
+        if (dst[0]==null)
+            for (int i = 0; i<src.length; i++)
+                dst[i] = new Point3D();
+
+        double coef[] = coefficients();
+
+        for (int i = 0; i < src.length; i++) {
+            dst[i] = new Point3D(
+                    src[i].getX() * coef[0] + src[i].getY() * coef[1] + src[i].getZ() * coef[2] + coef[3],
+                    src[i].getX() * coef[4] + src[i].getY() * coef[5] + src[i].getZ() * coef[6] + coef[7],
+                    src[i].getX() * coef[8] + src[i].getY() * coef[9] + src[i].getZ() * coef[10] + coef[11]);
+        }
+        return dst;
     }
 
-    @Bean(name="applicapableMillTasks")
-    public List<TaskTemplate> applicapableMillTasks() {
-        List<TaskTemplate> allOperations = new ArrayList<>();
-
-        //THis is currently hard coded, but needs to move into a register base
-        allOperations.add(new TaskTemplate("Create round stock", "Take's from a square material round stock on your indexer.", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml"));
-        allOperations.add(new TaskTemplate("Custom G-Code", "Let's you create your own G-Code.", "com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController", "CustomGCode.fxml"));
-        allOperations.add(new TaskTemplate("Facing/Pocketing", "Create simple facing or pocket operations", "com.rvantwisk.cnctools.operations.facing.FacingController", "Facing.fxml"));
-        return allOperations;
+    @Override
+    public Point3D transformPoint(Point3D src) {
+        double coef[] = coefficients();
+        return new Point3D(src.getX()*coef[0]+src.getY()*coef[1]
+                +src.getZ()*coef[2]+coef[3], src.getX()*coef[4]+src.getY()
+                *coef[5]+src.getZ()*coef[6]+coef[7], src.getX()*coef[8]
+                +src.getY()*coef[9]+src.getZ()*coef[10]+coef[11]);
     }
 }

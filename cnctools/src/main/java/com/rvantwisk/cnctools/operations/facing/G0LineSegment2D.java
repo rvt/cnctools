@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,43 +36,21 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools;
+package com.rvantwisk.cnctools.operations.facing;
 
-import com.rvantwisk.cnctools.data.TaskTemplate;
-import com.rvantwisk.cnctools.misc.ProjectModel;
-import com.rvantwisk.cnctools.misc.ToolDBManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 
-import java.util.ArrayList;
-import java.util.List;
+import math.geom2d.Point2D;
+import math.geom2d.line.LineSegment2D;
 
-@Lazy
-@Configuration
-@Import(ScreensConfiguration.class)
-public class IndexerAppConfiguration {
-
-    @Bean
-    public ProjectModel projectModel()  {
-        ProjectModel customerModel = new ProjectModel();
-        return customerModel;
+/**
+ * Created by rvt on 1/5/14.
+ */
+public class G0LineSegment2D extends LineSegment2D {
+    public G0LineSegment2D(Point2D point1, Point2D point2) {
+        super(point1, point2);
     }
 
-    @Bean
-    public ToolDBManager toolDBManager() {
-        return this.projectModel().getToolDBManager();
-    }
-
-    @Bean(name="applicapableMillTasks")
-    public List<TaskTemplate> applicapableMillTasks() {
-        List<TaskTemplate> allOperations = new ArrayList<>();
-
-        //THis is currently hard coded, but needs to move into a register base
-        allOperations.add(new TaskTemplate("Create round stock", "Take's from a square material round stock on your indexer.", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml"));
-        allOperations.add(new TaskTemplate("Custom G-Code", "Let's you create your own G-Code.", "com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController", "CustomGCode.fxml"));
-        allOperations.add(new TaskTemplate("Facing/Pocketing", "Create simple facing or pocket operations", "com.rvantwisk.cnctools.operations.facing.FacingController", "Facing.fxml"));
-        return allOperations;
+    public G0LineSegment2D(double x1, double y1, double x2, double y2) {
+        super(x1, y1, x2, y2);
     }
 }

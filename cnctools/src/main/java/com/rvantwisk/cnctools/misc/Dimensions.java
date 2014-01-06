@@ -58,7 +58,8 @@ public class Dimensions {
         LENGTH,
         VELOCITY,
         TIME,
-        RPM
+        RPM,
+        PERSENT
     }
 
     public enum Dim {
@@ -68,16 +69,20 @@ public class Dimensions {
         M(Type.LENGTH),
         INCH(Type.LENGTH),
         FOOT(Type.LENGTH),
+
         MM_SEC(Type.VELOCITY),
         MM_MINUTE(Type.VELOCITY),
         FOOT_SEC(Type.VELOCITY),
         FOOT_MINUTE(Type.VELOCITY),
         INCH_MINUTE(Type.VELOCITY),
         INCH_SEC(Type.VELOCITY),
+
         RPM(Type.RPM),
+
         SEC(Type.TIME),
         MINUTE(Type.TIME),
-        HOUR(Type.TIME);
+        HOUR(Type.TIME),
+        PERSENT(Type.PERSENT);
 
         private Type type;
         Dim(Type type) {
@@ -109,6 +114,10 @@ public class Dimensions {
         aMap.put(Dim.FOOT_MINUTE, 304.8/60.0);
         aMap.put(Dim.INCH_SEC, 25.4);
         aMap.put(Dim.INCH_MINUTE, 25.4/60.0);
+
+        aMap.put(Dim.RPM, 1.0);
+        aMap.put(Dim.PERSENT, 1.0);
+
         conversionRatios = Collections.unmodifiableMap(aMap);
     }
 
@@ -166,6 +175,11 @@ public class Dimensions {
     private static final ObservableList<Item> RPMLIST = FXCollections.observableArrayList(new Item(Dim.RPM, "RPM"));
 
     /**
+     * List if rotational units
+     */
+    private static final ObservableList<Item> PERSENTLIST = FXCollections.observableArrayList(new Item(Dim.PERSENT, "%"));
+
+    /**
      * List of velocity units
      */
     private static final ObservableList<Item> VELOCITYLIST = FXCollections.observableArrayList(
@@ -189,6 +203,8 @@ public class Dimensions {
         switch (dimType) {
             case RPM:
                 return RPMLIST;
+            case PERSENT:
+                return PERSENTLIST;
             case VELOCITY:
                 return VELOCITYLIST;
             case LENGTH:

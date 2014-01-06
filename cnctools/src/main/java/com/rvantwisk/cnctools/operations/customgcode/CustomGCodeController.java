@@ -59,6 +59,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -68,6 +69,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Component
+@Scope("prototype")
 public class CustomGCodeController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -123,13 +125,13 @@ public class CustomGCodeController implements MillTaskController {
     @FXML
     void initialize() {
         errors.setTooltip(new Tooltip());
+        modelToForm();
         gCodeText.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String s2) {
                 reRenderModel();
             }
         });
-        modelToForm();
 
     }
 

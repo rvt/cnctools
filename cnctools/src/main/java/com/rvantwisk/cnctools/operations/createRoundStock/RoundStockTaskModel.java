@@ -110,9 +110,9 @@ public class RoundStockTaskModel implements TaskModel {
         helper.setFinalSize(gCodeGenerator.convert(finalSize).getValue());
         helper.setStockSize(gCodeGenerator.convert(stockSize).getValue());
         helper.setStockLength(gCodeGenerator.convert(finalLength).getValue());
-        helper.setMillSize(gCodeGenerator.convert(em.diameterProperty()).getValue());
         helper.setRadialDepth(gCodeGenerator.convert(tp.radialDepthProperty()).getValue());
         helper.setAxialDepth(gCodeGenerator.convert(tp.axialDepthProperty()).getValue());
+        helper.setMillSize(gCodeGenerator.convert(em.diameterProperty()).getValue());
         helper.setRapidClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
         helper.setStockClearance(gCodeGenerator.convert(em.diameterProperty()).getValue());
 

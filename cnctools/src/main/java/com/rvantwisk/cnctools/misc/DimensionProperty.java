@@ -100,6 +100,10 @@ public class DimensionProperty {
         return new DimensionProperty(value, Dimensions.Dim.RPM);
     }
 
+    public static DimensionProperty DimPersent(final Double value) {
+        return new DimensionProperty(value, Dimensions.Dim.PERSENT);
+    }
+
     public double getValue() {
         return value.get();
     }
@@ -139,8 +143,8 @@ public class DimensionProperty {
 
     public void set(final DimensionProperty dimensionProperty) {
         block=true;
-        value.setValue(dimensionProperty.value.get());
-        dimension.setValue(dimensionProperty.dimension.get());
+        value.set(dimensionProperty.value.get());
+        dimension.set(dimensionProperty.dimension.get());
         block=false;
     }
 }

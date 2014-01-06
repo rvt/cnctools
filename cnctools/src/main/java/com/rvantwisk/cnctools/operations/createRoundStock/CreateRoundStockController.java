@@ -59,7 +59,7 @@ import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +68,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 @Component
-@Qualifier("RoundStockController")
+@Scope("prototype")
 public class CreateRoundStockController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -125,6 +125,7 @@ public class CreateRoundStockController implements MillTaskController {
     void initialize() {
 
        // iName.textProperty().setValue(task.getName());
+        modelToForm();
 
         selectOrEditTool.addEventHandler(ToolChangedEvent.TOOL_CHANGED_EVENT, new EventHandler<ToolChangedEvent>() {
             @Override
@@ -153,7 +154,6 @@ public class CreateRoundStockController implements MillTaskController {
             }
         });
 
-        modelToForm();
         generateGCode();
     }
 

@@ -38,8 +38,570 @@
 
 package com.rvantwisk.cnctools.operations.facing;
 
+import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
+import com.rvantwisk.gcodegenerator.GCodeBuilder;
+import math.geom2d.AffineTransform2D;
+import math.geom2d.Box2D;
+import math.geom2d.Point2D;
+import math.geom2d.circulinear.*;
+import math.geom2d.conic.Circle2D;
+import math.geom2d.conic.CircleArc2D;
+import math.geom2d.conic.Ellipse2D;
+import math.geom2d.curve.Curve2D;
+import math.geom2d.curve.CurveArray2D;
+import math.geom2d.domain.Contour2D;
+import math.geom2d.line.LineSegment2D;
+import math.geom2d.polygon.LinearRing2D;
+import math.geom2d.polygon.Polyline2D;
+import math.geom2d.polygon.Rectangle2D;
+import math.geom3d.Point3D;
+
+import java.util.*;
+
 /**
- * Created by rvt on 12/30/13.
+ * Class to employ simply facing and pocketing strategies
+ * This doesn't try to optimize cutting strategy, for example by using biarc's or other technique to
+ * decrease total milling time.
+ * The shape must be constructed in such a way that you can reach each end through s straight line without crossing a boundary
+ *
+ * @Author R. van Twisk
+ * TODO: see if we can interface with libACTP or libarea to we cna handle more complex millign strategies
  */
 public class FacingHelper {
+    public static enum CutStrategy {
+        LINEAR,
+        SPIRAL_OUT,
+        ZIGZAG
+    }
+
+    final CncToolsGCodegenerator gCode;
+
+    // Curve that hold's the data to be faced/pocketed
+    private CirculinearCurve2D domain;
+
+    private boolean spindleCW = true;
+    private double radialDepth = 0.0; // Step over
+    private double axialDepth = 0.0; // STep Depth
+    private double millSize = 0.0; // Size of endmill
+    private double rapidClearance = 1.0;
+    private double stockClearance = 5.0;
+    private double zTop;
+    private double zSafe;
+    private double zFinal;
+    private double edgeClearance = 0.0;
+    private boolean edgeCleanup;
+    private boolean edgeCleanupCW;
+    private double angle = 0.0; // In case of ZIGZAG/LINEAR method
+    private CutStrategy cutStrategy = CutStrategy.ZIGZAG;
+    private boolean climbCutting = false;
+
+    // Variables used during calculations
+    private CirculinearContour2D inside = null; // Contains the inside of teh total milled area
+    private CirculinearContour2D edge = null; // Contains the inside of teh total milled area
+
+    public FacingHelper(CncToolsGCodegenerator gCodeGenerator) {
+        this.gCode = gCodeGenerator;
+    }
+
+
+    public void calculate() {
+
+        // Build the inside of the shape
+        CirculinearDomain2D buffer = domain.buffer(radialDepth + edgeClearance);
+        Iterator<? extends CirculinearContour2D> iter = buffer.boundary().continuousCurves().iterator();
+        inside = iter.next();
+        inside = iter.next();
+
+        // Calculate the edge
+        buffer = domain.buffer(radialDepth);
+        iter = buffer.boundary().continuousCurves().iterator();
+        edge = iter.next();
+        edge = iter.next();
+
+
+        // Build
+        calculatePaths(angle, 0.0);
+
+        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
+        // draw(buffer, null);
+    }
+
+    public void calculatePaths(double angle, double zHeight) {
+        angle = Math.toRadians(angle);
+
+        Point3D[] pocketPoints = null;
+        switch (cutStrategy) {
+            case ZIGZAG:
+            case LINEAR:
+                pocketPoints = buildLinearorZigzagPath(angle, zHeight);
+                break;
+        }
+
+        // Move Z up to safe
+        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
+
+        // Move to X/Y coords to start
+        gCode.addBlock(new GCodeBuilder().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()));
+
+        // Entry Move (vertical)
+        gCode.addBlock(new GCodeBuilder().G1().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()).Z(zHeight));
+
+        // Generate GCode for clearing
+        createGCodeFromPoint3D(pocketPoints, 0.0);
+
+        // If edge needs to be cleaned up we can do that here
+        if (edgeCleanup) {
+            gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
+            gCode.addBlock(new GCodeBuilder().X(inside.firstPoint().x()).Y(inside.firstPoint().y()));
+            gCode.addBlock(new GCodeBuilder().G1().Z(zHeight));
+            createGCodeFromCirculinearContour2D(edge);
+        }
+
+        // Move to above startpoint
+        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
+
+    }
+
+
+    /**
+     * Build a linear of zigzag pattern
+     *
+     * @param angle
+     * @param zHeight
+     * @return
+     */
+    private Point3D[] buildLinearorZigzagPath(double angle, double zHeight) {
+        AffineTransform2D transform = AffineTransform2D.createRotation(-angle);
+
+        // Rotate design according to requested cut angle
+        Contour2D insideTransformed = inside.transform(transform);
+        Curve2D domainTransformed = domain.transform(transform);
+
+        // Place lines at distance of radialAxis on top of the design and calculate all interestions between teh design and the CNC path's
+        Box2D size = domainTransformed.boundingBox();
+        CurveArray2D millPaths = new CirculinearCurveArray2D();
+
+        double x = size.getMinX();
+        LineSegment2D lastAdded = null;
+        while (x < size.getMaxX()) {
+            List<Point2D> points = new ArrayList<>(insideTransformed.intersections(new LineSegment2D(x, size.getMinY(), x, size.getMaxY())));
+            if (points.size() == 2) {
+                lastAdded = new LineSegment2D(points.get(0), points.get(1));
+                millPaths.add(lastAdded);
+            } else if (points.size() > 2) {
+                throw new RuntimeException("Shape seems to be constructed in such a way that we get multiple intersection points.");
+            }
+            x = x + radialDepth;
+        }
+
+        // If we are more then 5% of radial depth to the edge of inside we add a last step, else we assume the endmill will beable to handle
+        // the extra material to be removed
+        if (Math.abs(lastAdded.lastPoint().x() - size.getMaxX()) > radialDepth / 5.0) {
+            List<Point2D> points = new ArrayList<>(insideTransformed.intersections(new LineSegment2D(size.getMaxX(), size.getMinY(), size.getMaxX(), size.getMaxY())));
+            if (points.size() == 2) {
+                lastAdded = new LineSegment2D(points.get(0), points.get(1));
+                millPaths.add(lastAdded);
+            } else if (points.size() > 2) {
+                throw new RuntimeException("Shape seems to be constructed in such a way that we get multiple intersection points.");
+            }
+        }
+
+        // Re-order of line segment's ensures that they are always upwards
+        millPaths = reOrderLineSegment2DUpwards(millPaths);
+
+        // Rotate back the created array of CNC paths so they are corectly alliged with the design
+        millPaths = millPaths.transform(AffineTransform2D.createRotation(angle));
+
+        // build a cut strategy for ZIGZAG and LINEAR
+        Point3D[] arrayPoints = null;
+        switch (cutStrategy) {
+            case ZIGZAG:
+                arrayPoints = buildCutPath_ZIGZAG(millPaths, zHeight);
+                break;
+            case LINEAR:
+                arrayPoints = buildCutPath_LINEAR(millPaths, zHeight);
+                break;
+        }
+        return arrayPoints;
+    }
+
+
+    /**
+     * Build a ZIGZAG cutting path cutting in both directions
+     *
+     * @param array
+     * @return Array of G0LineSegment2D or LineSegment2D with teh total pat to follow (last to first, first to last...)
+     */
+    private Point3D[] buildCutPath_ZIGZAG(CurveArray2D array, double zHeight) {
+
+        Point3D[] sorted = null;
+        final int size = array.size();
+        sorted = new Point3D[size * 2];
+
+        // Swap every other line segment
+        final LineSegment2D[] swapped = new LineSegment2D[size];
+        for (int i = 0; i < size; i++) {
+            if (i % 2 == 0) {
+                swapped[i] = (LineSegment2D) array.get(i);
+            } else {
+                swapped[i] = (LineSegment2D) array.get(i).reverse();
+            }
+        }
+
+        // Add first point
+        int pos = 0;
+        LineSegment2D item = swapped[0];
+        sorted[pos++] = new Point3D(item.firstPoint().x(), item.firstPoint().y(), zHeight);
+
+        // Follow path
+        for (int i = 0; i < size; i++) {
+            item = swapped[i];
+            sorted[pos++] = new Point3D(item.lastPoint().x(), item.lastPoint().y(), zHeight);
+
+            if (i < (size - 1)) {
+                LineSegment2D nextItem = swapped[i + 1];
+                sorted[pos++] = new Point3D(nextItem.firstPoint().x(), nextItem.firstPoint().y(), zHeight);
+            }
+        }
+
+        return sorted;
+    }
+
+    /**
+     * Build a Linear cut path, eg cutting into one direction only
+     *
+     * @param array
+     * @param zHeight
+     * @return
+     */
+    private Point3D[] buildCutPath_LINEAR(CurveArray2D array, double zHeight) {
+
+        Point3D[] sorted = null;
+        int pos = 0;
+        LineSegment2D item;
+        final int size = array.size();
+
+        sorted = new Point3D[size * 5 - 3];
+        pos = 0;
+        item = (LineSegment2D) array.get(0);
+        sorted[pos++] = new Point3D(item.firstPoint().x(), item.firstPoint().y(), zHeight);
+        for (int i = 0; i < size; i++) {
+            item = (LineSegment2D) array.get(i);
+            sorted[pos++] = new Point3D(item.lastPoint().x(), item.lastPoint().y(), zHeight);
+
+            if (i < (size - 1)) {
+                LineSegment2D nextItem = (LineSegment2D) array.get(i + 1);
+                sorted[pos++] = new G0Point3D(item.lastPoint().x(), item.lastPoint().y(), zSafe);
+                sorted[pos++] = new G0Point3D(item.firstPoint().x(), item.firstPoint().y(), zSafe);
+                sorted[pos++] = new Point3D(item.firstPoint().x(), item.firstPoint().y(), zHeight);
+                sorted[pos++] = new Point3D(nextItem.firstPoint().x(), nextItem.firstPoint().y(), zHeight);
+            }
+        }
+
+        return sorted;
+    }
+
+    /**
+     * Create G-Code based on point array
+     *
+     * @param arrayPoint
+     * @param zHeight
+     */
+    private void createGCodeFromPoint3D(final Point3D[] arrayPoint, double zHeight) {
+
+        for (Point3D item : arrayPoint) {
+            Point3D line = item;
+
+            if (item instanceof G0Point3D) {
+                gCode.addBlock(new GCodeBuilder().G0().X(item.getX()).Y(item.getY()).Z(item.getZ()));
+            } else if (item instanceof Point3D) {
+                gCode.addBlock(new GCodeBuilder().G1().X(item.getX()).Y(item.getY()).Z(item.getZ()));
+            }
+        }
+    }
+
+    /**
+     * Re-order a array of LineSegment2D in such a way that all vector's point upwards
+     *
+     * @param array
+     * @return
+     */
+    private CirculinearCurveArray2D reOrderLineSegment2DUpwards(CurveArray2D array) {
+        CirculinearCurveArray2D sorted = new CirculinearCurveArray2D();
+        Iterator<Curve2D> iter = array.iterator();
+        while (iter.hasNext()) {
+            LineSegment2D item = (LineSegment2D) iter.next();
+
+            if (item.firstPoint().y() < item.lastPoint().y()) {
+                sorted.add(item);
+            } else {
+                sorted.add(new LineSegment2D(item.firstPoint().x(), item.lastPoint().y(), item.lastPoint().x(), item.firstPoint().y()));
+            }
+        }
+        return sorted;
+    }
+
+
+    private void createGCodeFromCirculinearContour2D(CirculinearContour2D foo) {
+
+        Iterator<? extends CirculinearContour2D> iter = foo.continuousCurves().iterator();
+        while (iter.hasNext()) {
+            createGCodeFromGeom(iter.next());
+        }
+
+    }
+
+
+    private void createGCodeFromGeom(CirculinearContour2D item2) {
+
+        if (item2 instanceof Circle2D) {
+            Circle2D c = (Circle2D) item2;
+
+            for (LinearRing2D lr : c.asPolyline(30).continuousCurves()) {
+                for (Point2D p : lr.vertices()) {
+                    gCode.addBlock(new GCodeBuilder().X(p.x()).Y(p.y()));
+                }
+            }
+
+        } else if (item2 instanceof GenericCirculinearRing2D) {
+            GenericCirculinearRing2D item3 = (GenericCirculinearRing2D) item2;
+
+            for (CirculinearElement2D item4 : item3.smoothPieces()) {
+
+                if (item4 instanceof LineSegment2D) {
+                    LineSegment2D ls = (LineSegment2D) item4;
+
+                    Point2D fp = ls.firstPoint();
+                    gCode.addBlock(new GCodeBuilder().X(fp.x()).Y(fp.y()));
+                    Point2D lp = ls.lastPoint();
+                    gCode.addBlock(new GCodeBuilder().X(lp.x()).Y(lp.y()));
+
+
+                } else if ((item4 instanceof CircleArc2D)) {
+                    CircleArc2D ca = (CircleArc2D) item4;
+
+                    Polyline2D lines = ca.asPolyline(10);
+                    for (Point2D p : lines.vertices()) {
+                        gCode.addBlock(new GCodeBuilder().X(p.x()).Y(p.y()));
+                    }
+
+
+                } else {
+                    throw new RuntimeException("Unknown CirculinearElement2D encountered [" + item4.getClass().toString() + "]");
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the first item from a collection
+     *
+     * @param in
+     * @return Note: We could use iteratables from guave?
+     */
+    private Point2D getFirstPoint(final Collection<Point2D> in) {
+        return in.iterator().hasNext() ? in.iterator().next() : null;
+    }
+
+    /**
+     * From a number of point's in a collection, rotate the collection in such a way that the found point is as close as possible to closeAt
+     *
+     * @param in
+     * @param closeAt
+     * @return
+     */
+    private Collection<Point2D> rotateClosest(final Collection<Point2D> in, final Point2D closeAt) {
+        final Queue<Object> q = new ArrayDeque<Object>();
+
+        int optimum = 0;
+        double distance = Double.MAX_VALUE;
+        int step = 0;
+        for (Point2D p : in) {
+            double thisD = p.distance(closeAt);
+            if (thisD < distance) {
+                distance = thisD;
+                optimum = step;
+            }
+            step++;
+        }
+        List<Point2D> rotated = new ArrayList<Point2D>();
+        rotated.addAll(in);
+        Collections.rotate(rotated, -optimum);
+        return rotated;
+    }
+
+
+    /***********************************************************************************/
+    /******************************* Getters and Setters *******************************/
+    /**
+     * *******************************************************************************
+     */
+
+
+    public CirculinearCurve2D getDomain() {
+        return domain;
+    }
+
+    public void setDomain(CirculinearCurve2D domain) {
+        this.domain = domain;
+    }
+
+    public double getRadialDepth() {
+        return radialDepth;
+    }
+
+    public void setRadialDepth(double radialDepth) {
+        this.radialDepth = radialDepth;
+    }
+
+    public double getAxialDepth() {
+        return axialDepth;
+    }
+
+    public void setAxialDepth(double axialDepth) {
+        this.axialDepth = axialDepth;
+    }
+
+    public double getMillSize() {
+        return millSize;
+    }
+
+    public void setMillSize(double millSize) {
+        this.millSize = millSize;
+    }
+
+    public double getRapidClearance() {
+        return rapidClearance;
+    }
+
+    public void setRapidClearance(double rapidClearance) {
+        this.rapidClearance = rapidClearance;
+    }
+
+    public double getStockClearance() {
+        return stockClearance;
+    }
+
+    public void setStockClearance(double stockClearance) {
+        this.stockClearance = stockClearance;
+    }
+
+    public double getzTop() {
+        return zTop;
+    }
+
+    public void setzTop(double zTop) {
+        this.zTop = zTop;
+    }
+
+    public double getzSafe() {
+        return zSafe;
+    }
+
+    public void setzSafe(double zSafe) {
+        this.zSafe = zSafe;
+    }
+
+    public double getzFinal() {
+        return zFinal;
+    }
+
+    public void setzFinal(double zFinal) {
+        this.zFinal = zFinal;
+    }
+
+    public boolean isEdgeCleanup() {
+        return edgeCleanup;
+    }
+
+    public void setEdgeCleanup(boolean edgeCleanup) {
+        this.edgeCleanup = edgeCleanup;
+    }
+
+    public boolean isEdgeCleanupCW() {
+        return edgeCleanupCW;
+    }
+
+    public void setEdgeCleanupCW(boolean edgeCleanupCW) {
+        this.edgeCleanupCW = edgeCleanupCW;
+    }
+
+    public boolean isSpindleCW() {
+        return spindleCW;
+    }
+
+    public void setSpindleCW(boolean spindleCW) {
+        this.spindleCW = spindleCW;
+    }
+
+    public CutStrategy getCutStrategy() {
+        return cutStrategy;
+    }
+
+    public void setCutStrategy(CutStrategy cutStrategy) {
+        this.cutStrategy = cutStrategy;
+    }
+
+    public boolean isClimbCutting() {
+        return climbCutting;
+    }
+
+    public void setClimbCutting(boolean climbCutting) {
+        this.climbCutting = climbCutting;
+    }
+
+    public double getEdgeClearance() {
+        return edgeClearance;
+    }
+
+    public void setEdgeClearance(double edgeClearance) {
+        this.edgeClearance = edgeClearance;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    /**
+     * Create a eliptical Curve, reference is located at lower left
+     *
+     * @param width
+     * @param height
+     * @return TODO: USe circle for Eclipse optimisation, the current library (java geom) doesn't have the capability for buffering Eclipse
+     */
+    public static CirculinearCurve2D getEllipseDomain(double width, double height) {
+        Ellipse2D p2D = new Ellipse2D(width / 2.0, height / 2.0, width, height);
+        CirculinearCurveArray2D array = new CirculinearCurveArray2D();
+        array.add(p2D.asPolyline(10));
+        return array;
+    }
+
+    /**
+     * Create a Rectangular domain with a reference in the lower left corner
+     *
+     * @param width
+     * @param height
+     * @return
+     */
+    public static CirculinearCurve2D getRectangularDomain(double width, double height) {
+        Rectangle2D p2D = new Rectangle2D(new Point2D(0.0, 0.0), new Point2D(width, height));
+        return p2D.boundary();
+    }
+
+    /**
+     * Create a circular domain with the reference located in the lower left
+     *
+     * @param r
+     * @return
+     */
+    public static CirculinearCurve2D getCircleDomain(double r) {
+        Circle2D p2D = new Circle2D(r, r, 100.0);
+        return p2D;
+    }
+
+
 }
