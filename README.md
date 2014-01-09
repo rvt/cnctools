@@ -3,7 +3,7 @@ cnctools
 
 CNCTools - A G-Code editor, parser and transformer written in java.
 
-(c) 2013 R. van Twisk - http://riesvantwisk.com/cnctools - Source repository : https://github.com/rvt/cnctools
+(c) 2013-2014 R. van Twisk - http://riesvantwisk.com/cnctools - Source repository : https://github.com/rvt/cnctools
 
 Compilation instructions
 ========
@@ -69,4 +69,4 @@ Screenshot
 ========
 
 Example showing G-Code editor with life preview
-![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/bmk/AppMain-20131223-144808.jpg)
+![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/blog/Main-20140108-183048.jpg)
