@@ -95,6 +95,8 @@ public class GCodeParser {
                 parseLine();
                 currentLineNumber++;
             }
+            machineController.end(this, intermediateStatus);
+
         } catch (IOException x) {
             throw new SimParsingException("Unable to read stream", x);
         }
@@ -160,11 +162,11 @@ public class GCodeParser {
     /**
      * Find the next gcode in the current block
      *
-     * @param GCodeBLock
+     * @param gcodeBlock
      * @return TODO: Parse commands
      */
-    public ParsedWord findWordInBlock(final StringBuilder GCodeBLock) {
-        Matcher myMatcher = GCODEPATTERN.matcher(GCodeBLock);
+    public ParsedWord findWordInBlock(final StringBuilder gcodeBlock) {
+        Matcher myMatcher = GCODEPATTERN.matcher(gcodeBlock);
 
         if (myMatcher.find()) {
             try {
@@ -187,8 +189,8 @@ public class GCodeParser {
                     return new ParsedWord(g1, g1 + value, v, g0);
                 }
 
-            } catch (NumberFormatException e) {
-                // Assume word wasn't found
+            } catch (Exception e) {
+                // System.out.print(e.getMessage() + ":"+gcodeBlock.toString());
             }
         }
         return null;

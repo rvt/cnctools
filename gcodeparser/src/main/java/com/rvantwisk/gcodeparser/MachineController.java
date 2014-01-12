@@ -49,4 +49,6 @@ public interface MachineController {
 
     void endBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> block) throws SimException;
 
+    void end(GCodeParser parser, MachineStatus machineStatus) throws SimException;
+
 }

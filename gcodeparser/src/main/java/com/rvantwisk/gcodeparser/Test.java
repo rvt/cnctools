@@ -105,7 +105,7 @@ public class Test {
         long startTime = System.currentTimeMillis();
 
         Test t = new Test();
-        t.processFile();
+        t.processFile2();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -113,6 +113,41 @@ public class Test {
 
     }
 
+    private void processFile2() throws SimException, UnsupportedSimException {
+        try {
+
+            final MachineStatusHelper machine = new MachineStatusHelper();
+            final BufferedWriter br = Files.newBufferedWriter(new File("/tmp/flowmold101.txt_out").toPath(),
+                    Charset.forName("UTF-8"),
+                    new OpenOption[]{StandardOpenOption.CREATE});
+
+            MachineController machineController = new MachineController() {
+                @Override
+                public void startBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> currentBlock) {
+                }
+
+                @Override
+                public void endBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> currentBlock) {
+
+                }
+
+                @Override
+                public void end(GCodeParser parser, MachineStatus machineStatus) throws SimException {
+
+                }
+            };
+
+            File file = new File("/tmp/flowmold101.txt");
+            GCodeParser parser = new GCodeParser(machineController, null, new BufferedInputStream(new FileInputStream(file)));
+
+            br.flush();
+            br.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
 
     private void processFile() throws SimException, UnsupportedSimException {
         try {
@@ -185,6 +220,11 @@ public class Test {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }
+
+                @Override
+                public void end(GCodeParser parser, MachineStatus machineStatus) throws SimException {
+
                 }
             };
 
