@@ -69,4 +69,4 @@ Screenshot
 ========
 
 Example showing G-Code editor with life preview
-![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/blog/Main-20140108-183048.jpg)
+![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/blog/AppMain-20140112-163515.jpg)
