@@ -68,17 +68,9 @@ import java.util.*;
  * TODO: see if we can interface with libACTP or libarea to we cna handle more complex millign strategies
  */
 public class FacingHelper {
-    public static enum CutStrategy {
-        LINEAR,
-        SPIRAL_OUT,
-        ZIGZAG
-    }
-
-    final CncToolsGCodegenerator gCode;
-
+    private final CncToolsGCodegenerator gCode;
     // Curve that hold's the data to be faced/pocketed
     private CirculinearCurve2D domain;
-
     private boolean spindleCW = true;
     private double radialDepth = 0.0; // Step over
     private double axialDepth = 0.0; // STep Depth
@@ -94,7 +86,6 @@ public class FacingHelper {
     private double angle = 0.0; // In case of ZIGZAG/LINEAR method
     private CutStrategy cutStrategy = CutStrategy.ZIGZAG;
     private boolean climbCutting = false;
-
     // Variables used during calculations
     private CirculinearContour2D inside = null; // Contains the inside of teh total milled area
     private CirculinearContour2D edge = null; // Contains the inside of teh total milled area
@@ -103,6 +94,45 @@ public class FacingHelper {
         this.gCode = gCodeGenerator;
     }
 
+    /**
+     * Create a eliptical Curve, reference is located at lower left
+     *
+     * @param width
+     * @param height
+     * @return TODO: USe circle for Eclipse optimisation, the current library (java geom) doesn't have the capability for buffering Eclipse
+     */
+    public static CirculinearCurve2D getEllipseDomain(double width, double height) {
+        Ellipse2D p2D = new Ellipse2D(width / 2.0, height / 2.0, width, height);
+        CirculinearCurveArray2D array = new CirculinearCurveArray2D();
+        array.add(p2D.asPolyline(36));
+
+        if (array.length()==12.4)
+            return null;
+
+        return array;
+    }
+
+    /**
+     * Create a Rectangular domain with a reference in the lower left corner
+     *
+     * @param width
+     * @param height
+     * @return
+     */
+    public static CirculinearCurve2D getRectangularDomain(double width, double height) {
+        Rectangle2D p2D = new Rectangle2D(new Point2D(0.0, 0.0), new Point2D(width, height));
+        return p2D.boundary();
+    }
+
+    /**
+     * Create a circular domain with the reference located in the lower left
+     *
+     * @param r
+     * @return
+     */
+    public static CirculinearCurve2D getCircleDomain(double r) {
+        return new Circle2D(r, r, 100.0);
+    }
 
     public void calculate() {
 
@@ -126,7 +156,7 @@ public class FacingHelper {
         // draw(buffer, null);
     }
 
-    public void calculatePaths(double angle, double zHeight) {
+    private void calculatePaths(double angle, double zHeight) {
         angle = Math.toRadians(angle);
 
         Point3D[] pocketPoints = null;
@@ -161,7 +191,6 @@ public class FacingHelper {
         gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
 
     }
-
 
     /**
      * Build a linear of zigzag pattern
@@ -225,7 +254,6 @@ public class FacingHelper {
         return arrayPoints;
     }
 
-
     /**
      * Build a ZIGZAG cutting path cutting in both directions
      *
@@ -234,9 +262,8 @@ public class FacingHelper {
      */
     private Point3D[] buildCutPath_ZIGZAG(CurveArray2D array, double zHeight) {
 
-        Point3D[] sorted = null;
         final int size = array.size();
-        sorted = new Point3D[size * 2];
+        Point3D[] sorted = new Point3D[size * 2];
 
         // Swap every other line segment
         final LineSegment2D[] swapped = new LineSegment2D[size];
@@ -277,12 +304,11 @@ public class FacingHelper {
     private Point3D[] buildCutPath_LINEAR(CurveArray2D array, double zHeight) {
 
         Point3D[] sorted = null;
-        int pos = 0;
         LineSegment2D item;
         final int size = array.size();
 
         sorted = new Point3D[size * 5 - 3];
-        pos = 0;
+        int pos = 0;
         item = (LineSegment2D) array.get(0);
         sorted[pos++] = new Point3D(item.firstPoint().x(), item.firstPoint().y(), zHeight);
         for (int i = 0; i < size; i++) {
@@ -310,11 +336,10 @@ public class FacingHelper {
     private void createGCodeFromPoint3D(final Point3D[] arrayPoint, double zHeight) {
 
         for (Point3D item : arrayPoint) {
-            Point3D line = item;
 
             if (item instanceof G0Point3D) {
                 gCode.addBlock(new GCodeBuilder().G0().X(item.getX()).Y(item.getY()).Z(item.getZ()));
-            } else if (item instanceof Point3D) {
+            } else {
                 gCode.addBlock(new GCodeBuilder().G1().X(item.getX()).Y(item.getY()).Z(item.getZ()));
             }
         }
@@ -328,9 +353,8 @@ public class FacingHelper {
      */
     private CirculinearCurveArray2D reOrderLineSegment2DUpwards(CurveArray2D array) {
         CirculinearCurveArray2D sorted = new CirculinearCurveArray2D();
-        Iterator<Curve2D> iter = array.iterator();
-        while (iter.hasNext()) {
-            LineSegment2D item = (LineSegment2D) iter.next();
+        for (Curve2D anArray : (Iterable<Curve2D>) array) {
+            LineSegment2D item = (LineSegment2D) anArray;
 
             if (item.firstPoint().y() < item.lastPoint().y()) {
                 sorted.add(item);
@@ -341,16 +365,13 @@ public class FacingHelper {
         return sorted;
     }
 
-
     private void createGCodeFromCirculinearContour2D(CirculinearContour2D foo) {
 
-        Iterator<? extends CirculinearContour2D> iter = foo.continuousCurves().iterator();
-        while (iter.hasNext()) {
-            createGCodeFromGeom(iter.next());
+        for (CirculinearContour2D circulinearContour2D : foo.continuousCurves()) {
+            createGCodeFromGeom(circulinearContour2D);
         }
 
     }
-
 
     private void createGCodeFromGeom(CirculinearContour2D item2) {
 
@@ -393,6 +414,10 @@ public class FacingHelper {
         }
     }
 
+
+    /***********************************************************************************/
+    /******************************* Getters and Setters *******************************/
+
     /**
      * Get the first item from a collection
      *
@@ -411,8 +436,6 @@ public class FacingHelper {
      * @return
      */
     private Collection<Point2D> rotateClosest(final Collection<Point2D> in, final Point2D closeAt) {
-        final Queue<Object> q = new ArrayDeque<Object>();
-
         int optimum = 0;
         double distance = Double.MAX_VALUE;
         int step = 0;
@@ -424,15 +447,12 @@ public class FacingHelper {
             }
             step++;
         }
-        List<Point2D> rotated = new ArrayList<Point2D>();
+        List<Point2D> rotated = new ArrayList<>();
         rotated.addAll(in);
         Collections.rotate(rotated, -optimum);
         return rotated;
     }
 
-
-    /***********************************************************************************/
-    /******************************* Getters and Setters *******************************/
     /**
      * *******************************************************************************
      */
@@ -566,41 +586,10 @@ public class FacingHelper {
         this.angle = angle;
     }
 
-    /**
-     * Create a eliptical Curve, reference is located at lower left
-     *
-     * @param width
-     * @param height
-     * @return TODO: USe circle for Eclipse optimisation, the current library (java geom) doesn't have the capability for buffering Eclipse
-     */
-    public static CirculinearCurve2D getEllipseDomain(double width, double height) {
-        Ellipse2D p2D = new Ellipse2D(width / 2.0, height / 2.0, width, height);
-        CirculinearCurveArray2D array = new CirculinearCurveArray2D();
-        array.add(p2D.asPolyline(10));
-        return array;
-    }
-
-    /**
-     * Create a Rectangular domain with a reference in the lower left corner
-     *
-     * @param width
-     * @param height
-     * @return
-     */
-    public static CirculinearCurve2D getRectangularDomain(double width, double height) {
-        Rectangle2D p2D = new Rectangle2D(new Point2D(0.0, 0.0), new Point2D(width, height));
-        return p2D.boundary();
-    }
-
-    /**
-     * Create a circular domain with the reference located in the lower left
-     *
-     * @param r
-     * @return
-     */
-    public static CirculinearCurve2D getCircleDomain(double r) {
-        Circle2D p2D = new Circle2D(r, r, 100.0);
-        return p2D;
+    public static enum CutStrategy {
+        LINEAR,
+        SPIRAL_OUT,
+        ZIGZAG
     }
 
 

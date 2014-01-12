@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,20 +36,63 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.operations.interfaces;
+package com.rvantwisk.cnctools.opengl;
 
-import com.rvantwisk.cnctools.data.interfaces.TaskModel;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/11/13
- * Time: 2:08 PM
- * To change this template use File | Settings | File Templates.
+ *  Abstract actor that can be added to a OpenGL scene
  */
-public interface MillTaskController  {
-    public abstract void setModel(final TaskModel model);
-    public abstract TaskModel getModel();
-    public abstract <T extends TaskModel> T createNewModel();
+public abstract class AbstractActor {
+    private static final int SIZE_FLOAT = Float.SIZE / Byte.SIZE;
+    private String name="";
+
+    /**
+     *
+     * @param name  Nam eof teh actor, so it can be found and be replaced/delete when needed
+     */
+    public AbstractActor(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Initialise is called before any draw methid, but within the OpenGL thread
+     */
+    public abstract void initialize();
+
+    /**
+     * prepare is called before the actual draw
+     */
+    public abstract void prepare();
+
+    /**
+     * Draw is called within each frame
+     */
+    public abstract void draw();
+
+    /**
+     * Destroy is called after the actor get's removed from the scene
+     */
     public abstract void destroy();
+
+
+    public FloatBuffer allocFloats(int howmany) {
+        return ByteBuffer.allocateDirect(howmany * SIZE_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
+    }
+
+    public FloatBuffer allocFloats(float[] floatarray) {
+        FloatBuffer fb = ByteBuffer.allocateDirect(floatarray.length * SIZE_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        fb.put(floatarray).flip();
+        return fb;
+    }
 }

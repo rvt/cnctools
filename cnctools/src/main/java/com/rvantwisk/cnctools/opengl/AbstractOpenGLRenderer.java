@@ -59,6 +59,7 @@ import static org.lwjgl.opengl.ARBDebugOutput.glDebugMessageCallbackARB;
  * to implement openGL views in JavaFX
  */
 public abstract class AbstractOpenGLRenderer {
+    final static long FPS_UPD_INTERVAL = 1 * (1000L * 1000L * 1000L);
 
     private final ConcurrentLinkedQueue<Runnable> pendingRunnables;
 
@@ -147,13 +148,9 @@ public abstract class AbstractOpenGLRenderer {
      * @param running
      */
     protected void _loop(final CountDownLatch running) {
-        final long FPS_UPD_INTERVAL = 1 * (1000L * 1000L * 1000L);
 
         long nextFPSUpdateTime = System.nanoTime() + FPS_UPD_INTERVAL;
         int frames = 0;
-
-        long lastTime = System.nanoTime();
-        double timeDelta = 0.0;
 
         while (0 < running.getCount()) {
             drainPendingActionsQueue();
@@ -167,14 +164,10 @@ public abstract class AbstractOpenGLRenderer {
                 Display.sync(10); // run at 10 fps
 
             final long currentTime = System.nanoTime();
-            timeDelta = (currentTime - lastTime) / 1000000.0;
-            lastTime = currentTime;
-
             frames++;
             if (nextFPSUpdateTime <= currentTime) {
                 long timeUsed = FPS_UPD_INTERVAL + (currentTime - nextFPSUpdateTime);
                 nextFPSUpdateTime = currentTime + FPS_UPD_INTERVAL;
-
                 final int fpsAverage = (int) (frames * (1000L * 1000L * 1000L) / (timeUsed));
                 Platform.runLater(new Runnable() {
                     public void run() {

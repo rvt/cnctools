@@ -41,6 +41,8 @@ package com.rvantwisk.cnctools.operations.createRoundStock;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
+import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
+import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
@@ -48,8 +50,10 @@ import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import com.rvantwisk.events.ToolChangedEvent;
+import com.rvantwisk.gcodeparser.GCodeParser;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -99,6 +103,11 @@ public class CreateRoundStockController implements MillTaskController {
     @Override
     public <T extends TaskModel> T createNewModel() {
         return (T) new RoundStockTaskModel();
+    }
+
+    @Override
+    public void destroy() {
+        gCodeViewerControl.destroy();
     }
 
     @FXML
@@ -178,7 +187,17 @@ public class CreateRoundStockController implements MillTaskController {
             model.generateGCode(toolDBManager, gCodeGenerator);
 
             InputStream in = new ByteArrayInputStream(os.toByteArray());
-            gCodeViewerControl.load(in);
+
+            GCodeActor machine = new GCodeActor("gcode");
+            LinuxCNCValidator validator = new LinuxCNCValidator();
+            GCodeParser parser = new GCodeParser(machine, validator, in);
+            gCodeViewerControl.addActor(machine);
+
+            // Add a platform
+            gCodeViewerControl.addActor(new PlatformActor(
+                    (float)gCodeGenerator.convert(model.finalLengthProperty()).getValue()*1.0f,
+                    (float)gCodeGenerator.convert(model.stockSizeProperty()).getValue()*4.0f
+            ));
 
         } catch (UnsupportedSimException e) {
             error = e.getMessage();

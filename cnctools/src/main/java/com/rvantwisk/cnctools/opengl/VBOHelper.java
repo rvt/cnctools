@@ -38,65 +38,114 @@
 
 package com.rvantwisk.cnctools.opengl;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /**
  * Created by rvt on 12/10/13.
  */
-public class VBOHelper {
+public abstract class VBOHelper {
+    protected static final int SIZE_FLOAT = Float.SIZE / Byte.SIZE;
+    protected int vbID = -1;
+    protected int vbRows = 0;
+    protected float colorR = 1.0f;
+    protected float colorG = 1.0f;
+    protected float colorB = 1.0f;
+    protected float colorA = 1.0f;
+    protected boolean hasOwnColor = false;
+    protected float[] data;
 
-    public void add(VBOInfo vbo) {
-        this.vboList.add(vbo);
-    }
-
-    public static class VBOInfo {
-        public int vbID = -1;
-        public int vbRows = 0;
-        public float colorR = 1.0f;
-        public float colorG = 1.0f;
-        public float colorB = 1.0f;
-        public float colorA = 1.0f;
-        public boolean draw = true;
-        public boolean hasOwnColor = false;
-        public float[] data;
-    }
-
-    private final List<VBOInfo> vboList = new ArrayList<>();
-
-
-    public List<VBOInfo> getVboList() {
-        return Collections.unmodifiableList(vboList);
-    }
-
-    public void destroy() {
-        removeAll();
-    }
-
-
-    public static VBOInfo createVBO(final float[] data, int i, boolean b) {
-        VBOInfo vbo = new VBOInfo();
+    /**
+     * Cretae a VBO array with
+     *
+     * @param data Array of float
+     * @param i    Number of rows
+     * @param b    set if it has it's own color
+     * @return
+     */
+    public static VBOHelper createLineStrip(final float[] data, int i, boolean b) {
+        VBOHelper vbo = new LineStrip();
         vbo.vbRows = i;
         vbo.hasOwnColor = b;
         vbo.data = data;
 
+        IntBuffer buffer = BufferUtils.createIntBuffer(1);
+        GL15.glGenBuffers(buffer);
+        vbo.vbID = buffer.get(0);
+
+        FloatBuffer vertex_buffer_data = BufferUtils.createFloatBuffer(vbo.data.length);
+        vertex_buffer_data.put(vbo.data);
+        vertex_buffer_data.rewind();
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo.vbID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertex_buffer_data, GL15.GL_STATIC_DRAW);
+        vbo.data = null;
+
         return vbo;
     }
 
-    public void removeVBO(final VBOInfo vboInfo) {
-        vboList.remove(vboInfo);
-        GL15.glDeleteBuffers(vboInfo.vbID);
+    public void destroy() {
+        GL15.glDeleteBuffers(vbID);
     }
 
-    public void removeAll() {
-        Iterator<VBOInfo> vboInfo = vboList.iterator();
-        while (vboInfo.hasNext()) {
-            GL15.glDeleteBuffers(vboInfo.next().vbID);
-            vboInfo.remove();
+    abstract public void draw();
+
+
+    // LineStrip VBO
+    public static class LineStrip extends VBOHelper {
+
+        @Override
+        public void draw() {
+            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbID);
+            if (hasOwnColor) {
+                GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+                GL11.glVertexPointer(3, GL11.GL_FLOAT, 7 * SIZE_FLOAT, 0);
+                GL11.glColorPointer(3, GL11.GL_FLOAT, 7 * SIZE_FLOAT, 3 * SIZE_FLOAT);
+                GL11.glDrawArrays(GL11.GL_LINE_STRIP, 0, vbRows);
+                GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+            } else {
+                GL11.glVertexPointer(3, GL11.GL_FLOAT, 3 * SIZE_FLOAT, 0);
+                GL11.glColor4f(colorR, colorG, colorB, colorA);
+                GL11.glDrawArrays(GL11.GL_LINE_STRIP, 0, vbRows);
+            }
+            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
         }
+    }
+
+    public float getColorR() {
+        return colorR;
+    }
+
+    public void setColorR(float colorR) {
+        this.colorR = colorR;
+    }
+
+    public float getColorG() {
+        return colorG;
+    }
+
+    public void setColorG(float colorG) {
+        this.colorG = colorG;
+    }
+
+    public float getColorB() {
+        return colorB;
+    }
+
+    public void setColorB(float colorB) {
+        this.colorB = colorB;
+    }
+
+    public float getColorA() {
+        return colorA;
+    }
+
+    public void setColorA(float colorA) {
+        this.colorA = colorA;
     }
 }

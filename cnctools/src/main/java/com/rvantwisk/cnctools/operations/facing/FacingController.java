@@ -41,6 +41,7 @@ package com.rvantwisk.cnctools.operations.facing;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
+import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
@@ -48,8 +49,10 @@ import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import com.rvantwisk.events.ToolChangedEvent;
+import com.rvantwisk.gcodeparser.GCodeParser;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -255,6 +258,11 @@ public class FacingController implements MillTaskController {
         return (T) new FacingOperation();
     }
 
+    @Override
+    public void destroy() {
+        gCodeViewerControl.destroy();
+    }
+
     private void formToModel() {
 
         model.setToolID(this.selectOrEditTool.getTool().getId());
@@ -314,9 +322,13 @@ public class FacingController implements MillTaskController {
             gCodeGenerator.setOutput(printStream);
 
             model.generateGCode(toolDBManager, gCodeGenerator);
-
             InputStream in = new ByteArrayInputStream(os.toByteArray());
-            gCodeViewerControl.load(in);
+
+            GCodeActor machine = new GCodeActor("gcode");
+            LinuxCNCValidator validator = new LinuxCNCValidator();
+            GCodeParser parser = new GCodeParser(machine, validator, in);
+
+            gCodeViewerControl.addActor(machine);
 
         } catch (UnsupportedSimException e) {
             error = e.getMessage();

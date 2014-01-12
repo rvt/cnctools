@@ -1,15 +1,15 @@
 package com.rvantwisk.cnctools.controls.opengl;
 
-import com.rvantwisk.gcodeparser.GCodeParser;
-import com.rvantwisk.gcodeparser.MachineStatus;
-import com.rvantwisk.gcodeparser.MachineStatusHelper;
-import com.rvantwisk.gcodeparser.ParsedWord;
+import com.rvantwisk.cnctools.opengl.AbstractActor;
+import com.rvantwisk.cnctools.opengl.VBOHelper;
+import com.rvantwisk.gcodeparser.*;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.gcodes.MotionMode;
 import com.rvantwisk.gcodeparser.gcodes.Units;
 import gnu.trove.list.array.TFloatArrayList;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
 
@@ -17,23 +17,27 @@ import java.util.Map;
  * Render's GCode into OpenGLView
  * Created by rvt on 12/19/13.
  */
-public class OpenGLMachineImpl implements OpenGLMachineController {
-    final TFloatArrayList data = new TFloatArrayList();
+public class GCodeActor extends AbstractActor implements MachineController {
 
     public static double curveSectionMM = 1.0;
     public static double AAXISSTEPDEGREES = 1.0; // When A axis rotaties, simulate it in this number of degrees
     public static int AXISMAXSTEPS = 5000; // When A axis rotates with other axis, limit the number of steps to 5000
-
     public static double curveSectionInches = curveSectionMM / 25.4;
-    final MachineStatusHelper machine = new MachineStatusHelper();
-
-    private MotionMode prevMotionMode = MotionMode.G0;
     private static int ROWSIZE = 7;
-
+    final TFloatArrayList data = new TFloatArrayList();
+    final MachineStatusHelper machine = new MachineStatusHelper();
+    private MotionMode prevMotionMode = MotionMode.G0;
     private double lastX = 0;
     private double lastY = 0;
     private double lastZ = 0;
     private double lastA = 0;
+
+    // USed during rendering
+    VBOHelper vboInfo=null;
+
+    public GCodeActor(String name) {
+        super(name);
+    }
 
     @Override
     public void startBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> currentBlock) {
@@ -45,7 +49,7 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
             data.add(0.87f);
             data.add(0.33f);
             data.add(0.27f);
-            data.add(1.0f);
+            data.add(0.5f);
         } else {
             data.add(0.33f);
             data.add(0.27f);
@@ -85,12 +89,9 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
         lastA = machine.getA();
     }
 
-    public TFloatArrayList getVBOData() {
-        return data;
-    }
+    @Override
+    public void end(GCodeParser parser, MachineStatus machineStatus) throws SimException {
 
-    public int getNumWords() {
-        return data.size() / ROWSIZE;
     }
 
     private void addData(double x, double y, double z, MotionMode m) {
@@ -106,7 +107,7 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
 
         for (int i = 0; i < steps; i++) {
 
-            Vector3D rotatedLoc = new Rotation(new Vector3D(1.0, 0.0, 0.0), lastA / 360.0 * Math.PI * 2.0 + (stepSize * i) / 360.0 * Math.PI * 2.0).applyTo(new Vector3D(lastX+stepXSize*i, lastY+stepYSize*i, lastZ+stepZSize*i));
+            Vector3D rotatedLoc = new Rotation(new Vector3D(1.0, 0.0, 0.0), lastA / 360.0 * Math.PI * 2.0 + (stepSize * i) / 360.0 * Math.PI * 2.0).applyTo(new Vector3D(lastX + stepXSize * i, lastY + stepYSize * i, lastZ + stepZSize * i));
 
             data.add((float) (rotatedLoc.getX() + machine.getOX()));
             data.add((float) (rotatedLoc.getY() + machine.getOY()));
@@ -125,7 +126,6 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
         setMotionColor(m);
 
     }
-
 
     // This routine was taken from : https://github.com/makerbot/ReplicatorG/blob/master/src/replicatorg/app/gcode/java
     // However this was modified to support P (number of turns)
@@ -196,12 +196,36 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
         // or the length of the curve divided by the curve section constant
         steps = (int) Math.ceil(Math.max(angle * 2.4, length / curveSection));
 
-        int step;
+
+        final double fta;
+        if (!clockwise) {
+            fta = angleA + angle;
+        } else {
+            fta = angleA;
+        }
+
+        // THis if arc is correct
+        // TODO move this into the validator
+        final double r2 = Math.sqrt(bX * bX + bY * bY);
+        final double percentage;
+        if (r2 > radius) {
+            percentage = Math.abs(radius / r2) * 100.0;
+        } else {
+            percentage = Math.abs(r2 / radius) * 100.0;
+        }
+
+        if (percentage < 99.9) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Radius to end of arc differs from radius to start:\n");
+            sb.append("r1=" + radius + "\n");
+            sb.append("r2=" + r2 + "\n");
+            throw new SimException(sb.toString());
+        }
 
         // this is the real draw action.
-        double arcStartZ = lastZ;
+        final double arcStartZ = lastZ;
         for (s = 1; s <= steps; s++) {
-
+            int step;
             if (!clockwise)
                 step = s;
             else
@@ -214,6 +238,29 @@ public class OpenGLMachineImpl implements OpenGLMachineController {
                     (cY + radius * Math.sin(ta)),
                     (lastZ + (z - arcStartZ) * s / steps), machine.getMotionMode());
         }
+    }
 
+    @Override
+    public void initialize() {
+        vboInfo = VBOHelper.createLineStrip(data.toArray(), data.size() / ROWSIZE, true);
+        data.clear();
+
+    }
+
+    @Override
+    public void prepare() {
+
+    }
+
+    @Override
+    public void draw() {
+        GL11.glPushMatrix();
+        vboInfo.draw();
+        GL11.glPopMatrix();
+    }
+
+    @Override
+    public void destroy() {
+        vboInfo.destroy();
     }
 }

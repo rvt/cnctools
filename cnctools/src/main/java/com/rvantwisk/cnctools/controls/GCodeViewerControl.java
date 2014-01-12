@@ -38,11 +38,13 @@
 
 package com.rvantwisk.cnctools.controls;
 
-import com.rvantwisk.cnctools.controls.opengl.GCodeRender;
-import com.rvantwisk.cnctools.controls.opengl.OpenGLMachineImpl;
-import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
-import com.rvantwisk.gcodeparser.exceptions.SimException;
+import com.rvantwisk.cnctools.controls.opengl.BeadActor;
+import com.rvantwisk.cnctools.controls.opengl.OpenGLRenderer;
+import com.rvantwisk.cnctools.opengl.AbstractActor;
+import com.rvantwisk.cnctools.opengl.Camera;
 import com.rvantwisk.cnctools.opengl.OpenGLImage;
+import com.rvantwisk.gcodeparser.exceptions.SimException;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -51,8 +53,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Vector;
 
 /**
  * Created by rvt on 12/6/13.
@@ -60,39 +60,11 @@ import java.util.Vector;
 public class GCodeViewerControl extends AnchorPane {
 
     private final double MOUSE_SENSETIVITY = 1.0;
-
+    float lastMouseX = 0.0f;
+    float lastMouseY = 0.0f;
     @FXML
     private OpenGLImage openGLImage;
-
-
-    double lastMouseX = 0.0, lastMouseY = 0.0;
-
-    private GCodeRender gCodeRender;
-
-    static class Messages {
-        private Vector messages = new Vector();
-        static final int MAXQUEUE = 5;
-
-        private synchronized void putMessage(Object msg)
-                throws InterruptedException {
-
-            while (messages.size() == MAXQUEUE)
-                wait();
-            messages.addElement(msg);
-            notify();
-        }
-
-        public synchronized Object getMessage()
-                throws InterruptedException {
-            notify();
-            while (messages.size() == 0)
-                wait();
-            Object message = (Object) messages.firstElement();
-            messages.removeElement(message);
-            return message;
-        }
-
-    }
+    private OpenGLRenderer gCodeRender;
 
     public GCodeViewerControl() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("GCodeViewer.fxml"));
@@ -105,25 +77,20 @@ public class GCodeViewerControl extends AnchorPane {
         }
     }
 
-    private void show(final InputStream in) {
-        stop();
+    private void show() {
+        if (gCodeRender != null) {
+            gCodeRender.stop();
+        }
 
         new Thread("GCode Render") {
             public void run() {
-                gCodeRender = new GCodeRender(openGLImage.getReadHandler());
+                gCodeRender = new OpenGLRenderer(openGLImage.getReadHandler());
+                gCodeRender.addActor(new BeadActor());
+                gCodeRender.setSamples(8);
                 gCodeRender.run();
-
             }
         }.start();
 
-    }
-
-    @FXML
-    void initialize() throws IOException {
-        openGLImage.fitWidthProperty().bind(this.widthProperty());
-        openGLImage.fitHeightProperty().bind(this.heightProperty());
-
-        show(null);
         while (gCodeRender == null) {
             try {
                 Thread.sleep(10);
@@ -131,60 +98,84 @@ public class GCodeViewerControl extends AnchorPane {
                 throw new RuntimeException("Error while waiting for renderer to come alive");
             }
         }
+    }
+
+    @FXML
+    void initialize() throws IOException {
+        openGLImage.fitWidthProperty().bind(this.widthProperty());
+        openGLImage.fitHeightProperty().bind(this.heightProperty());
 
 
         this.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                lastMouseX = mouseEvent.getX();
-                lastMouseY = mouseEvent.getY();
-
+                lastMouseX = (float) mouseEvent.getX();
+                lastMouseY = (float) mouseEvent.getY();
             }
         });
 
         this.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                double dX = mouseEvent.getX() - lastMouseX;
-                double dY = mouseEvent.getY() - lastMouseY;
+                float dX = (float) (mouseEvent.getX() - lastMouseX);
+                float dY = (float) (mouseEvent.getY() - lastMouseY);
+
+                Camera c = new Camera(gCodeRender.getCamera());
+
+                c.setWidth((float) openGLImage.getFitWidth());
+                c.setHeight((float) openGLImage.getFitHeight());
 
                 if (mouseEvent.isPrimaryButtonDown()) {
-                    gCodeRender.setCamera(gCodeRender.getCamera().rotateView(dX / (MOUSE_SENSETIVITY * openGLImage.getFitWidth()), dY / (MOUSE_SENSETIVITY * openGLImage.getFitHeight())));
+                    c.rotate(dX, dY);
                 } else if (mouseEvent.isSecondaryButtonDown()) {
-                    gCodeRender.setCamera(gCodeRender.getCamera().panView(dX / (MOUSE_SENSETIVITY * openGLImage.getFitWidth()), dY / (MOUSE_SENSETIVITY * openGLImage.getFitHeight()), openGLImage.getFitWidth(), openGLImage.getFitHeight()));
+                    c.pan(dX, dY);
                 }
-
-                lastMouseX = mouseEvent.getX();
-                lastMouseY = mouseEvent.getY();
+                gCodeRender.setCamera(c.getReadOnly());
+                lastMouseX = (float) mouseEvent.getX();
+                lastMouseY = (float) mouseEvent.getY();
             }
         });
+
         this.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
+                Camera c = new Camera(gCodeRender.getCamera());
                 if (!event.isInertia()) {
-                    gCodeRender.setCamera(gCodeRender.getCamera().zoomView((int) event.getDeltaY() / (MOUSE_SENSETIVITY * openGLImage.getFitHeight())));
+                    c.zoom((float) event.getDeltaX(), (float) event.getDeltaY());
                 }
+                gCodeRender.setCamera(c.getReadOnly());
                 event.consume();
             }
         });
 
+
+        // Set the camera for the renderer
+        show();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Camera c = new Camera(gCodeRender.getCamera());
+                c.setWidth((float) openGLImage.getFitWidth());
+                c.setHeight((float) openGLImage.getFitHeight());
+                gCodeRender.setCamera(c.getReadOnly());
+            }
+        });
+
     }
 
-    public void load(final InputStream in) throws SimException {
-
-        // If we decide to have other implementation of a OPenGL machine to view we can create them here, or even pass then in load, or make a configuration
-        gCodeRender.load(new OpenGLMachineImpl(), new LinuxCNCValidator(), in);
+    public void addActor(final AbstractActor actor) throws SimException {
+        gCodeRender.addActor(actor);
     }
 
     public void finalize() {
-        if (gCodeRender!=null)
+        if (gCodeRender != null)
             gCodeRender.stop();
     }
 
-    public void stop() {
-        if (gCodeRender!=null)
-        gCodeRender.stop();
+    public void destroy() {
+        if (gCodeRender != null) {
+            gCodeRender.stop();
+        }
     }
-
 
 }

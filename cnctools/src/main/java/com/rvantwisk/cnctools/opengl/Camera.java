@@ -38,156 +38,108 @@
 
 package com.rvantwisk.cnctools.opengl;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
 /**
- * Camera system that can be used with gluLookAt to allow rotation of a camera and calculate correct center, eye and up vectors
  * Created by rvt on 12/12/13.
  */
-public class Camera {
+public class Camera extends ReadonlyCamera {
 
-    private final Vector3D eye;
-    private final Vector3D up;
-    private final Vector3D center;
-    private final Vector3D diry;
-
-    private float fovy = 60.0f;
-
-    public Camera() {
-        eye = new Vector3D(0.0, 0.0, 100.0f);
-        up = new Vector3D(0.0, 1.0, 0.0);
-        center = new Vector3D(0.0, 0.0, 0.0);
-        fovy = 60.0f;
-        diry = up.crossProduct(center.subtract(eye)).normalize();
+    public Camera(Camera other) {
+        super(other);
+    }
+    public Camera(ReadonlyCamera other) {
+        super(other);
     }
 
-    public Camera(Vector3D eye, Vector3D center, Vector3D up, float fovy) {
-        this.eye = eye;
-        this.up = up;
-        this.center = center;
-        this.fovy = fovy;
-        diry = up.crossProduct(center.subtract(eye)).normalize();
+    public ReadonlyCamera getReadOnly() {
+        return new ReadonlyCamera(this);
     }
 
-    public Camera(Vector3D eye, Vector3D center, Vector3D up) {
-        this.eye = eye;
-        this.up = up;
-        this.center = center;
-        this.fovy = 60.0f;
-        diry = up.crossProduct(center.subtract(eye)).normalize();
-    }
+    public void zoom(float delta_x, float delta_y) {
 
+         float old_zoom = zoom_factor;
 
-    /**
-     * Zoom in/out
-     *
-     * @param delta
-     */
-    public Camera zoomView(final double delta) {
-        return new Camera(center.add(eye.subtract(center).scalarMultiply(delta + 1.0f)), center, up, fovy);
-    }
-
-    public Camera rotateView(final double dx, final double dy) {
-        Vector3D eye;
-        eye = new Rotation(up.subtract(center), -dx * Math.PI).applyTo(this.eye);
-        eye = new Rotation(diry.subtract(center), dy * Math.PI).applyTo(eye);
-
-//        eye= rotate(center, up, this.eye,  -dx * Math.PI);
-//        eye = rotate(center, up, eye,  dy * Math.PI);
-
-        // now calculate the new up-vector
-        Vector3D upCenter = center.add(up);
-        upCenter = new Rotation(diry.subtract(center), dy * Math.PI).applyTo(upCenter);
-//        upCenter = rotate(center, diry, upCenter,  dy * Math.PI);
-        Vector3D up = upCenter.subtract(center);
-        up = up.normalize();
-
-        return new Camera(eye, center, up, fovy);
-
-        /*
-        float dx = (float)(newPos.x() - _oldMousePos.x()) / (float)_width;
-        float dy = (float)(newPos.y() - _oldMousePos.y()) / (float)_height;
-        _oldMousePos = newPos;
-        updateDir();
-        // rotate eye around center
-        _eye.rotate(_center, _up, -dx * PI );
-        _eye.rotate(_center, _diry, dy*PI );
-
-        // now calculate the new up-vector
-        P3<float> upCenter = _center + _up;
-        upCenter.rotate( _center , _diry, dy*PI);
-        _up = upCenter - _center;
-        _up *= 1.0/_up.norm();
-
-        updateGL(); */
-
-    }
-
-    public Camera panView(double dx, double dy, final double sdx, final double sdy) {
-
-        double length = 2.0 * eye.subtract(center).getNorm() * Math.tan((fovy / 360.0) * Math.PI);
-
-        Vector3D y_pan = diry.scalarMultiply(dx * length * (sdx / sdy));
-        Vector3D x_pan = up.scalarMultiply(dy * length);
-
-        return new Camera(eye.add(y_pan.add(x_pan)), center.add(y_pan.add(x_pan)), up, fovy);
-    }
-
-    /**
-     * Rotation around axis
-     *
-     * @param origin
-     * @param v
-     * @param alfa
-     * @return
-     * @Deprecated
-     */
-    private Vector3D rotate(Vector3D origin, Vector3D v, Vector3D that, double alfa) {
-        // rotate point p by alfa deg/rad around vector o->v
-        // p = o + M*(p-o)
-        double[][] M = new double[3][3];
-        double c = Math.cos(alfa);
-        double D = 1.0 - c;
-        double s = Math.sin(alfa);
-        M[0][0] = v.getX() * v.getX() * D + c;
-        M[0][1] = v.getY() * v.getX() * D + v.getZ() * s;
-        M[0][2] = v.getZ() * v.getX() * D - v.getY() * s;
-        M[1][0] = v.getX() * v.getY() * D - v.getZ() * s;
-        M[1][1] = v.getY() * v.getY() * D + c;
-        M[1][2] = v.getZ() * v.getY() * D + v.getX() * s;
-        M[2][0] = v.getX() * v.getZ() * D + v.getY() * s;
-        M[2][1] = v.getY() * v.getZ() * D - v.getX() * s;
-        M[2][2] = v.getZ() * v.getZ() * D + c;
-        // matrix multiply
-        double[] vector = new double[3];
-        vector[0] = that.getX() - origin.getX();
-        vector[1] = that.getY() - origin.getY();
-        vector[2] = that.getZ() - origin.getZ();
-        double[] result = new double[3];
-        for (int i = 0; i < 3; i++) {
-            result[i] = 0;
-            for (int j = 0; j < 3; j++)
-                result[i] += vector[j] * M[i][j];
+        if (delta_y > 0) {
+            zoom_factor = Math.min(this.zoom_factor * 1.2f, ZOOM_MAX);
+        } else if (delta_y < 0) {
+            zoom_factor = Math.max(this.zoom_factor * 0.83f, ZOOM_MIN);
         }
 
-        return new Vector3D(origin.getX() + result[0], origin.getY() + result[1], origin.getZ() + result[2]);
+        if (this.isOrtho) {
+            x = this.x * zoom_factor / old_zoom;
+            y = this.y * zoom_factor / old_zoom;
+        }
+
     }
 
-
-    public Vector3D getEye() {
-        return eye;
+    public void rotate(float delta_x, float delta_y) {
+         azimuth = this.azimuth + delta_x;
+         elevation = this.elevation - delta_y;
     }
 
-    public Vector3D getUp() {
-        return up;
+    public void pan(float delta_x, float delta_y) {
+         x = this.x + delta_x / zoom_factor;
+         z = this.z - delta_y / zoom_factor;
     }
 
-    public Vector3D getCenter() {
-        return center;
+    public void offset(float delta_x, float delta_y) {
+         offset_x = this.offset_x + delta_x / zoom_factor;
+         offset_y = this.offset_y - delta_y / zoom_factor;
     }
 
-    public float getFovy() {
-        return fovy;
+    public void setWidth(float width) {
+        this.width = width;
     }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public void setOffset_x(float offset_x) {
+        this.offset_x = offset_x;
+    }
+
+    public void setOffset_y(float offset_y) {
+        this.offset_y = offset_y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+
+    public void setZoom_factor(float zoom_factor) {
+        this.zoom_factor = zoom_factor;
+    }
+
+    public void setElevation(float elevation) {
+        this.elevation = elevation;
+    }
+
+    public void setAzimuth(float azimuth) {
+        this.azimuth = azimuth;
+    }
+
+    public void setZOOM_MIN(float ZOOM_MIN) {
+        this.ZOOM_MIN = ZOOM_MIN;
+    }
+
+    public void setZOOM_MAX(float ZOOM_MAX) {
+        this.ZOOM_MAX = ZOOM_MAX;
+    }
+
+    public void setFOVY(float FOVY) {
+        this.FOVY = FOVY;
+    }
+
+    public void setZOOM_ORTHO_ADJ(float ZOOM_ORTHO_ADJ) {
+        this.ZOOM_ORTHO_ADJ = ZOOM_ORTHO_ADJ;
+    }
+
 }

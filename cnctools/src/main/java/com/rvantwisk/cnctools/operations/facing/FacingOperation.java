@@ -84,7 +84,7 @@ public class FacingOperation implements TaskModel {
             new Configuration("Vertical Zig Zag", FacingHelper.CutStrategy.ZIGZAG, 0.0),
             new Configuration("Horizontal Zig Zag", FacingHelper.CutStrategy.ZIGZAG, 90.0),
             new Configuration("Vertical Linear", FacingHelper.CutStrategy.LINEAR, 0.0),
-            new Configuration("Horizontal Linear", FacingHelper.CutStrategy.ZIGZAG, 90.0)
+            new Configuration("Horizontal Linear", FacingHelper.CutStrategy.LINEAR, 90.0)
     );
 
 
@@ -138,7 +138,11 @@ public class FacingOperation implements TaskModel {
         }
 
         // Get teh shape and apply transformation
-        CirculinearCurve2D curve = FacingHelper.getRectangularDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
+
+        CirculinearCurve2D curve = FacingHelper.getCircleDomain(gCodeGenerator.convert(width).getValue());
+//        CirculinearCurve2D curve = FacingHelper.getEllipseDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
+
+//        CirculinearCurve2D curve = FacingHelper.getRectangularDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
         Box2D bBox = curve.boundingBox();
         AffineTransform2D transform;
         switch (partReference.get()) {
@@ -170,17 +174,6 @@ public class FacingOperation implements TaskModel {
 
         helper.calculate();
 
-        /*
-        gCodeGenerator.addBlock(new GCodeBuilder().Z(10.0));
-        final FacingHelper helper2 = new FacingHelper(gCodeGenerator);
-        helper2.setDomain(FacingHelper.getCircleDomain(100.0, 0.0, 0.0));
-        helper2.calculate();
-
-
-        gCodeGenerator.addBlock(new GCodeBuilder().Z(20.0));
-        final FacingHelper helper3 = new FacingHelper(gCodeGenerator);
-        helper3.setDomain(FacingHelper.getEllipseDomain(60.0, 120.0, 0.0, 0.0));
-        helper3.calculate(); */
 
     }
 

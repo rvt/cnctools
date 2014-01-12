@@ -96,12 +96,14 @@ public class TaskEditController extends AbstractController {
 
     @FXML
     void onCancel(ActionEvent event) {
+        tasksController.destroy();
         setReturned(Result.CANCEL);
         getDialog().close();
     }
 
     @FXML
     void onSave(ActionEvent event) {
+        tasksController.destroy();
         setReturned(Result.SAVE);
         getDialog().close();
     }

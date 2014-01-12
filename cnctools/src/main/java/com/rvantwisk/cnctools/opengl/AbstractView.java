@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,20 +36,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.operations.interfaces;
+package com.rvantwisk.cnctools.opengl;
 
-import com.rvantwisk.cnctools.data.interfaces.TaskModel;
+import org.lwjgl.opengl.GL11;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/11/13
- * Time: 2:08 PM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 1/12/14.
  */
-public interface MillTaskController  {
-    public abstract void setModel(final TaskModel model);
-    public abstract TaskModel getModel();
-    public abstract <T extends TaskModel> T createNewModel();
-    public abstract void destroy();
+public abstract class AbstractView {
+    public ReadonlyCamera camera = new ReadonlyCamera();
+
+    public ReadonlyCamera getCamera() {
+        return camera;
+    }
+
+    public void setCamera(ReadonlyCamera camera) {
+        this.camera = camera;
+    }
+
+    public void ui_transform(final float length) {
+        GL11.glRotatef(-90f, 1.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(length + 20.0f, 0.0f, length + 20.0f);
+        GL11.glRotatef(camera.getElevation(), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
+    }
+
+    abstract void begin();
+    abstract void end();
+    abstract void display_transform();
 }

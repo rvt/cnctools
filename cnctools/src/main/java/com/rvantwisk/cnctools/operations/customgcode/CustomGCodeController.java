@@ -39,12 +39,18 @@
 package com.rvantwisk.cnctools.operations.customgcode;
 
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
+import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
+import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
+import com.rvantwisk.gcodeparser.GCodeParser;
+import com.rvantwisk.gcodeparser.MachineStatus;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.gcodeparser.machines.StatisticLimitsController;
+import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -99,6 +105,11 @@ public class CustomGCodeController implements MillTaskController {
         return (T) new GCodeTaskModel();
     }
 
+    @Override
+    public void destroy() {
+        gCodeViewerControl.destroy();
+    }
+
     @FXML
     public TaskModel getModel() {
         formToModel();
@@ -132,7 +143,7 @@ public class CustomGCodeController implements MillTaskController {
                 reRenderModel();
             }
         });
-
+        reRenderModel();
     }
 
     private void reRenderModel() {
@@ -146,7 +157,19 @@ public class CustomGCodeController implements MillTaskController {
             }
 
             if (str != null) {
-                gCodeViewerControl.load(str);
+                GCodeActor machine = new GCodeActor("gcode");
+                StatisticLimitsController stats = new StatisticLimitsController(machine);
+                LinuxCNCValidator validator = new LinuxCNCValidator();
+                GCodeParser parser = new GCodeParser(stats, validator, str);
+
+                gCodeViewerControl.addActor(machine);
+
+                // create a platform
+                gCodeViewerControl.addActor(new PlatformActor(
+                        stats.getMaxValues().get(MachineStatus.Axis.X).floatValue()*1.2f,
+                        stats.getMaxValues().get(MachineStatus.Axis.Y).floatValue()*1.2f
+                ));
+
             }
 
             errors.textProperty().set("");

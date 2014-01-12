@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,20 +36,53 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.operations.interfaces;
+package com.rvantwisk.cnctools.opengl;
 
-import com.rvantwisk.cnctools.data.interfaces.TaskModel;
+import org.lwjgl.opengl.GL11;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/11/13
- * Time: 2:08 PM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 1/10/14.
  */
-public interface MillTaskController  {
-    public abstract void setModel(final TaskModel model);
-    public abstract TaskModel getModel();
-    public abstract <T extends TaskModel> T createNewModel();
-    public abstract void destroy();
+public class View2D extends AbstractView {
+    protected float NEAR=-100.0f;
+    protected float FAR=100.0f;
+
+    @Override
+    public void begin() {
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+
+        GL11.glOrtho(0, camera.getWidth(), 0, camera.getHeight(), NEAR, FAR);
+
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+    }
+
+    @Override
+    public void end() {
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+    }
+
+    @Override
+    public void display_transform() {
+
+        // _center_on_origin
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(-camera.getX(), camera.getX(), -camera.getY(), camera.getY(), NEAR, FAR);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        // _center_on_origin
+
+        GL11.glTranslatef(camera.getX(), camera.getY(), camera.getZ());
+        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
+        GL11.glScalef(camera.getZoom_factor(), camera.getZoom_factor(), camera.getZoom_factor());
+    }
+
+
+
 }

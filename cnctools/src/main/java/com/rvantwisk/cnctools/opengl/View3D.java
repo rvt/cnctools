@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,60 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.controls.opengl;
+package com.rvantwisk.cnctools.opengl;
 
-
-import com.rvantwisk.gcodeparser.MachineController;
-import gnu.trove.list.array.TFloatArrayList;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 
 /**
- * Created by rvt on 12/19/13.
+ * Created by rvt on 1/10/14.
  */
-public interface OpenGLMachineController extends MachineController {
-    public int getNumWords();
-    public TFloatArrayList getVBOData();
+public class View3D extends AbstractView {
+    protected float NEAR=0.01f;
+    protected float FAR=1000000.0f;
+
+    @Override
+    public void begin() {
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+
+        if (camera.isOrtho()) {
+            GL11.glOrtho(-camera.getX(), camera.getX(), -camera.getY(), camera.getY(), -NEAR, FAR);
+        } else {
+            GLU.gluPerspective(camera.getFOVY(), camera.getWidth() / camera.getHeight(), NEAR, FAR);
+        }
+
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+    }
+
+    @Override
+    public void end() {
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+    }
+
+    @Override
+    public void display_transform() {
+        GL11.glRotatef(-90f, 1.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(0.0f, camera.getY(), 0.0f);
+
+        float f = camera.getZoom_factor();
+        if (camera.isOrtho()) {
+            f *= camera.getZOOM_ORTHO_ADJ();
+        }
+        GL11.glScalef(f, f, f);
+
+        GL11.glTranslatef(camera.getX(), 0.0f, camera.getZ());
+        GL11.glRotatef(-camera.getElevation(), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
+
+        GL11.glTranslatef(camera.getOffset_x(), camera.getOffset_y(), 0.0f);
+    }
+
+
 }
