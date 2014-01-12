@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.rvantwisk.cnctools.opengl.OpenGLImage?>
 <?import java.lang.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -10,8 +11,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
-
-<?import com.rvantwisk.cnctools.opengl.OpenGLImage?>
+<?scenebuilder-classpath-element ../../../../../../../target/classes?>
 <!--
   ~ Copyright (c) 2013, R. van Twisk
   ~ All rights reserved.
@@ -50,13 +50,10 @@
   ~ OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 
-<fx:root type="javafx.scene.layout.AnchorPane" prefHeight="449.0" prefWidth="510.0" style="-fx-background-color: antiquewhite;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
-    <children>
-        <Label id="" fx:id="glInfoLabel" styleClass="canvas-label" text="G-Code Viewer" textFill="BLACK" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
-            <font>
-                <Font name="System Bold" size="14.0" fx:id="x4"/>
-            </font>
-        </Label>
-        <OpenGLImage fx:id="openGLImage" fitHeight="382.0" fitWidth="454.0" layoutX="0.0" layoutY="0.0" pickOnBounds="true" preserveRatio="false" scaleY="-1.0" smooth="false"/>
-    </children>
+<fx:root type="javafx.scene.layout.AnchorPane" prefHeight="449.0" prefWidth="510.0" style="    -fx-background-color:&#10;    linear-gradient(#f7fff7 0%, #838783 100%);    &#10;    -fx-background-insets: 0,1,4,5,6;&#10;    -fx-background-radius: 9,8,5,4,3;&#10;    -fx-font-family: &quot;Helvetica&quot;;&#10;    -fx-font-size: 18px;&#10;    -fx-font-weight: bold;&#10;    -fx-text-fill: white;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" >
+    <OpenGLImage fx:id="openGLImage" fitHeight="382.0" fitWidth="454.0" layoutX="0.0" layoutY="0.0" pickOnBounds="true" preserveRatio="false" scaleY="-1.0" smooth="false"/>
+
+
 </fx:root>
+
+
