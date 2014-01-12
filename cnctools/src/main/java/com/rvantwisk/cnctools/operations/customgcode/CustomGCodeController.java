@@ -119,7 +119,6 @@ public class CustomGCodeController implements MillTaskController {
     private void formToModel() {
         model.gcodeProperty().setValue(gCodeText.getText());
         model.referencedFileProperty().setValue(iKeepReference.selectedProperty().get());
-        // getDialog().close();
         // Remove the G-Code data during save operation if it's a referenced file
         if (model.referencedFileProperty().get()) {
             model.setGcode("");
