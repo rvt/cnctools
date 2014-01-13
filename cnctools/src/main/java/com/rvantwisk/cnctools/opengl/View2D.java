@@ -48,6 +48,12 @@ public class View2D extends AbstractView {
     protected float FAR=100.0f;
 
     @Override
+    public void ui_transform(float length) {
+        GL11.glTranslatef(length, length, 0.0f);
+        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
+    }
+
+    @Override
     public void begin() {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPushMatrix();

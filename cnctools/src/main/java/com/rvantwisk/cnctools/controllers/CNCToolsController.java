@@ -257,14 +257,14 @@ public class CNCToolsController extends AbstractController {
     @FXML
     public void editMillTask(ActionEvent event) throws Exception {
         try {
+            final Project project = v_projectList.getSelectionModel().selectedItemProperty().get();
             Task task = (Task) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
             screens.registerBean(task.getClassName());
             FXMLDialog dialog = screens.taskEditDialog();
             TaskEditController controller = dialog.getController();
-            controller.setTask(task.copy());
+            controller.setTask(project, task.copy());
             dialog.showAndWait();
             if (controller.getReturned() == Result.SAVE) {
-                Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
                 int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
                 Task modified = controller.getTask();
                 project.millTasksProperty().add(index, modified);

@@ -42,7 +42,9 @@ import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
+import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
+import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
 import com.rvantwisk.cnctools.misc.Factory;
@@ -50,8 +52,10 @@ import com.rvantwisk.cnctools.misc.ToolDBManager;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
 import com.rvantwisk.events.ToolChangedEvent;
 import com.rvantwisk.gcodeparser.GCodeParser;
+import com.rvantwisk.gcodeparser.MachineStatus;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.gcodeparser.machines.StatisticLimitsController;
 import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -76,67 +80,54 @@ import java.util.ResourceBundle;
 @Component
 public class FacingController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private Project project;
     @Autowired
     private ToolDBManager toolDBManager;
-
     private FacingOperation model;
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
-
     @FXML
     private ToggleGroup edgeDirection;
     @FXML
     private ToggleGroup cutDirection;
-
     @FXML
     private GCodeViewerControl gCodeViewerControl;
-
     @FXML
     private ComboBox<FacingOperation.Configuration> iCutStrategy;
-
     @FXML
     private CheckBox iEdgeCleanup;
-
     @FXML
     private RadioButton iEdgeClimb;
-
     @FXML
     private RadioButton iEdgeConv;
-
     @FXML
     private RadioButton iConv;
-
     @FXML
     private RadioButton iClimb;
-
     @FXML
     private ChoiceBox<String> iPartReference;
-
     @FXML
     private DimensionControl iXLength;
-
     @FXML
     private DimensionControl iYLength;
-
     @FXML
     private DimensionControl iZFinal;
-
     @FXML
     private DimensionControl iZSafe;
-
     @FXML
     private DimensionControl iZTop;
-
     @FXML
     private SelectOrEditToolControl selectOrEditTool;
 
     public FacingController() {
     }
 
+    @Override
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
     @FXML
     void initialize() {
@@ -241,16 +232,15 @@ public class FacingController implements MillTaskController {
         generateGCode();
     }
 
-
-    @Override
-    public void setModel(final TaskModel model) {
-        this.model = (FacingOperation) model;
-    }
-
     @Override
     public TaskModel getModel() {
         formToModel();
         return model;
+    }
+
+    @Override
+    public void setModel(final TaskModel model) {
+        this.model = (FacingOperation) model;
     }
 
     @Override
@@ -284,14 +274,14 @@ public class FacingController implements MillTaskController {
         selectOrEditTool.setTool(toolDBManager.getByID(model.getToolID()));
 
         int i = iCutStrategy.getItems().indexOf(model.cutStrategyProperty().get());
-        iCutStrategy.getSelectionModel().select(i<0?i=0:i);
+        iCutStrategy.getSelectionModel().select(i < 0 ? i = 0 : i);
 
         iEdgeCleanup.selectedProperty().set(model.edgeCleanupProperty().get());
         iEdgeClimb.selectedProperty().set(model.getEdgeCleanupClimb());
         iEdgeConv.selectedProperty().set(!model.getEdgeCleanupClimb());
 
         i = iPartReference.getItems().indexOf(model.partReferenceProperty().get());
-        iPartReference.getSelectionModel().select(i<0?i=0:i);
+        iPartReference.getSelectionModel().select(i < 0 ? i = 0 : i);
 
         iZFinal.dimensionProperty().set(model.getzFinal());
         iZSafe.dimensionProperty().set(model.getzSafe());
@@ -310,25 +300,37 @@ public class FacingController implements MillTaskController {
             formToModel();
 
             CNCToolsPostProcessConfig ppc;
-//            PostProcessorConfig ppc = project.getPostProcessor();
-//            if (ppc==null) {
-            ppc = Factory.newPostProcessor();
-//            }
+            ppc = project.getPostProcessor();
+            if (ppc == null) {
+                ppc = Factory.newPostProcessor();
+            }
 
             final ByteArrayOutputStream os = new ByteArrayOutputStream();
             final PrintStream printStream = new PrintStream(os);
 
             CncToolsRS274 gCodeGenerator = new CncToolsRS274(ppc);
             gCodeGenerator.setOutput(printStream);
+            gCodeGenerator.startProgram();
 
             model.generateGCode(toolDBManager, gCodeGenerator);
             InputStream in = new ByteArrayInputStream(os.toByteArray());
 
             GCodeActor machine = new GCodeActor("gcode");
+            StatisticLimitsController stats = new StatisticLimitsController(machine);
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(machine, validator, in);
+            GCodeParser parser = new GCodeParser(stats, validator, in);
+            gCodeGenerator.endProgram();
 
             gCodeViewerControl.addActor(machine);
+
+            // create a platform
+            gCodeViewerControl.addActor(new PlatformActor(
+                    stats.getMinValues().get(MachineStatus.Axis.X).floatValue() - 20.0f,
+                    stats.getMinValues().get(MachineStatus.Axis.Y).floatValue() - 20.0f,
+                    stats.getMaxValues().get(MachineStatus.Axis.X).floatValue() + 20.0f,
+                    stats.getMaxValues().get(MachineStatus.Axis.Y).floatValue() + 20.0f,
+                    stats.isMetric()
+            ));
 
         } catch (UnsupportedSimException e) {
             error = e.getMessage();

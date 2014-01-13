@@ -44,6 +44,7 @@ import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
+import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsRS274;
 import com.rvantwisk.cnctools.misc.Factory;
@@ -53,6 +54,7 @@ import com.rvantwisk.events.ToolChangedEvent;
 import com.rvantwisk.gcodeparser.GCodeParser;
 import com.rvantwisk.gcodeparser.exceptions.SimException;
 import com.rvantwisk.gcodeparser.exceptions.UnsupportedSimException;
+import com.rvantwisk.gcodeparser.machines.StatisticLimitsController;
 import com.rvantwisk.gcodeparser.validators.LinuxCNCValidator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -75,7 +77,7 @@ import java.io.PrintStream;
 @Scope("prototype")
 public class CreateRoundStockController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private Project project;
     private RoundStockTaskModel model;
     @Autowired
     private ToolDBManager toolDBManager;
@@ -94,12 +96,6 @@ public class CreateRoundStockController implements MillTaskController {
     @FXML
     private TextField iName;
 
-
-    @Override
-    public void setModel(TaskModel model) {
-        this.model = (RoundStockTaskModel) model;
-    }
-
     @Override
     public <T extends TaskModel> T createNewModel() {
         return (T) new RoundStockTaskModel();
@@ -110,10 +106,20 @@ public class CreateRoundStockController implements MillTaskController {
         gCodeViewerControl.destroy();
     }
 
+    @Override
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
     @FXML
     public TaskModel getModel() {
         formToModel();
         return model;
+    }
+
+    @Override
+    public void setModel(TaskModel model) {
+        this.model = (RoundStockTaskModel) model;
     }
 
     private void formToModel() {
@@ -133,7 +139,7 @@ public class CreateRoundStockController implements MillTaskController {
     @FXML
     void initialize() {
 
-       // iName.textProperty().setValue(task.getName());
+        // iName.textProperty().setValue(task.getName());
         modelToForm();
 
         selectOrEditTool.addEventHandler(ToolChangedEvent.TOOL_CHANGED_EVENT, new EventHandler<ToolChangedEvent>() {
@@ -173,31 +179,37 @@ public class CreateRoundStockController implements MillTaskController {
             formToModel();
 
             CNCToolsPostProcessConfig ppc;
-//            PostProcessorConfig ppc = project.getPostProcessor();
-//            if (ppc==null) {
-            ppc = Factory.newPostProcessor();
-//            }
+            ppc = project.getPostProcessor();
+            if (ppc == null) {
+                ppc = Factory.newPostProcessor();
+            }
 
             final ByteArrayOutputStream os = new ByteArrayOutputStream();
             final PrintStream printStream = new PrintStream(os);
 
             CncToolsRS274 gCodeGenerator = new CncToolsRS274(ppc);
             gCodeGenerator.setOutput(printStream);
-
+            gCodeGenerator.startProgram();
             model.generateGCode(toolDBManager, gCodeGenerator);
 
             InputStream in = new ByteArrayInputStream(os.toByteArray());
 
             GCodeActor machine = new GCodeActor("gcode");
+            StatisticLimitsController stats = new StatisticLimitsController(machine);
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(machine, validator, in);
-            gCodeViewerControl.addActor(machine);
+            GCodeParser parser = new GCodeParser(stats, validator, in);
+            gCodeGenerator.endProgram();
 
             // Add a platform
             gCodeViewerControl.addActor(new PlatformActor(
-                    (float)gCodeGenerator.convert(model.finalLengthProperty()).getValue()*1.0f,
-                    (float)gCodeGenerator.convert(model.stockSizeProperty()).getValue()*4.0f
+                    -40.0f,
+                    -(float) gCodeGenerator.convert(model.stockSizeProperty()).getValue() * 4.0f,
+                    (float) gCodeGenerator.convert(model.finalLengthProperty()).getValue() * 1.0f + 40.0f,
+                    (float) gCodeGenerator.convert(model.stockSizeProperty()).getValue() * 4.0f,
+                    stats.isMetric()
             ));
+
+            gCodeViewerControl.addActor(machine);
 
         } catch (UnsupportedSimException e) {
             error = e.getMessage();

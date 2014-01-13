@@ -38,6 +38,7 @@
 
 package com.rvantwisk.cnctools.controllers;
 
+import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.Task;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.misc.AbstractController;
@@ -116,7 +117,7 @@ public class TaskEditController extends AbstractController {
         assert lbHeader != null : "fx:id=\"lbHeader\" was not injected: check your FXML file 'TaskEdit.fxml'.";
     }
 
-    public void setTask(final Task task) {
+    public void setTask(final Project project, final Task task) {
         currentTask = task;
         tasksController = (MillTaskController) applicationContext.getBean(task.getClassName());
 
@@ -128,6 +129,7 @@ public class TaskEditController extends AbstractController {
         } else {
             tasksController.setModel(task.getMilltaskModel());
         }
+        tasksController.setProject(project);
 
         // get the resource path of the main class for this MillTask
         List<String> path = new ArrayList<>(Arrays.asList(task.getClassName().split("\\.")));

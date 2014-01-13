@@ -139,10 +139,10 @@ public class FacingOperation implements TaskModel {
 
         // Get teh shape and apply transformation
 
-        CirculinearCurve2D curve = FacingHelper.getCircleDomain(gCodeGenerator.convert(width).getValue());
+//        CirculinearCurve2D curve = FacingHelper.getCircleDomain(gCodeGenerator.convert(width).getValue());
 //        CirculinearCurve2D curve = FacingHelper.getEllipseDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
 
-//        CirculinearCurve2D curve = FacingHelper.getRectangularDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
+        CirculinearCurve2D curve = FacingHelper.getRectangularDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
         Box2D bBox = curve.boundingBox();
         AffineTransform2D transform;
         switch (partReference.get()) {

@@ -38,13 +38,11 @@
 
 package com.rvantwisk.cnctools.opengl;
 
-import org.lwjgl.opengl.GL11;
-
 /**
  * Created by rvt on 1/12/14.
  */
 public abstract class AbstractView {
-    public ReadonlyCamera camera = new ReadonlyCamera();
+    protected ReadonlyCamera camera = new ReadonlyCamera();
 
     public ReadonlyCamera getCamera() {
         return camera;
@@ -54,13 +52,7 @@ public abstract class AbstractView {
         this.camera = camera;
     }
 
-    public void ui_transform(final float length) {
-        GL11.glRotatef(-90f, 1.0f, 0.0f, 0.0f);
-        GL11.glTranslatef(length + 20.0f, 0.0f, length + 20.0f);
-        GL11.glRotatef(camera.getElevation(), 1.0f, 0.0f, 0.0f);
-        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
-    }
-
+    abstract  void ui_transform(final float length);
     abstract void begin();
     abstract void end();
     abstract void display_transform();

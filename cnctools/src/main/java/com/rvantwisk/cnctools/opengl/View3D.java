@@ -49,6 +49,14 @@ public class View3D extends AbstractView {
     protected float FAR=1000000.0f;
 
     @Override
+    public void ui_transform(float length) {
+        GL11.glRotatef(-90f, 1.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(length, 0.0f, length);
+        GL11.glRotatef(-camera.getElevation(), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(camera.getAzimuth(), 0.0f, 0.0f, 1.0f);
+    }
+
+    @Override
     public void begin() {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPushMatrix();

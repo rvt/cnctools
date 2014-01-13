@@ -38,6 +38,7 @@
 
 package com.rvantwisk.cnctools.operations.interfaces;
 
+import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 
 /**
@@ -49,6 +50,7 @@ import com.rvantwisk.cnctools.data.interfaces.TaskModel;
  */
 public interface MillTaskController  {
     public abstract void setModel(final TaskModel model);
+    public abstract void setProject(final Project project);
     public abstract TaskModel getModel();
     public abstract <T extends TaskModel> T createNewModel();
     public abstract void destroy();

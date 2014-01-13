@@ -62,20 +62,20 @@ public abstract class AbstractOpenGLRenderer {
     final static long FPS_UPD_INTERVAL = 1 * (1000L * 1000L * 1000L);
 
     private final ConcurrentLinkedQueue<Runnable> pendingRunnables;
-
     private final CountDownLatch runningLatch = new CountDownLatch(1);
-
     private final Pbuffer pbuffer;
 
     private final ReadOnlyIntegerWrapper fps;
 
     private StreamUtil.RenderStreamFactory renderStreamFactory;
     private RenderStream renderStream;
-    private int transfersToBuffer = 3;
 
-    private boolean vsync = false;
-
+    private int vSyncFPS =30;
+    // Rendering options
+    private int transfersToBuffer = 1;
+    private boolean vsync = true;
     private int samples = 4;
+
 
     public AbstractOpenGLRenderer(final StreamHandler readHandler) {
         this.pendingRunnables = new ConcurrentLinkedQueue<Runnable>();
@@ -86,7 +86,7 @@ public abstract class AbstractOpenGLRenderer {
             throw new UnsupportedOperationException("Support for pbuffers is required.");
 
         try {
-            pbuffer = new Pbuffer(1, 1, new PixelFormat(), null, null, new ContextAttribs().withDebug(true));
+            pbuffer = new Pbuffer(1, 1, new PixelFormat(), null, null, new ContextAttribs().withDebug(false));
             pbuffer.makeCurrent();
         } catch (LWJGLException e) {
             throw new RuntimeException(e);
@@ -100,7 +100,7 @@ public abstract class AbstractOpenGLRenderer {
         }
 
         this.renderStreamFactory = StreamUtil.getRenderStreamImplementation();
-        this.renderStream = renderStreamFactory.create(readHandler, 1, transfersToBuffer);
+        this.renderStream = renderStreamFactory.create(readHandler, samples, transfersToBuffer);
     }
 
 
@@ -124,7 +124,6 @@ public abstract class AbstractOpenGLRenderer {
         pendingRunnables.offer(new Runnable() {
             public void run() {
                 renderStream.destroy();
-
                 renderStream = renderStreamFactory.create(renderStream.getHandler(), samples, transfersToBuffer);
             }
         });
@@ -160,8 +159,9 @@ public abstract class AbstractOpenGLRenderer {
 
             renderStream.swapBuffers();
 
-            if (isVsync())
-                Display.sync(10); // run at 10 fps
+            if (isVsync()) {
+                Display.sync(vSyncFPS); // run at 10 fps
+            }
 
             final long currentTime = System.nanoTime();
             frames++;
@@ -233,5 +233,13 @@ public abstract class AbstractOpenGLRenderer {
 
     public RenderStream getRenderStream() {
         return renderStream;
+    }
+
+    public int getvSyncFPS() {
+        return vSyncFPS;
+    }
+
+    public void setvSyncFPS(int vSyncFPS) {
+        this.vSyncFPS = vSyncFPS;
     }
 }

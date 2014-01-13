@@ -86,7 +86,8 @@ public class GCodeViewerControl extends AnchorPane {
             public void run() {
                 gCodeRender = new OpenGLRenderer(openGLImage.getReadHandler());
                 gCodeRender.addActor(new BeadActor());
-                gCodeRender.setSamples(8);
+                gCodeRender.setSamples(4);
+                gCodeRender.setvSyncFPS(15);
                 gCodeRender.run();
             }
         }.start();

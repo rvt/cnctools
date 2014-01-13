@@ -42,7 +42,9 @@ import com.rvantwisk.cnctools.opengl.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.stream.StreamHandler;
+import org.newdawn.slick.TrueTypeFont;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +57,11 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
 
     private final View2D viewAxis = new View2D();
     private final View3D viewModel = new View3D();
-    private ReadonlyCamera camera = new ReadonlyCamera();
-
     private final List<AbstractActor> actors = new ArrayList<>();
     private final Map<String, AbstractActor> activeActors = new TreeMap<>();
+    Font awtFont;
+    TrueTypeFont font;
+    private ReadonlyCamera camera = new ReadonlyCamera();
 
     public OpenGLRenderer(StreamHandler readHandler) {
         super(readHandler);
@@ -73,12 +76,16 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        //   Font awtFont = new Font("Times New Roman", Font.ITALIC, 24);
+        //   font = new TrueTypeFont(awtFont, false);
     }
 
     protected void loop() {
+        final ReadonlyCamera localCam;
         synchronized (this) {
-            final ReadonlyCamera camera = this.camera;
-            if (actors.size()>0) {
+            localCam = this.camera;
+            if (actors.size() > 0) {
                 for (AbstractActor actor : actors) {
                     // CHeck if a existing axctor already exists, if so destroy it
                     if (activeActors.containsKey(actor.getName())) {
@@ -93,8 +100,8 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
             }
         }
 
-        viewAxis.setCamera(camera);
-        viewModel.setCamera(camera);
+        viewAxis.setCamera(localCam);
+        viewModel.setCamera(localCam);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_BACK);
@@ -102,16 +109,16 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
 
         // Draw axis in lower left corner
         viewAxis.begin();
-        drawAxis(20.0f);
+        drawAxis(25f);
         viewAxis.end();
-
-        viewModel.begin();
-        viewModel.display_transform();
 
         // Prepare actors for next drawing sequence
         for (final AbstractActor actor : activeActors.values()) {
             actor.prepare();
         }
+
+        viewModel.begin();
+        viewModel.display_transform();
 
         // Draw the actor
         for (final AbstractActor actor : activeActors.values()) {
@@ -123,10 +130,11 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
 
     protected void drawAxis(float length) {
         GL11.glPushMatrix();
-        this.viewModel.ui_transform(length);
+        this.viewModel.ui_transform(length + length / 2.0f);
 
         float[][] axis = {{length, 0.0f, 0.0f}, {0.0f, -length, 0.0f}, {0.0f, 0.0f, length}};
         float[][] colors = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.5f, 1.0f}};
+        String[] names = {"X", "Y", "Z"};
 
         GL11.glBegin(GL11.GL_LINES);
         for (int i = 0; i < 3; i++) {
@@ -136,22 +144,17 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
         }
         GL11.glEnd();
 
+        // TODO optmize text rendering, lack of glutBitmapCharacter forces me to do it differently.
+        for (int i = 0; i < 3; i++) {
+            GL11.glPushMatrix();
+            GL11.glColor3f(colors[i][0], colors[i][1], colors[i][2]);
+            GL11.glTranslatef(Math.round(axis[i][0]), Math.round(axis[i][1]), Math.round(axis[i][2]));
+            GL11.glRotatef(camera.getElevation() + 90f, 1.0f, 0.0f, 0.0f);
+            GL11.glRotatef(-camera.getAzimuth(), 0.0f, 1.0f, 0.0f);
+            SimpleText.drawString(names[i], 0.0f, 0.0f, 0.0f);
+            GL11.glPopMatrix();
+        }
 
-        //# draw axis labels
-        //    glutInit()
-
-//        for (int i = 0; i<3;i++) {
-//            GL11.glColor3f(colors[i][0], colors[i][1], colors[i][2]);
-//            GL11.glRasterPos3f(axis[i][0] + 2.0f, axis[i][1] + 2.0f, axis[i][2] + 2.0f);
-//        }
-
-        /*
-        for label, axis, color in zip(labels, axes, colors):
-        glColor(*color)
-        # add padding to labels
-        glRasterPos(axis[0] + 2, axis[1] + 2, axis[2] + 2)
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, ord(label));
-*/
         GL11.glPopMatrix();
     }
 
@@ -163,6 +166,7 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
             actor.destroy();
         }
         activeActors.clear();
+        actors.clear();
     }
 
     public void addActor(final AbstractActor actor) {

@@ -64,6 +64,8 @@ public class BeadActor extends AbstractActor {
     private FloatBuffer lightPos0;
     private FloatBuffer lightPos1;
 
+    private int display_list;
+
     public BeadActor() {
         super(BeadActor.class.getSimpleName());
     }
@@ -78,15 +80,11 @@ public class BeadActor extends AbstractActor {
         light = allocFloats(colorDefaultLight);
         lightPos0 = allocFloats(lightDefaultPos0);
         lightPos1 = allocFloats(lightDefaultPos1);
-    }
 
-    @Override
-    public void prepare() {
+        display_list = GL11.glGenLists(1);
 
-    }
+        GL11.glNewList(display_list, GL11.GL_COMPILE);
 
-    @Override
-    public void draw() {
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_LIGHT0);
         GL11.glEnable(GL11.GL_LIGHT1);
@@ -114,10 +112,23 @@ public class BeadActor extends AbstractActor {
         GL11.glDisable(GL11.GL_LIGHT1);
         GL11.glDisable(GL11.GL_LIGHT0);
         GL11.glDisable(GL11.GL_LIGHTING);
+
+        GL11.glEndList();
+
+    }
+
+    @Override
+    public void prepare() {
+
+    }
+
+    @Override
+    public void draw() {
+        GL11.glCallList(display_list);
     }
 
     @Override
     public void destroy() {
-
+        GL11.glDeleteLists(display_list, 1);
     }
 }

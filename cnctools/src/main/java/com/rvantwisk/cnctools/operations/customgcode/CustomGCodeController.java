@@ -41,6 +41,7 @@ package com.rvantwisk.cnctools.operations.customgcode;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
+import com.rvantwisk.cnctools.data.Project;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
@@ -80,6 +81,7 @@ public class CustomGCodeController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private GCodeTaskModel model;
+    private Project project;
 
     @Autowired
     ToolDBManager toolDBManager;
@@ -94,6 +96,10 @@ public class CustomGCodeController implements MillTaskController {
     @FXML
     private CheckBox iKeepReference;
 
+    @Override
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
     @Override
     public void setModel(TaskModel model) {
@@ -161,14 +167,17 @@ public class CustomGCodeController implements MillTaskController {
                 LinuxCNCValidator validator = new LinuxCNCValidator();
                 GCodeParser parser = new GCodeParser(stats, validator, str);
 
-                gCodeViewerControl.addActor(machine);
 
                 // create a platform
                 gCodeViewerControl.addActor(new PlatformActor(
-                        stats.getMaxValues().get(MachineStatus.Axis.X).floatValue()*1.2f,
-                        stats.getMaxValues().get(MachineStatus.Axis.Y).floatValue()*1.2f
+                        stats.getMinValues().get(MachineStatus.Axis.X).floatValue() - 20.0f,
+                        stats.getMinValues().get(MachineStatus.Axis.Y).floatValue() - 20.0f,
+                        stats.getMaxValues().get(MachineStatus.Axis.X).floatValue() + 20.0f,
+                        stats.getMaxValues().get(MachineStatus.Axis.Y).floatValue() + 20.0f,
+                        stats.isMetric()
                 ));
 
+                gCodeViewerControl.addActor(machine);
             }
 
             errors.textProperty().set("");
