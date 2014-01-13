@@ -56,6 +56,7 @@ public class StatisticLimitsController implements MachineController {
 
     private final MachineController controller;
     private static String[] AXIS = {"X","Y","Z","A","B","C","U","V","W"};
+    private boolean metric=true;
 
     private final Map<MachineStatus.Axis, Double> maxValues = new HashMap<>();
     private final Map<MachineStatus.Axis, Double> minValues = new HashMap<>();
@@ -95,6 +96,7 @@ public class StatisticLimitsController implements MachineController {
                 minValues.put(axis, null);
             }
         }
+        metric = machineStatus.getModals().contains("G21");
     }
 
     /**
@@ -110,5 +112,9 @@ public class StatisticLimitsController implements MachineController {
      */
     public Map<MachineStatus.Axis, Double> getMinValues() {
         return Collections.unmodifiableMap(minValues);
+    }
+
+    public boolean isMetric() {
+        return metric;
     }
 }

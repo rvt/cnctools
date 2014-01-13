@@ -42,9 +42,7 @@ import com.rvantwisk.cnctools.opengl.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.stream.StreamHandler;
-import org.newdawn.slick.TrueTypeFont;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +57,6 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
     private final View3D viewModel = new View3D();
     private final List<AbstractActor> actors = new ArrayList<>();
     private final Map<String, AbstractActor> activeActors = new TreeMap<>();
-    Font awtFont;
-    TrueTypeFont font;
     private ReadonlyCamera camera = new ReadonlyCamera();
 
     public OpenGLRenderer(StreamHandler readHandler) {
