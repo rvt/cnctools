@@ -80,6 +80,10 @@ final public class GCodeBuilder {
     final Collection<GCodeWord> block = new TreeSet<>();
 //    final Collection<GCodeWord> block = new ArrayList<>();
 
+    public static GCodeBuilder builder() {
+        return new GCodeBuilder();
+    }
+
     /**
      * Add a new GCode word
      *

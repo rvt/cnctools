@@ -84,7 +84,7 @@ public class GCodeBuilderTest {
     @Test
     public void testM6T2() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().M6(2));
+        generator.addBlock(GCodeBuilder.builder().M6(2));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -94,7 +94,7 @@ public class GCodeBuilderTest {
     @Test
     public void testG0A() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G0().A(123.456));
+        generator.addBlock(GCodeBuilder.builder().G0().A(123.456));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -104,7 +104,7 @@ public class GCodeBuilderTest {
     @Test
     public void testG1AF() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G1().A(123.456123).F(123.4));
+        generator.addBlock(GCodeBuilder.builder().G1().A(123.456123).F(123.4));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -127,11 +127,11 @@ public class GCodeBuilderTest {
         ppc.setPreamble("(start)");
         ppc.setPostamble("M30");
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G0().Z(0.0).A(0.0).X(0.0).Y(0.0));
-        generator.addBlock(new GCodeBuilder().F(100.0).G1().X(10.0));
-        generator.addBlock(new GCodeBuilder().Y(10.0).comment("Moved Y Up"));
-        generator.addBlock(new GCodeBuilder().X(0.0));
-        generator.addBlock(new GCodeBuilder().Y(0.0));
+        generator.addBlock(GCodeBuilder.builder().G0().Z(0.0).A(0.0).X(0.0).Y(0.0));
+        generator.addBlock(GCodeBuilder.builder().F(100.0).G1().X(10.0));
+        generator.addBlock(GCodeBuilder.builder().Y(10.0).comment("Moved Y Up"));
+        generator.addBlock(GCodeBuilder.builder().X(0.0));
+        generator.addBlock(GCodeBuilder.builder().Y(0.0));
         generator.comment("Nearly there!");
         generator.endProgram();
 
@@ -149,7 +149,7 @@ public class GCodeBuilderTest {
     @Test
     public void testG4() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G4(10.0));
+        generator.addBlock(GCodeBuilder.builder().G4(10.0));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -159,7 +159,7 @@ public class GCodeBuilderTest {
     @Test
     public void testGXWithValue() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().word("G12", 12.12345678));
+        generator.addBlock(GCodeBuilder.builder().word("G12", 12.12345678));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -169,7 +169,7 @@ public class GCodeBuilderTest {
     @Test
     public void testSmallComment() throws IOException {
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().word("F", 12.987654321).comment("Set feedrate"));
+        generator.addBlock(GCodeBuilder.builder().word("F", 12.987654321).comment("Set feedrate"));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -181,7 +181,7 @@ public class GCodeBuilderTest {
         ppc.getAxisMapping().put("A", "AXIS_A");
         generator.rebuildSetup();
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G0().A(10.12));
+        generator.addBlock(GCodeBuilder.builder().G0().A(10.12));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
@@ -193,7 +193,7 @@ public class GCodeBuilderTest {
         ppc.getAxisDecimals().put("A", 6);
         generator.rebuildSetup();
         generator.startProgram();
-        generator.addBlock(new GCodeBuilder().G0().A(10.12345678).X(10.12345678));
+        generator.addBlock(GCodeBuilder.builder().G0().A(10.12345678).X(10.12345678));
         generator.endProgram();
 
         String out = asString(new ByteArrayInputStream(os.toByteArray()));
