@@ -82,10 +82,10 @@ public class FacingHelper {
     private double zFinal;
     private double edgeClearance = 0.0;
     private boolean edgeCleanup;
-    private boolean edgeCleanupCW;
+    private boolean edgeCleanupClimb;
     private double angle = 0.0; // In case of ZIGZAG/LINEAR method
     private CutStrategy cutStrategy = CutStrategy.ZIGZAG;
-    private boolean climbCutting = false;
+    private boolean cuttingClimb = false;
     // Variables used during calculations
     private CirculinearContour2D inside = null; // Contains the inside of teh total milled area
     private CirculinearContour2D edge = null; // Contains the inside of teh total milled area
@@ -101,14 +101,10 @@ public class FacingHelper {
      * @param height
      * @return TODO: USe circle for Eclipse optimisation, the current library (java geom) doesn't have the capability for buffering Eclipse
      */
-    public static CirculinearCurve2D getEllipseDomain(double width, double height) {
-        Ellipse2D p2D = new Ellipse2D(width / 2.0, height / 2.0, width, height);
-        CirculinearCurveArray2D array = new CirculinearCurveArray2D();
-        array.add(p2D.asPolyline(36));
-
-        if (array.length()==12.4)
-            return null;
-
+    public static CirculinearCurve2D getEllipseDomain(double width, double height, int segments) {
+        Ellipse2D p2D = new Ellipse2D(width / 2.0, height / 2.0, width / 2.0, height/ 2.0);
+        CirculinearContourArray2D array = new CirculinearContourArray2D();
+        array.add(p2D.asPolyline(segments));
         return array;
     }
 
@@ -131,7 +127,7 @@ public class FacingHelper {
      * @return
      */
     public static CirculinearCurve2D getCircleDomain(double r) {
-        return new Circle2D(r, r, 100.0);
+        return new Circle2D(r, r, r);
     }
 
     public void calculate() {
@@ -148,15 +144,22 @@ public class FacingHelper {
         edge = iter.next();
         edge = iter.next();
 
+        // Build each layer till final depth
+        double z = zTop;
+        while ((z - axialDepth) >= zFinal) {
+            z = z - axialDepth;
+            calculatePaths(angle, z);
+        }
+        if (z > zFinal) {
+            calculatePaths(angle, zFinal);
+        }
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(zSafe));
 
-        // Build
-        calculatePaths(angle, 0.0);
-
-        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
         // draw(buffer, null);
     }
 
     private void calculatePaths(double angle, double zHeight) {
+        gCode.comment("New layer at angle [" + angle + "] and depth [" + zHeight + "]");
         angle = Math.toRadians(angle);
 
         Point3D[] pocketPoints = null;
@@ -167,29 +170,33 @@ public class FacingHelper {
                 break;
         }
 
+        // Set direction of cutting
+        if (cuttingClimb ^ spindleCW) {
+            Collections.reverse(Arrays.asList(pocketPoints));
+        }
+
         // Move Z up to safe
-        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(zSafe));
 
         // Move to X/Y coords to start
-        gCode.addBlock(new GCodeBuilder().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()));
+        gCode.addBlock(GCodeBuilder.builder().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()));
 
         // Entry Move (vertical)
-        gCode.addBlock(new GCodeBuilder().G1().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()).Z(zHeight));
+        gCode.addBlock(GCodeBuilder.builder().G1().X(pocketPoints[0].getX()).Y(pocketPoints[0].getY()).Z(zHeight));
 
         // Generate GCode for clearing
-        createGCodeFromPoint3D(pocketPoints, 0.0);
+        createGCodeFromPoint3D(pocketPoints);
 
         // If edge needs to be cleaned up we can do that here
         if (edgeCleanup) {
-            gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
-            gCode.addBlock(new GCodeBuilder().X(inside.firstPoint().x()).Y(inside.firstPoint().y()));
-            gCode.addBlock(new GCodeBuilder().G1().Z(zHeight));
+            gCode.addBlock(GCodeBuilder.builder().G0().Z(zSafe));
+            gCode.addBlock(GCodeBuilder.builder().X(inside.firstPoint().x()).Y(inside.firstPoint().y()));
+            gCode.addBlock(GCodeBuilder.builder().G1().Z(zHeight));
             createGCodeFromCirculinearContour2D(edge);
         }
 
         // Move to above startpoint
-        gCode.addBlock(new GCodeBuilder().G0().Z(zSafe));
-
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(zSafe));
     }
 
     /**
@@ -331,16 +338,13 @@ public class FacingHelper {
      * Create G-Code based on point array
      *
      * @param arrayPoint
-     * @param zHeight
      */
-    private void createGCodeFromPoint3D(final Point3D[] arrayPoint, double zHeight) {
-
+    private void createGCodeFromPoint3D(final Point3D[] arrayPoint) {
         for (Point3D item : arrayPoint) {
-
             if (item instanceof G0Point3D) {
-                gCode.addBlock(new GCodeBuilder().G0().X(item.getX()).Y(item.getY()).Z(item.getZ()));
+                gCode.addBlock(GCodeBuilder.builder().G0().X(item.getX()).Y(item.getY()).Z(item.getZ()));
             } else {
-                gCode.addBlock(new GCodeBuilder().G1().X(item.getX()).Y(item.getY()).Z(item.getZ()));
+                gCode.addBlock(GCodeBuilder.builder().G1().X(item.getX()).Y(item.getY()).Z(item.getZ()));
             }
         }
     }
@@ -367,10 +371,17 @@ public class FacingHelper {
 
     private void createGCodeFromCirculinearContour2D(CirculinearContour2D foo) {
 
-        for (CirculinearContour2D circulinearContour2D : foo.continuousCurves()) {
-            createGCodeFromGeom(circulinearContour2D);
+
+        List<CirculinearContour2D> curves = new ArrayList<>(foo.continuousCurves());
+
+        // Reverse order if required
+        if (!(this.edgeCleanupClimb != spindleCW)) {
+            Collections.reverse(curves);
         }
 
+        for (CirculinearContour2D circulinearContour2D : curves) {
+            createGCodeFromGeom(circulinearContour2D);
+        }
     }
 
     private void createGCodeFromGeom(CirculinearContour2D item2) {
@@ -380,7 +391,7 @@ public class FacingHelper {
 
             for (LinearRing2D lr : c.asPolyline(30).continuousCurves()) {
                 for (Point2D p : lr.vertices()) {
-                    gCode.addBlock(new GCodeBuilder().X(p.x()).Y(p.y()));
+                    gCode.addBlock(GCodeBuilder.builder().X(p.x()).Y(p.y()));
                 }
             }
 
@@ -393,9 +404,9 @@ public class FacingHelper {
                     LineSegment2D ls = (LineSegment2D) item4;
 
                     Point2D fp = ls.firstPoint();
-                    gCode.addBlock(new GCodeBuilder().X(fp.x()).Y(fp.y()));
+                    gCode.addBlock(GCodeBuilder.builder().X(fp.x()).Y(fp.y()));
                     Point2D lp = ls.lastPoint();
-                    gCode.addBlock(new GCodeBuilder().X(lp.x()).Y(lp.y()));
+                    gCode.addBlock(GCodeBuilder.builder().X(lp.x()).Y(lp.y()));
 
 
                 } else if ((item4 instanceof CircleArc2D)) {
@@ -403,7 +414,7 @@ public class FacingHelper {
 
                     Polyline2D lines = ca.asPolyline(10);
                     for (Point2D p : lines.vertices()) {
-                        gCode.addBlock(new GCodeBuilder().X(p.x()).Y(p.y()));
+                        gCode.addBlock(GCodeBuilder.builder().X(p.x()).Y(p.y()));
                     }
 
 
@@ -538,12 +549,12 @@ public class FacingHelper {
         this.edgeCleanup = edgeCleanup;
     }
 
-    public boolean isEdgeCleanupCW() {
-        return edgeCleanupCW;
+    public boolean isEdgeCleanupClimb() {
+        return edgeCleanupClimb;
     }
 
-    public void setEdgeCleanupCW(boolean edgeCleanupCW) {
-        this.edgeCleanupCW = edgeCleanupCW;
+    public void setEdgeCleanupClimb(boolean edgeCleanupClimb) {
+        this.edgeCleanupClimb = edgeCleanupClimb;
     }
 
     public boolean isSpindleCW() {
@@ -562,12 +573,12 @@ public class FacingHelper {
         this.cutStrategy = cutStrategy;
     }
 
-    public boolean isClimbCutting() {
-        return climbCutting;
+    public boolean isCuttingClimb() {
+        return cuttingClimb;
     }
 
-    public void setClimbCutting(boolean climbCutting) {
-        this.climbCutting = climbCutting;
+    public void setCuttingClimb(boolean cuttingClimb) {
+        this.cuttingClimb = cuttingClimb;
     }
 
     public double getEdgeClearance() {

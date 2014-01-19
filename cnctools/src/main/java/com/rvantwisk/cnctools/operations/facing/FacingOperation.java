@@ -49,8 +49,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import math.geom2d.AffineTransform2D;
 import math.geom2d.Box2D;
+import math.geom2d.circulinear.CirculinearContourArray2D;
 import math.geom2d.circulinear.CirculinearCurve2D;
-import math.geom2d.circulinear.CirculinearCurveArray2D;
+import math.geom2d.domain.ContourArray2D;
 
 /**
  * Created by rvt on 12/30/13.
@@ -130,47 +131,47 @@ public class FacingOperation implements TaskModel {
         helper.setAxialDepth(gCodeGenerator.convert(tp.axialDepthProperty()).getValue());
         helper.setSpindleCW(tp.getSpindleDirection() == ToolParameter.SpindleDirection.CW ? true : false);
         helper.setEdgeCleanup(edgeCleanup.get());
-        helper.setEdgeCleanupCW(edgeCleanupClimb.get());
+        helper.setEdgeCleanupClimb(edgeCleanupClimb.get());
 
         // If edge cleanup is selected, setup a edge clearance and use this for final pass
         if (helper.isEdgeCleanup()) {
             helper.setEdgeClearance(gCodeGenerator.convert(tp.axialDepthProperty()).getValue() / 5.0);
         }
 
-        // Get teh shape and apply transformation
-
+// Get the shape and apply transformation
 //        CirculinearCurve2D curve = FacingHelper.getCircleDomain(gCodeGenerator.convert(width).getValue());
-//        CirculinearCurve2D curve = FacingHelper.getEllipseDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
+//        CirculinearCurve2D curve = FacingHelper.getEllipseDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue(), 50);
 
         CirculinearCurve2D curve = FacingHelper.getRectangularDomain(gCodeGenerator.convert(width).getValue(), gCodeGenerator.convert(height).getValue());
         Box2D bBox = curve.boundingBox();
         AffineTransform2D transform;
-        switch (partReference.get()) {
+        switch (partReference.get().toLowerCase()) {
             case "center":
                 transform = AffineTransform2D.createTranslation(-bBox.getWidth() / 2.0, -bBox.getHeight() / 2.0);
                 break;
-            case "topleft":
+            case "top left":
                 transform = AffineTransform2D.createTranslation(0, -bBox.getHeight());
                 break;
-            case "topright":
+            case "top right":
                 transform = AffineTransform2D.createTranslation(-bBox.getWidth(), -bBox.getHeight());
                 break;
-            case "bottomRight":
+            case "bottom right":
                 transform = AffineTransform2D.createTranslation(-bBox.getWidth(), 0.0);
                 break;
             default:
                 transform = AffineTransform2D.createTranslation(0.0, 0.0);
         }
 
+        ContourArray2D transformedCurve = (ContourArray2D) curve.transform(transform);
+        CirculinearContourArray2D foo = CirculinearContourArray2D.create(transformedCurve.continuousCurves());
+
+        helper.setDomain(foo);
+
+
         if (this.cutStrategy.get().angle != null) {
             helper.setAngle(this.cutStrategy.get().angle);
         }
         helper.setCutStrategy(this.cutStrategy.get().cutStrategy);
-
-        CirculinearCurveArray2D array = new CirculinearCurveArray2D();
-        array.add(curve);
-        helper.setDomain(array);
-
 
         helper.calculate();
 
