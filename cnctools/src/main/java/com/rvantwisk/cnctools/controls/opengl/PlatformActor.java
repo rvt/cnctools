@@ -46,27 +46,27 @@ import org.lwjgl.opengl.GL11;
  * Created by rvt on 1/12/14.
  */
 public class PlatformActor extends AbstractActor {
-    private static final float ZPOS=-0.01f;
-    private final float xneg;
-    private final float yneg;
-    private final float xpos;
-    private final float ypos;
-    private final float seps;
-
-    public static final float color_grads_minor[] = {0xaf/255.0f, 0xdf / 255.0f, 0x5f / 255.0f, 0.1f}; // default ambient color
-    public static final float color_grads_interm[] = {0xaf/255.0f, 0xdf / 255.0f, 0x5f / 255.0f, 0.2f}; // default ambient color
-    public static final float color_grads_major[] = {0xaf/255.0f, 0xdf / 255.0f, 0x5f / 255.0f, 0.33f}; // default ambient color
-    public static final float color_fill[] = {0xaf/255.0f, 0xdf / 255.0f, 0x5f / 255.0f, 0.5f}; // default ambient color
-
+    public static final float color_grads_minor[] = {0xaf / 255.0f, 0xdf / 255.0f, 0x5f / 255.0f, .1f};
+    public static final float color_grads_interm[] = {0xaf / 255.0f, 0xdf / 255.0f, 0x5f / 255.0f, .2f};
+    public static final float color_grads_major[] = {0xaf / 255.0f, 0xdf / 255.0f, 0x5f / 255.0f, .33f};
+    public static final float color_fill[] = {0xaf / 255.0f, 0xdf / 255.0f, 0x5f / 255.0f, 1.0f};
+    private static final float ZPOS = 0.0f;
+    private final int xneg;
+    private final int yneg;
+    private final int xpos;
+    private final int ypos;
+    private final int seps;
+    private final int openNess = 5;
     private int display_list;
 
     public PlatformActor(final float xneg, final float yneg, final float xpos, final float ypos, final boolean metric) {
         super(PlatformActor.class.getSimpleName());
-        this.xneg = (float) Math.floor(xneg);
-        this.yneg = (float) Math.floor(yneg);
-        this.xpos = (float) Math.ceil(xpos);
-        this.ypos = (float) Math.ceil(ypos);
-        seps = metric?10.0f:8.0f;
+        this.xneg = (int) Math.floor(xneg / (openNess*openNess)) * openNess*openNess;
+        this.yneg = (int) Math.floor(yneg / (openNess*openNess)) * openNess*openNess;
+        this.xpos = (int) Math.ceil(xpos / (openNess*openNess)) * openNess*openNess;
+        this.ypos = (int) Math.ceil(ypos / (openNess*openNess)) * openNess*openNess;
+
+        seps = (metric ? 10 * openNess : 8 * openNess);
 
     }
 
@@ -80,19 +80,19 @@ public class PlatformActor extends AbstractActor {
         // draw the grid
         GL11.glBegin(GL11.GL_LINES);
 
-        for (float i=xneg;i<xpos;i++) {
+        for (int i = xneg; i <= xpos; i += openNess) {
             setColor(i);
             GL11.glVertex3f(i, yneg, ZPOS);
             GL11.glVertex3f(i, ypos, ZPOS);
         }
 
-        for (float i=yneg;i<ypos;i++) {
+        for (int i = yneg; i <= ypos; i += openNess) {
             setColor(i);
             GL11.glVertex3f(xneg, i, ZPOS);
             GL11.glVertex3f(xpos, i, ZPOS);
         }
 
-        GL11.glColor4f(color_fill[0],color_fill[1],color_fill[2], color_fill[3]);
+        GL11.glColor4f(color_fill[0], color_fill[1], color_fill[2], color_fill[3]);
         GL11.glRectf(xneg, yneg, xpos, ypos);
         GL11.glEnd();
 
@@ -101,20 +101,20 @@ public class PlatformActor extends AbstractActor {
 
     @Override
     public void prepare() {
-
     }
 
     /**
      * Decide what color to use
+     *
      * @param i
      */
-    private void setColor(float i) {
-        if (i%seps == 0.0f) {
-            GL11.glColor4f(color_grads_major[0],color_grads_major[1],color_grads_major[2], color_grads_major[3]);
-        } else if (i%(seps/2.0f) == 0.0f) {
-            GL11.glColor4f(color_grads_interm[0],color_grads_interm[1],color_grads_interm[2], color_grads_interm[3]);
+    private void setColor(int i) {
+        if (i % seps == 0) {
+            GL11.glColor4f(color_grads_major[0], color_grads_major[1], color_grads_major[2], color_grads_major[3]);
+        } else if (i % (seps / 2) == 0) {
+            GL11.glColor4f(color_grads_interm[0], color_grads_interm[1], color_grads_interm[2], color_grads_interm[3]);
         } else {
-            GL11.glColor4f(color_grads_minor[0],color_grads_minor[1],color_grads_minor[2], color_grads_minor[3]);
+            GL11.glColor4f(color_grads_minor[0], color_grads_minor[1], color_grads_minor[2], color_grads_minor[3]);
         }
     }
 

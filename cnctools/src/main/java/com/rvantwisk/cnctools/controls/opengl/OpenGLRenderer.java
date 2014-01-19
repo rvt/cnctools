@@ -96,6 +96,7 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
             }
         }
 
+
         viewAxis.setCamera(localCam);
         viewModel.setCamera(localCam);
 
