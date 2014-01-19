@@ -74,7 +74,7 @@ public class GCodeParser {
 
     private final MachineStatus machineStatus = new MachineStatus();        // kept's track of machine status after end of block
     private final MachineStatus intermediateStatus = new MachineStatus();   // Keeps tracking of machine status during block processing
-    private final MachineController machineController;                      // A machine controller to send parsed block's + machine status into
+    private final MachineController machineController[];                      // A machine controller to send parsed block's + machine status into
     private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
     private final AbstractMachineValidator machineValidator;                      // A machine controller to send parsed block's + machine status into
     private final Pattern GCODEPATTERN = Pattern.compile("([GXYZABCDFHIJKLMNPQRSTUVW]o?)\\s*([0-9.+-]+)?(\\s*/?\\s*)([0-9.+-]+)?");
@@ -84,7 +84,13 @@ public class GCodeParser {
     private String currentLine = ""; // Hold's the current line between begin and endblock calls
     private int currentLineNumber=1;
 
-    public GCodeParser(final MachineController machineController, final AbstractMachineValidator machineValidator, final InputStream input) throws SimException {
+    public GCodeParser(final AbstractMachineValidator machineValidator, final InputStream input, final MachineController ... machineController) throws SimException {
+        for (Object c : machineController) {
+            if (!(c instanceof MachineController)) {
+                throw new IllegalArgumentException("StatisticLimitsController only accepts type's of MachineController");
+            }
+        }
+
         this.machineController = machineController;
         this.machineValidator = machineValidator;
         Charset charset = Charset.forName("UTF-8");
@@ -95,7 +101,9 @@ public class GCodeParser {
                 parseLine();
                 currentLineNumber++;
             }
-            machineController.end(this, intermediateStatus);
+            for (MachineController controller : this.machineController) {
+                controller.end(this, intermediateStatus);
+            }
 
         } catch (IOException x) {
             throw new SimParsingException("Unable to read stream", x);
@@ -140,7 +148,9 @@ public class GCodeParser {
         // Copy to intermediate status to ensure our machine status is always valid
         intermediateStatus.copyFrom(machineStatus);
         // Notify the controller that we are about to start a new block, the block itself is valid, for example there we be no G1's and G0 on one line
-        machineController.startBlock(this, intermediateStatus, Collections.unmodifiableMap(block));
+        for (MachineController controller : this.machineController) {
+            controller.startBlock(this, intermediateStatus, Collections.unmodifiableMap(block));
+        }
         intermediateStatus.startBlock();
 
         // Copy the block to the machine
@@ -153,7 +163,9 @@ public class GCodeParser {
         if (machineValidator != null) machineValidator.postVerify(intermediateStatus);
 
         // Notify the controller that everything was ok, now teh controller start 'running' the data
-        machineController.endBlock(this, intermediateStatus, Collections.unmodifiableMap(block));
+        for (MachineController controller : this.machineController) {
+            controller.endBlock(this, intermediateStatus, Collections.unmodifiableMap(block));
+        }
 
         // setup new and valid machine status
         machineStatus.copyFrom(intermediateStatus);
