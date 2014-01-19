@@ -54,15 +54,13 @@ import java.util.Map;
  */
 public class StatisticLimitsController implements MachineController {
 
-    private final MachineController controller;
     private static String[] AXIS = {"X","Y","Z","A","B","C","U","V","W"};
     private boolean metric=true;
 
     private final Map<MachineStatus.Axis, Double> maxValues = new HashMap<>();
     private final Map<MachineStatus.Axis, Double> minValues = new HashMap<>();
 
-    public StatisticLimitsController(MachineController controller) {
-        this.controller = controller;
+    public StatisticLimitsController() {
         for (MachineStatus.Axis axis : MachineStatus.Axis.values()) {
             maxValues.put(axis, Double.NEGATIVE_INFINITY);
             minValues.put(axis, Double.POSITIVE_INFINITY );
@@ -71,12 +69,10 @@ public class StatisticLimitsController implements MachineController {
 
     @Override
     public void startBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> block) {
-        controller.startBlock(parser, machineStatus, block);
     }
 
     @Override
     public void endBlock(GCodeParser parser, MachineStatus machineStatus, Map<String, ParsedWord> block) throws SimException {
-        controller.endBlock(parser, machineStatus, block);
         final Map<MachineStatus.Axis, Double> coords = machineStatus.getCoordinates();
         for (MachineStatus.Axis axis : MachineStatus.Axis.values()) {
             if (coords.get(axis)!=null) {
