@@ -75,6 +75,10 @@ public class Main extends Application {
     // http://docs.oracle.com/javafx/2/fxml_get_started/jfxpub-fxml_get_started.htm
     // http://docs.oracle.com/javafx/2/api/javafx/fxml/doc-files/introduction_to_fxml.html
 
+    // http://lwjgl.org/wiki/index.php?title=Render_to_Texture_with_Frame_Buffer_Objects_(FBO)
+    // https://bitbucket.org/dejayberlin/joglfxpipeline/src/a91c1f745f9a?at=default
+
+    // https://community.oracle.com/thread/2434563?tstart=0
     public static void main(String[] args) {
 
 

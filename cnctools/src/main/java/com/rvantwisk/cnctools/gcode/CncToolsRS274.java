@@ -49,20 +49,20 @@ public class CncToolsRS274 extends RS274 implements CncToolsGCodegenerator {
     public void addTool(ToolParameter tool) {
         // Add tool if this machine has a tool changer
         if (this.getPostProcessorConfig().isHasToolChanger() && tool.toolNumberProperty().getValue()!=null) {
-            this.addBlock(new GCodeBuilder().M6(tool.getToolNumber()));
+            this.addBlock(GCodeBuilder.builder().M6(tool.getToolNumber()));
         }
 
         // Add feedrate
         if (tool.feedRateProperty().valueProperty().getValue()!=null) {
-            this.addBlock(new GCodeBuilder().F(convert(tool.feedRateProperty()).getValue()));
+            this.addBlock(GCodeBuilder.builder().F(convert(tool.feedRateProperty()).getValue()));
         }
 
         // Add spindle speed
         if (tool.spindleSpeedProperty().valueProperty().getValue()!=null) {
             if (ToolParameter.SpindleDirection.CW.toString().equals(tool.spindleDirectionProperty().get())) {
-                this.addBlock(new GCodeBuilder().M3(convert(tool.spindleSpeedProperty()).getValue()));
+                this.addBlock(GCodeBuilder.builder().M3(convert(tool.spindleSpeedProperty()).getValue()));
             } else {
-                this.addBlock(new GCodeBuilder().M4(convert(tool.spindleSpeedProperty()).getValue()));
+                this.addBlock(GCodeBuilder.builder().M4(convert(tool.spindleSpeedProperty()).getValue()));
             }
         }
     }

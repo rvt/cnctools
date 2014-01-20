@@ -23,7 +23,7 @@ public class GCodeActor extends AbstractActor implements MachineController {
     public static double AAXISSTEPDEGREES = 1.0; // When A axis rotaties, simulate it in this number of degrees
     public static int AXISMAXSTEPS = 5000; // When A axis rotates with other axis, limit the number of steps to 5000
     public static double curveSectionInches = curveSectionMM / 25.4;
-    private static int ROWSIZE = 7;
+    private static int ROWSIZE = 7; // coordinates + color 3+4
     final TFloatArrayList data = new TFloatArrayList();
     final MachineStatusHelper machine = new MachineStatusHelper();
     private MotionMode prevMotionMode = MotionMode.G0;
@@ -242,7 +242,7 @@ public class GCodeActor extends AbstractActor implements MachineController {
 
     @Override
     public void initialize() {
-        vboInfo = VBOHelper.createLineStrip(data.toArray(), data.size() / ROWSIZE, true);
+        vboInfo = VBOHelper.createLines(data.toArray(), data.size() / ROWSIZE, true);
         data.clear();
 
     }

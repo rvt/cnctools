@@ -86,10 +86,10 @@ public class RoundStockHelper {
     public void calculate() {
         nextDepth = stockSize * Math.sqrt(2);
 
-        // gCode.addBlock(new GCodeBuilder().F(feedRate));
+        // gCode.addBlock(GCodeBuilder.builder().F(feedRate));
 
-        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
-        gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0).Y(0.0));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(GCodeBuilder.builder().A(0.0).X(0.0).Y(0.0));
 
         while ((calculateBase()) > -1) {
             gCode.comment("Angle at 0.0");
@@ -103,10 +103,10 @@ public class RoundStockHelper {
         }
         gCode.commentLarge("start final rounds");
         fullRoundMillSteps();
-        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
-        gCode.addBlock(new GCodeBuilder().X(0.0));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(GCodeBuilder.builder().X(0.0));
         // Reset A to 0 degrees
-        gCode.addBlock(new GCodeBuilder().G92("A", 0.0));
+        gCode.addBlock(GCodeBuilder.builder().G92("A", 0.0));
         gCode.commentLarge("Done");
     }
 
@@ -116,8 +116,8 @@ public class RoundStockHelper {
     private void fullRoundMillSteps() {
         Double offsetAngle = 0.0;
 
-        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
-        gCode.addBlock(new GCodeBuilder().A(0.0).X(0.0));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(GCodeBuilder.builder().A(0.0).X(0.0));
         while (nextDepth > finalSize) {
             offsetAngle = fullRoundMillStep(offsetAngle);
 
@@ -142,10 +142,10 @@ public class RoundStockHelper {
         Double millLength = (stockLength / radialDepth) * Math.PI * finalSize * 2.0;
         Double G93F = this.feedRate / millLength;
 
-        gCode.addBlock(new GCodeBuilder().G1().Z(nextDepth));
-        gCode.addBlock(new GCodeBuilder().G93(G93F).A(offsetAngle + totalAngle).X(stockLength));
-        gCode.addBlock(new GCodeBuilder().G0().Z(nextDepth + rapidClearance));
-        gCode.addBlock(new GCodeBuilder().X(0.0));
+        gCode.addBlock(GCodeBuilder.builder().G1().Z(nextDepth));
+        gCode.addBlock(GCodeBuilder.builder().G93(G93F).A(offsetAngle + totalAngle).X(stockLength));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(nextDepth + rapidClearance));
+        gCode.addBlock(GCodeBuilder.builder().X(0.0));
 
         return totalAngle + offsetAngle;
     }
@@ -193,19 +193,19 @@ public class RoundStockHelper {
         Double startAngle = currentAngle;
         Double stepAngle = Point.angleBetween2Lines(Point.zero, startPoint, Point.zero, millPA) * (180.0 / Math.PI);
 
-        gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
-        gCode.addBlock(new GCodeBuilder().A(currentAngle + 1.0 + angleOffset));
+        gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+        gCode.addBlock(GCodeBuilder.builder().A(currentAngle + 1.0 + angleOffset));
 
         Boolean isEnd;
         do {
             // Remove some material
             gCode.comment("Remove stock");
-            gCode.addBlock(new GCodeBuilder().G1().Z(nextDepth));
-            gCode.addBlock(new GCodeBuilder().G1().A(currentAngle + angleOffset));
-            gCode.addBlock(new GCodeBuilder().X(stockLength));
+            gCode.addBlock(GCodeBuilder.builder().G1().Z(nextDepth));
+            gCode.addBlock(GCodeBuilder.builder().G1().A(currentAngle + angleOffset));
+            gCode.addBlock(GCodeBuilder.builder().X(stockLength));
 
-            gCode.addBlock(new GCodeBuilder().G0().Z(nextDepth + rapidClearance));
-            gCode.addBlock(new GCodeBuilder().G0().A(currentAngle + angleOffset + 1.0).X(0.0));
+            gCode.addBlock(GCodeBuilder.builder().G0().Z(nextDepth + rapidClearance));
+            gCode.addBlock(GCodeBuilder.builder().G0().A(currentAngle + angleOffset + 1.0).X(0.0));
 
             currentAngle = currentAngle - Math.abs(stepAngle);
 
@@ -213,7 +213,7 @@ public class RoundStockHelper {
             isEnd = reachedEndOf(-startAngle, currentAngle);
 
             if (isEnd) {
-                gCode.addBlock(new GCodeBuilder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
+                gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
             }
 
         } while (!isEnd);

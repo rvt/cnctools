@@ -41,6 +41,7 @@ package com.rvantwisk.cnctools.operations.createRoundStock;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
+import com.rvantwisk.cnctools.controls.opengl.ArrowsActor;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
@@ -195,10 +196,13 @@ public class CreateRoundStockController implements MillTaskController {
             InputStream in = new ByteArrayInputStream(os.toByteArray());
 
             GCodeActor machine = new GCodeActor("gcode");
-            StatisticLimitsController stats = new StatisticLimitsController(machine);
+            ArrowsActor arrows = new ArrowsActor("arrows");
+            StatisticLimitsController stats = new StatisticLimitsController();
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(stats, validator, in);
+            GCodeParser parser = new GCodeParser(validator, in, stats, machine, arrows);
             gCodeGenerator.endProgram();
+
+            gCodeViewerControl.addActor(arrows);
 
             // Add a platform
             gCodeViewerControl.addActor(new PlatformActor(

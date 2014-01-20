@@ -41,6 +41,7 @@ package com.rvantwisk.cnctools.operations.facing;
 import com.rvantwisk.cnctools.controls.DimensionControl;
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
 import com.rvantwisk.cnctools.controls.SelectOrEditToolControl;
+import com.rvantwisk.cnctools.controls.opengl.ArrowsActor;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.CNCToolsPostProcessConfig;
@@ -120,9 +121,6 @@ public class FacingController implements MillTaskController {
     private DimensionControl iZTop;
     @FXML
     private SelectOrEditToolControl selectOrEditTool;
-
-    public FacingController() {
-    }
 
     @Override
     public void setProject(Project project) {
@@ -316,12 +314,14 @@ public class FacingController implements MillTaskController {
             InputStream in = new ByteArrayInputStream(os.toByteArray());
 
             GCodeActor machine = new GCodeActor("gcode");
-            StatisticLimitsController stats = new StatisticLimitsController(machine);
+            ArrowsActor arrows = new ArrowsActor("arrows");
+            StatisticLimitsController stats = new StatisticLimitsController();
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(stats, validator, in);
+            GCodeParser parser = new GCodeParser(validator, in, machine, arrows, stats);
             gCodeGenerator.endProgram();
 
             gCodeViewerControl.addActor(machine);
+            gCodeViewerControl.addActor(arrows);
 
             // create a platform
             gCodeViewerControl.addActor(new PlatformActor(

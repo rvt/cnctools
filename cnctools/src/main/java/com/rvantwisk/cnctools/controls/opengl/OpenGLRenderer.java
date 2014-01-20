@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+
 /**
  * Class to render GCode
  */
@@ -58,6 +59,7 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
     private final List<AbstractActor> actors = new ArrayList<>();
     private final Map<String, AbstractActor> activeActors = new TreeMap<>();
     private ReadonlyCamera camera = new ReadonlyCamera();
+
 
     public OpenGLRenderer(StreamHandler readHandler) {
         super(readHandler);
@@ -73,8 +75,6 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        //   Font awtFont = new Font("Times New Roman", Font.ITALIC, 24);
-        //   font = new TrueTypeFont(awtFont, false);
     }
 
     protected void loop() {
@@ -145,11 +145,19 @@ final public class OpenGLRenderer extends AbstractOpenGLRenderer {
         for (int i = 0; i < 3; i++) {
             GL11.glPushMatrix();
             GL11.glColor3f(colors[i][0], colors[i][1], colors[i][2]);
+
+            // http://breadmilkbeercigarettes.com/bmbc/shelves/users/bbb/src/java/SpinningTextureCube.php
             GL11.glTranslatef(Math.round(axis[i][0]), Math.round(axis[i][1]), Math.round(axis[i][2]));
             GL11.glRotatef(camera.getElevation() + 90f, 1.0f, 0.0f, 0.0f);
             GL11.glRotatef(-camera.getAzimuth(), 0.0f, 1.0f, 0.0f);
             SimpleText.drawString(names[i], 0.0f, 0.0f, 0.0f);
+
+//            GL11.glRasterPos3f(Math.round(axis[i][0]), Math.round(axis[i][1]), Math.round(axis[i][2]));
+//            SimpleText.drawString(names[i], 0, 0);
+
             GL11.glPopMatrix();
+
+
         }
 
         GL11.glPopMatrix();

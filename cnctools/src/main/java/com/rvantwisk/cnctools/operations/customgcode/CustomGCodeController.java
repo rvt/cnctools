@@ -39,6 +39,7 @@
 package com.rvantwisk.cnctools.operations.customgcode;
 
 import com.rvantwisk.cnctools.controls.GCodeViewerControl;
+import com.rvantwisk.cnctools.controls.opengl.ArrowsActor;
 import com.rvantwisk.cnctools.controls.opengl.GCodeActor;
 import com.rvantwisk.cnctools.controls.opengl.PlatformActor;
 import com.rvantwisk.cnctools.data.Project;
@@ -163,10 +164,12 @@ public class CustomGCodeController implements MillTaskController {
 
             if (str != null) {
                 GCodeActor machine = new GCodeActor("gcode");
-                StatisticLimitsController stats = new StatisticLimitsController(machine);
+                ArrowsActor arrows = new ArrowsActor("arrows");
+                StatisticLimitsController stats = new StatisticLimitsController();
                 LinuxCNCValidator validator = new LinuxCNCValidator();
-                GCodeParser parser = new GCodeParser(stats, validator, str);
+                GCodeParser parser = new GCodeParser(validator, str, machine, arrows, stats);
 
+                gCodeViewerControl.addActor(arrows);
 
                 // create a platform
                 gCodeViewerControl.addActor(new PlatformActor(

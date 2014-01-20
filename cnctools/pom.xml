@@ -273,11 +273,11 @@ mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath
             <artifactId>lwjgl_util</artifactId>
             <version>${lwjgl.version}</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>slick</groupId>
             <artifactId>slick</artifactId>
             <version>${slick.version}</version>
-        </dependency-->
+        </dependency>
 
 
         <dependency>
