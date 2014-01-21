@@ -53,6 +53,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -66,10 +67,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.StandardOpenOption;
+import java.util.ResourceBundle;
 
 
 /**
@@ -89,6 +92,14 @@ public class CNCToolsController extends AbstractController {
     @Autowired
     private ToolDBManager toolDBManager;
 
+    @FXML
+    private ResourceBundle resources;
+    @FXML
+    private URL location;
+    @FXML
+    private AnchorPane details;
+    @FXML
+    private Label displayedIssueLabel;
     @FXML
     TextArea descriptionValue;
     @FXML
@@ -111,7 +122,10 @@ public class CNCToolsController extends AbstractController {
     Button btnView;
     @FXML
     Button btnPostProcessor;
-
+    @FXML
+    private Button btnMoveTaskDown;
+    @FXML
+    private Button btnMoveTaskUp;
 
     BeanPathAdapter<Project> currentProjectBinding;
 
@@ -388,6 +402,25 @@ public class CNCToolsController extends AbstractController {
     @FXML
         // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+        assert addMillTask != null : "fx:id=\"addMillTask\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert btnMoveTaskDown != null : "fx:id=\"btnMoveTaskDown\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert btnMoveTaskUp != null : "fx:id=\"btnMoveTaskUp\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert btnPostProcessor != null : "fx:id=\"btnPostProcessor\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert btnView != null : "fx:id=\"btnView\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert deleteProject != null : "fx:id=\"deleteProject\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert descriptionValue != null : "fx:id=\"descriptionValue\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert details != null : "fx:id=\"details\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert displayedIssueLabel != null : "fx:id=\"displayedIssueLabel\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert editMilltask != null : "fx:id=\"editMilltask\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert generateGCode != null : "fx:id=\"generateGCode\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        //assert millTaskDescription != null : "fx:id=\"millTaskDescription\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        //assert millTaskName != null : "fx:id=\"millTaskName\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        //assert millTaskOperation != null : "fx:id=\"millTaskOperation\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert milltaskEnabled != null : "fx:id=\"milltaskEnabled\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert removeMilltask != null : "fx:id=\"removeMilltask\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert tbl_millTasks != null : "fx:id=\"tbl_millTasks\" was not injected: check your FXML file 'CNCTools.fxml'.";
+        assert v_projectList != null : "fx:id=\"v_projectList\" was not injected: check your FXML file 'CNCTools.fxml'.";
+
         v_projectList.setItems(projectModel.projectsProperty());
 
         projectModel.loadPostProcessors();
@@ -399,7 +432,6 @@ public class CNCToolsController extends AbstractController {
             dialog.setMessage("No Post Processors where found, a new a new post processor set has been created.");
             dialog.show();
         }
-
 
         projectModel.loadToolsFromDB();
         if (projectModel.toolDBProperty().size() == 0) {
@@ -429,7 +461,7 @@ public class CNCToolsController extends AbstractController {
         editMilltask.disableProperty().bind(tbl_millTasks.getSelectionModel().selectedItemProperty().isNull());
         generateGCode.disableProperty().bind(v_projectList.getSelectionModel().selectedItemProperty().isNull());
 
-        // Update description when project changes
+        // Update description when project changes by means of databinding
         v_projectList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Project>() {
             @Override
             public void changed(ObservableValue<? extends Project> observable, Project oldValue, Project newValue) {
@@ -441,6 +473,22 @@ public class CNCToolsController extends AbstractController {
                 } else {
                     tbl_millTasks.setItems(newValue.millTasksProperty());
                     descriptionValue.textProperty().bindBidirectional(newValue.descriptionProperty());
+                }
+
+            }
+        });
+
+        // Enable/Disable up/Down arrows
+        tbl_millTasks.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Task>() {
+            @Override
+            public void changed(ObservableValue <? extends Task> observable, Task o, Task o2) {
+                if (o2!=null) {
+                    final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
+                    btnMoveTaskUp.setDisable(index==0?true:false);
+                    btnMoveTaskDown.setDisable((index+1)==tbl_millTasks.getItems().size()?true:false);
+                } else {
+                    btnMoveTaskUp.setDisable(true);
+                    btnMoveTaskDown.setDisable(true);
                 }
             }
         });
@@ -520,7 +568,6 @@ public class CNCToolsController extends AbstractController {
         } catch (Exception e) {
             handleException(e);
         }
-
     }
 
     @FXML
@@ -548,6 +595,36 @@ public class CNCToolsController extends AbstractController {
         }
         controller.setMessage(sb.toString());
         dialog.showAndWait();
+    }
+
+    @FXML
+    void onMoveTaskUp(ActionEvent event) {
+        final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
+        final int index = tbl_millTasks.getSelectionModel().getSelectedIndex()-1;
+
+        final Task t1 = p.millTasksProperty().get(index);
+        final Task t2 = p.millTasksProperty().get(index+1);
+
+        p.millTasksProperty().remove(index);
+        p.millTasksProperty().remove(index);
+
+        p.millTasksProperty().add(index, t2);
+        p.millTasksProperty().add(index+1, t1);
+    }
+
+    @FXML
+    void onMovetaskDown(ActionEvent event) {
+        final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
+        final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
+
+        final Task t1 = p.millTasksProperty().get(index);
+        final Task t2 = p.millTasksProperty().get(index+1);
+
+        p.millTasksProperty().remove(index);
+        p.millTasksProperty().remove(index);
+
+        p.millTasksProperty().add(index, t2);
+        p.millTasksProperty().add(index+1, t1);
     }
 }
 

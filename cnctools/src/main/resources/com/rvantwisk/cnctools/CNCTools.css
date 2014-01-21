@@ -86,3 +86,9 @@ HBox {
     -fx-padding: 0 2 0 2;
 }
 
+.arrowButton {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px;
+
+}
