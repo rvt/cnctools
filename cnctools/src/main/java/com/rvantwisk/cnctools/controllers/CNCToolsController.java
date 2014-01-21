@@ -44,6 +44,8 @@ import com.rvantwisk.cnctools.data.tools.BallMill;
 import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.rvantwisk.cnctools.misc.*;
 import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockTaskModel;
+import com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController;
+import com.rvantwisk.cnctools.operations.customgcode.GCodeTaskModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -183,18 +185,16 @@ public class CNCToolsController extends AbstractController {
                             new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
                     fileChooser.setTitle("Save GCode");
                     File file = fileChooser.showSaveDialog(null);
+                    file.delete();
                     if (file != null) {
-                        try {
-                            file.delete();
-                            BufferedWriter br = Files.newBufferedWriter(file.toPath(),
-                                    Charset.forName("UTF-8"),
-                                    new OpenOption[]{StandardOpenOption.CREATE_NEW});
+                        try (BufferedWriter br = Files.newBufferedWriter(file.toPath(),
+                                Charset.forName("UTF-8"),
+                                new OpenOption[]{StandardOpenOption.CREATE_NEW})) {
                             br.write(gCode.toString());
                             br.write("\n");
 
                             br.flush();
                             br.close();
-
                         } catch (IOException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -492,6 +492,9 @@ public class CNCToolsController extends AbstractController {
                 }
             }
         });
+        btnMoveTaskUp.setDisable(true);
+        btnMoveTaskDown.setDisable(true);
+
 
         // Set text in ListView
         v_projectList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
@@ -572,7 +575,65 @@ public class CNCToolsController extends AbstractController {
 
     @FXML
     public void onViewGCode(ActionEvent actionEvent) {
+        try {
+            if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+                final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
 
+                if (p.postProcessorProperty().get() == null) {
+                    MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                    dialog.setTitleText("No postprocessor");
+                    dialog.setMessage("No post processor configured, please select a post processor first!");
+                    dialog.show();
+                } else {
+
+                    File file =  File.createTempFile("cnctools", "gcode");
+                    final StringBuilder gCode = p.getGCode(toolDBManager);
+                    file.createNewFile();
+                    file.deleteOnExit();
+                    if (file != null) {
+                        try (BufferedWriter br = Files.newBufferedWriter(file.toPath(),
+                                Charset.forName("UTF-8"),
+                                new OpenOption[]{StandardOpenOption.WRITE})) {
+                            br.write(gCode.toString());
+                            br.write("\n");
+                            br.flush();
+                            br.close();
+
+
+                            Project project = projectModel.projectsProperty().get(v_projectList.getSelectionModel().getSelectedIndex());
+                            showGCodeFromFile(project, file.getAbsolutePath());
+
+                        } catch (IOException ex) {
+                            handleException(ex);
+                        }
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
+
+    /**
+     * Show's a dialog's with gcode from file
+     * @param project
+     * @param fName
+     */
+    public static void showGCodeFromFile(final Project project, final String fName) {
+        FXMLDialog dialog = ScreensConfiguration.getInstance().taskEditDialog();
+
+        GCodeTaskModel model = new GCodeTaskModel();
+        model.setgCodeFile(fName);
+        model.setReferencedFile(true);
+
+        Task task = new Task("G-Code", "", CustomGCodeController.class.getName(), "CustomGCode.fxml");
+        task.setMilltaskModel(model);
+
+        ScreensConfiguration.getInstance().registerBean(task.getClassName());
+        TaskEditController controller = dialog.getController();
+        controller.setTask(project, task.copy());
+        dialog.showAndWait();
     }
 
     /**
