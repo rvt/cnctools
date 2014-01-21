@@ -79,6 +79,7 @@ public class Main extends Application {
     // https://bitbucket.org/dejayberlin/joglfxpipeline/src/a91c1f745f9a?at=default
 
     // https://community.oracle.com/thread/2434563?tstart=0
+    // http://thomasdiewald.com/blog/
     public static void main(String[] args) {
 
 

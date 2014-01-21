@@ -192,7 +192,7 @@ public class FacingHelper {
             gCode.addBlock(GCodeBuilder.builder().G0().Z(zSafe));
             gCode.addBlock(GCodeBuilder.builder().X(inside.firstPoint().x()).Y(inside.firstPoint().y()));
             gCode.addBlock(GCodeBuilder.builder().G1().Z(zHeight));
-            createGCodeFromCirculinearContour2D(edge);
+            buildEdgeGCodeFromContour(edge);
         }
 
         // Move to above startpoint
@@ -369,17 +369,14 @@ public class FacingHelper {
         return sorted;
     }
 
-    private void createGCodeFromCirculinearContour2D(CirculinearContour2D foo) {
-
-
-        List<CirculinearContour2D> curves = new ArrayList<>(foo.continuousCurves());
+    private void buildEdgeGCodeFromContour(CirculinearContour2D curves) {
 
         // Reverse order if required
         if (!(this.edgeCleanupClimb != spindleCW)) {
-            Collections.reverse(curves);
+            curves = curves.reverse();
         }
 
-        for (CirculinearContour2D circulinearContour2D : curves) {
+        for (CirculinearContour2D circulinearContour2D : curves.continuousCurves()) {
             createGCodeFromGeom(circulinearContour2D);
         }
     }

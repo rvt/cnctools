@@ -131,12 +131,18 @@ public class FacingOperation implements TaskModel {
         helper.setAxialDepth(gCodeGenerator.convert(tp.axialDepthProperty()).getValue());
         helper.setSpindleCW(tp.getSpindleDirection() == ToolParameter.SpindleDirection.CW ? true : false);
         helper.setEdgeCleanup(edgeCleanup.get());
-        helper.setEdgeCleanupClimb(edgeCleanupClimb.get());
+        helper.setEdgeCleanupClimb(this.getEdgeCleanupClimb());
 
         // If edge cleanup is selected, setup a edge clearance and use this for final pass
         if (helper.isEdgeCleanup()) {
             helper.setEdgeClearance(gCodeGenerator.convert(tp.axialDepthProperty()).getValue() / 5.0);
         }
+
+        if (this.cutStrategy.get().angle != null) {
+            helper.setAngle(this.cutStrategy.get().angle);
+        }
+        helper.setCutStrategy(this.cutStrategy.get().cutStrategy);
+        helper.setCuttingClimb(this.getClimbCutting());
 
 // Get the shape and apply transformation
 //        CirculinearCurve2D curve = FacingHelper.getCircleDomain(gCodeGenerator.convert(width).getValue());
@@ -168,10 +174,7 @@ public class FacingOperation implements TaskModel {
         helper.setDomain(foo);
 
 
-        if (this.cutStrategy.get().angle != null) {
-            helper.setAngle(this.cutStrategy.get().angle);
-        }
-        helper.setCutStrategy(this.cutStrategy.get().cutStrategy);
+
 
         helper.calculate();
 
