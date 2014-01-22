@@ -73,6 +73,7 @@ _On OS/X and Linux you need to do one extra step to ensure the JavaFX environmen
 
 <pre>
 rvt@rvt:~$ sudo bash
+root@rvt:~# export JAVA_HOME=$(/usr/libexec/java_home -v1.7)
 root@rvt:~# mvn com.zenjava:javafx-maven-plugin:2.0:fix-classpath
 [INFO] Scanning for projects...
 [INFO]
@@ -140,5 +141,6 @@ BSD3, see LICENSE file
 Screenshot
 ========
 
-Example showing G-Code editor with life preview
-![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/blog/AppMain-20140112-163515.jpg)
+Example showing 3 operations executed after eachother for one project.
+In this case 3 pocket's at different depth's.
+![G-Code editor with life preview](http://skitch.rvantwisk.nl/~rvt/blog/AppMain-20140121-213213.png)
