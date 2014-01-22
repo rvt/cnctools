@@ -61,15 +61,16 @@ public class IndexerAppConfiguration implements BeanDefinitionRegistryPostProces
 
     private final List<AbstractTask> allOperations = new ArrayList<>();
 
+    private final ProjectModel customerModel = new ProjectModel();
+
     @Bean
     public ProjectModel projectModel()  {
-        ProjectModel customerModel = new ProjectModel();
         return customerModel;
     }
 
     @Bean
     public ToolDBManager toolDBManager() {
-        return this.projectModel().getToolDBManager();
+        return projectModel().getToolDBManager();
     }
 
     @Bean(name="applicapableMillTasks")
