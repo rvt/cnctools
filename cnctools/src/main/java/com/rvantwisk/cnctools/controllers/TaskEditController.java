@@ -49,7 +49,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +66,14 @@ import java.util.ResourceBundle;
  */
 public class TaskEditController extends AbstractController {
 
+    enum ViewAs {
+        CLOSE,
+        CANCELSAVE
+    }
+
     private MillTaskController tasksController;
     private TaskRunnable currentTaskRunnable;
+    private ViewAs viewAs;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -83,13 +88,13 @@ public class TaskEditController extends AbstractController {
     private URL location;
 
     @FXML
+    private Button btnClose;
+
+    @FXML
     private Button btnCancel;
 
     @FXML
     private Button btnSave;
-
-    @FXML
-    private HBox closeAndUse;
 
     @FXML
     private Label lbHeader;
@@ -99,6 +104,13 @@ public class TaskEditController extends AbstractController {
     void onCancel(ActionEvent event) {
         tasksController.destroy();
         setReturned(Result.CANCEL);
+        getDialog().close();
+    }
+
+    @FXML
+    void onClose(ActionEvent event) {
+        tasksController.destroy();
+        setReturned(Result.CLOSE);
         getDialog().close();
     }
 
@@ -113,8 +125,9 @@ public class TaskEditController extends AbstractController {
     void initialize() {
         assert btnCancel != null : "fx:id=\"btnCancel\" was not injected: check your FXML file 'TaskEdit.fxml'.";
         assert btnSave != null : "fx:id=\"btnSave\" was not injected: check your FXML file 'TaskEdit.fxml'.";
-        assert closeAndUse != null : "fx:id=\"closeAndUse\" was not injected: check your FXML file 'TaskEdit.fxml'.";
         assert lbHeader != null : "fx:id=\"lbHeader\" was not injected: check your FXML file 'TaskEdit.fxml'.";
+
+        setViewAs(ViewAs.CANCELSAVE);
     }
 
     public void setTask(final Project project, final TaskRunnable taskRunnable) {
@@ -165,5 +178,24 @@ public class TaskEditController extends AbstractController {
     public TaskRunnable getTask() {
         tasksController.getModel();
         return currentTaskRunnable;
+    }
+
+    public ViewAs getViewAs() {
+        return viewAs;
+    }
+
+    public void setViewAs(ViewAs viewAs) {
+        if (btnClose!=null) {
+            if (viewAs == ViewAs.CLOSE) {
+                btnClose.setVisible(true);
+                btnCancel.setVisible(false);
+                btnSave.setVisible(false);
+            } else {
+                btnClose.setVisible(false);
+                btnCancel.setVisible(true);
+                btnSave.setVisible(true);
+            }
+        }
+        this.viewAs = viewAs;
     }
 }

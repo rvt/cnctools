@@ -633,6 +633,7 @@ public class CNCToolsController extends AbstractController {
 
         ScreensConfiguration.getInstance().registerBean(taskRunnable.getClassName());
         TaskEditController controller = dialog.getController();
+        controller.setViewAs(TaskEditController.ViewAs.CLOSE);
         controller.setTask(project, taskRunnable.copy());
         dialog.showAndWait();
     }

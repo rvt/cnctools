@@ -56,6 +56,7 @@
           <children>
             <Button id="btnClose" fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#onCancel" text="Cancel" />
             <Button id="bt_add" fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#onSave" text="Save" />
+            <Button id="bt_add" fx:id="btnClose" defaultButton="true" mnemonicParsing="false" onAction="#onClose" text="Close" />
           </children>
         </HBox>
         <AnchorPane fx:id="taskPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
