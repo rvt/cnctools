@@ -203,5 +203,20 @@ public class CNCToolsPostProcessConfig implements PostProcessorConfig {
         this.spaceBetweenWords.set(spaceBetweenWords);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CNCToolsPostProcessConfig)) return false;
 
+        CNCToolsPostProcessConfig that = (CNCToolsPostProcessConfig) o;
+
+        if (!name.get().equals(that.name.get())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

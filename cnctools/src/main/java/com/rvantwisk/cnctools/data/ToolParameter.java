@@ -187,4 +187,21 @@ public class ToolParameter {
     public DimensionProperty radialDepthProperty() {
         return radialDepth;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ToolParameter)) return false;
+
+        ToolParameter that = (ToolParameter) o;
+
+        if (!id.get().equals(that.id.get())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

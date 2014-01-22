@@ -94,6 +94,7 @@ public class SelectOrEditToolControl extends VBox {
         final FXMLDialog toolConfigurationsDialog= ScreensConfiguration.getInstance().toolConfigurationsDialog();
         ToolConfigurationsController tcc = toolConfigurationsDialog.getController();
         tcc.setMode(ToolConfigurationsController.Mode.SELECT);
+        tcc.setToolParameter(this.getTool());
         toolConfigurationsDialog.showAndWait();
         if (tcc.getReturned() != AbstractController.Result.DISMISS) {
             setTool(tcc.getTool());

@@ -137,6 +137,11 @@ public class PostProcessorsController extends AbstractController {
 
     public void setPostProcessConfig(CNCToolsPostProcessConfig postProcessConfig) {
         this.postProcessConfig = postProcessConfig;
+        if (v_postprocessorList!=null) {
+            int index = projectModel.postProcessorsProperty().indexOf(postProcessConfig);
+            v_postprocessorList.getSelectionModel().select(index);
+        }
+
     }
 
     @FXML
@@ -187,6 +192,9 @@ public class PostProcessorsController extends AbstractController {
                 return cell;
             }
         });
+
+        int index = projectModel.postProcessorsProperty().indexOf(postProcessConfig);
+        v_postprocessorList.getSelectionModel().select(index);
     }
 
     public void setMode(Mode mode) {

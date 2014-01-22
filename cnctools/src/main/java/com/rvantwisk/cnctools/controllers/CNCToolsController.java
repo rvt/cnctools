@@ -474,7 +474,6 @@ public class CNCToolsController extends AbstractController {
                     tbl_millTasks.setItems(newValue.millTasksProperty());
                     descriptionValue.textProperty().bindBidirectional(newValue.descriptionProperty());
                 }
-
             }
         });
 
@@ -559,13 +558,14 @@ public class CNCToolsController extends AbstractController {
     public void onSelectPostprocessor(ActionEvent actionEvent) {
         try {
             if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+                Project project = v_projectList.getSelectionModel().getSelectedItem();
                 final FXMLDialog dialog = screens.postProcessorsDialog();
                 PostProcessorsController controller = dialog.getController();
                 controller.setMode(PostProcessorsController.Mode.SELECT);
+                controller.setPostProcessConfig(project.getPostProcessor());
                 dialog.showAndWait();
                 if (controller.getReturned() == Result.USE) {
-                    Project P = v_projectList.getSelectionModel().getSelectedItem();
-                    P.setPostProcessor(ProjectModel.<CNCToolsPostProcessConfig>deepCopy(controller.getPostProcessConfig()));
+                    project.setPostProcessor(ProjectModel.<CNCToolsPostProcessConfig>deepCopy(controller.getPostProcessConfig()));
                 }
             }
         } catch (Exception e) {

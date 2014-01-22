@@ -38,12 +38,11 @@
 
 package com.rvantwisk.cnctools.controllers;
 
-import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.controls.ToolParametersControl;
 import com.rvantwisk.cnctools.data.StockToolParameter;
 import com.rvantwisk.cnctools.data.ToolParameter;
+import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.misc.Factory;
-import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -58,7 +57,6 @@ import javafx.util.Callback;
 import jfxtras.labs.dialogs.MonologFX;
 import jfxtras.labs.dialogs.MonologFXButton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -75,9 +73,13 @@ public class ToolConfigurationsController extends AbstractController {
     private Mode mode;
 
 
-
     public Mode getMode() {
         return mode;
+    }
+
+    public void setToolParameter(ToolParameter toolParameter) {
+        final int index = toolDBManager.getToolDB().indexOf(toolParameter);
+        v_toolsList.getSelectionModel().select(index);
     }
 
     public enum Mode {
@@ -205,6 +207,8 @@ public class ToolConfigurationsController extends AbstractController {
                 return cell;
             }
         });
+
+
     }
 
     public StringProperty closeButtonTextProperty() {
