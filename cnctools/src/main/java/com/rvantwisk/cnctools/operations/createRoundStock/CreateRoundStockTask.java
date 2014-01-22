@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,25 +36,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
+package com.rvantwisk.cnctools.operations.createRoundStock;
+
+import com.rvantwisk.cnctools.data.AbstractTask;
+import com.rvantwisk.cnctools.data.interfaces.Task;
 
 /**
- * T
+ * Created by rvt on 1/22/14.
  */
-public class TaskTemplate extends AbstractTask {
-
-
-    public TaskTemplate(String name, String description, String className, String fxmlFileName) {
-        super(name, description, className, fxmlFileName);
-    }
-
-    public TaskTemplate() {
-        super();
-    }
-
-    @Override
-    public AbstractTask copy() {
-        Task t = new Task(this.getName(), this.getDescription(), this.classNameProperty().get(), this.fxmlFileNameProperty().get());
-        return t;
+@Task
+public class CreateRoundStockTask extends AbstractTask {
+    public CreateRoundStockTask() {
+        super("Create round stock", "Take's from a square material round stock on your indexer.", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
     }
 }

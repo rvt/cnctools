@@ -55,7 +55,7 @@ public class Project {
 
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty description = new SimpleStringProperty();
-    private final ObservableList<Task> milltasks = FXCollections.observableArrayList();
+    private final ObservableList<TaskRunnable> milltasks = FXCollections.observableArrayList();
     private  ObjectProperty<CNCToolsPostProcessConfig> postProcessor = new SimpleObjectProperty<>();
 
     public Project() {
@@ -81,7 +81,7 @@ public class Project {
                 ", has Operations='" + milltasks.size() + '\'' +
                 '}';
     }
-    public ObservableList<Task> millTasksProperty() {
+    public ObservableList<TaskRunnable> millTasksProperty() {
         return milltasks;
     }
 
@@ -129,7 +129,7 @@ public class Project {
         gCodeGenerator.setOutput(printStream);
 
         gCodeGenerator.startProgram();
-        for (Task t : milltasks) {
+        for (TaskRunnable t : milltasks) {
             t.generateGCode(toolDBManager, gCodeGenerator);
         }
         gCodeGenerator.endProgram();

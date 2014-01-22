@@ -28,7 +28,7 @@
                 <AnchorPane id="anchorPane3" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                   <children>
                     <Label id="label4" fx:id="displayedIssueLabel" alignment="CENTER_LEFT" minWidth="-Infinity" prefHeight="40.0" prefWidth="258.0" text="PROJECT OPERATIONS:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="0.0" />
-                    <HBox id="HBox" alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="630.9998779296875" spacing="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
+                    <HBox id="HBox" alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="630.9998779296875" spacing="15.0" AnchorPane.rightAnchor="34.0" AnchorPane.topAnchor="0.0">
                       <children>
                         <Button fx:id="addMillTask" disable="true" onAction="#addMillTask" text="add" />
                         <Button fx:id="removeMilltask" onAction="#removeMillTask" text="Remove" />

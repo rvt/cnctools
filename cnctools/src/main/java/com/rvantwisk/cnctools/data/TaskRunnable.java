@@ -38,10 +38,14 @@
 
 package com.rvantwisk.cnctools.data;
 
+import com.rvantwisk.cnctools.data.interfaces.Copyable;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -51,12 +55,12 @@ import org.apache.commons.lang3.StringUtils;
  * Time: 2:05 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Task extends AbstractTask {
+public class TaskRunnable extends AbstractTask implements Copyable<TaskRunnable> {
 
     private BooleanProperty enabled = new SimpleBooleanProperty();
     private ObjectProperty<TaskModel> milltaskModel = new SimpleObjectProperty<TaskModel>();
 
-    public Task(String name, String description, String className, String fxmlFileName) {
+    public TaskRunnable(String name, String description, String className, String fxmlFileName) {
         super(name, description, className, fxmlFileName);
         this.enabled.set(Boolean.TRUE);
     }
@@ -96,12 +100,14 @@ public class Task extends AbstractTask {
     }
 
     @Override
-    public Task copy() {
-        Task t = new Task(this.getName(), this.getDescription(), this.classNameProperty().get(), this.fxmlFileNameProperty().get());
+    public TaskRunnable copy() {
+        TaskRunnable t = new TaskRunnable(this.getName(), this.getDescription(), this.getClassName(), this.getFxmlFileName());
         this.enabled.set(this.getEnabled());
         if (milltaskModel.get()!=null) {
             t.milltaskModel.set(milltaskModel.get().copy());
         }
         return t;
     }
+
+
 }

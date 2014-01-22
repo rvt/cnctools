@@ -39,7 +39,7 @@
 package com.rvantwisk.cnctools.controllers;
 
 import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.data.Task;
+import com.rvantwisk.cnctools.data.TaskRunnable;
 import com.rvantwisk.cnctools.data.interfaces.TaskModel;
 import com.rvantwisk.cnctools.misc.AbstractController;
 import com.rvantwisk.cnctools.operations.interfaces.MillTaskController;
@@ -68,7 +68,7 @@ import java.util.ResourceBundle;
 public class TaskEditController extends AbstractController {
 
     private MillTaskController tasksController;
-    private Task currentTask;
+    private TaskRunnable currentTaskRunnable;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -117,32 +117,32 @@ public class TaskEditController extends AbstractController {
         assert lbHeader != null : "fx:id=\"lbHeader\" was not injected: check your FXML file 'TaskEdit.fxml'.";
     }
 
-    public void setTask(final Project project, final Task task) {
-        currentTask = task;
-        tasksController = (MillTaskController) applicationContext.getBean(task.getClassName());
+    public void setTask(final Project project, final TaskRunnable taskRunnable) {
+        currentTaskRunnable = taskRunnable;
+        tasksController = (MillTaskController) applicationContext.getBean(taskRunnable.getClassName());
 
         // Ensure we supply a non-null model to the operation
-        if (task.getMilltaskModel()==null) {
+        if (taskRunnable.getMilltaskModel()==null) {
             TaskModel m = tasksController.createNewModel();
-            task.setMilltaskModel(m);
+            taskRunnable.setMilltaskModel(m);
             tasksController.setModel(m);
         } else {
-            tasksController.setModel(task.getMilltaskModel());
+            tasksController.setModel(taskRunnable.getMilltaskModel());
         }
         tasksController.setProject(project);
 
         // get the resource path of the main class for this MillTask
-        List<String> path = new ArrayList<>(Arrays.asList(task.getClassName().split("\\.")));
+        List<String> path = new ArrayList<>(Arrays.asList(taskRunnable.getClassName().split("\\.")));
         path.remove(path.size() - 1);
 
         // verify the fxml location
-        final String tpackage = StringUtils.join(path, "/") + "/" + task.getFxmlFileName();
+        final String tpackage = StringUtils.join(path, "/") + "/" + taskRunnable.getFxmlFileName();
         if (tpackage.contains("../") || tpackage.contains("http:") || tpackage.contains("https:")) {
-            throw new RuntimeException("Resource for ApplicapableMillTask with name [" + task.getName() + "] is invalid.");
+            throw new RuntimeException("Resource for ApplicapableMillTask with name [" + taskRunnable.getName() + "] is invalid.");
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(tasksController.getClass().getResource(task.getFxmlFileName()));
+            FXMLLoader loader = new FXMLLoader(tasksController.getClass().getResource(taskRunnable.getFxmlFileName()));
             loader.setControllerFactory(new Callback<Class<?>, Object>() {
                 @Override
                 public Object call(Class<?> aClass) {
@@ -150,7 +150,7 @@ public class TaskEditController extends AbstractController {
                 }
             });
 
-            lbHeader.setText(task.getName());
+            lbHeader.setText(taskRunnable.getName());
             AnchorPane aPane = (AnchorPane) loader.load();
             taskPane.getChildren().add(aPane);
             taskPane.setBottomAnchor(aPane, 0.0);
@@ -162,8 +162,8 @@ public class TaskEditController extends AbstractController {
         }
     }
 
-    public Task getTask() {
+    public TaskRunnable getTask() {
         tasksController.getModel();
-        return currentTask;
+        return currentTaskRunnable;
     }
 }

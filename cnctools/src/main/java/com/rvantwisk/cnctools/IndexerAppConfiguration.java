@@ -38,21 +38,28 @@
 
 package com.rvantwisk.cnctools;
 
-import com.rvantwisk.cnctools.data.TaskTemplate;
+import com.rvantwisk.cnctools.data.AbstractTask;
+import com.rvantwisk.cnctools.data.interfaces.Task;
 import com.rvantwisk.cnctools.misc.ProjectModel;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.context.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Lazy
 @Configuration
 @Import(ScreensConfiguration.class)
-public class IndexerAppConfiguration {
+@ComponentScan("com.rvantwisk.cnctools")
+public class IndexerAppConfiguration implements BeanDefinitionRegistryPostProcessor {
+
+    private final List<AbstractTask> allOperations = new ArrayList<>();
 
     @Bean
     public ProjectModel projectModel()  {
@@ -66,13 +73,24 @@ public class IndexerAppConfiguration {
     }
 
     @Bean(name="applicapableMillTasks")
-    public List<TaskTemplate> applicapableMillTasks() {
-        List<TaskTemplate> allOperations = new ArrayList<>();
-
-        //THis is currently hard coded, but needs to move into a register base
-        allOperations.add(new TaskTemplate("Create round stock", "Take's from a square material round stock on your indexer.", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml"));
-        allOperations.add(new TaskTemplate("Custom G-Code", "Let's you create your own G-Code.", "com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController", "CustomGCode.fxml"));
-        allOperations.add(new TaskTemplate("Facing/Pocketing", "Create simple facing or pocket operations", "com.rvantwisk.cnctools.operations.facing.FacingController", "Facing.fxml"));
+    public List<AbstractTask> applicapableMillTasks() {
         return allOperations;
+    }
+
+    @Override
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        Map<String, Object> beansWithAnnotation = beanFactory.getBeansWithAnnotation(Task.class);
+        Collection operations = beansWithAnnotation.values();
+        System.out.println("Registering the following operations:");
+        for (Object operation : operations) {
+            AbstractTask op = (AbstractTask) operation;
+            allOperations.add(op);
+            System.out.println(op.getName());
+        }
+        System.out.println("- done");
     }
 }

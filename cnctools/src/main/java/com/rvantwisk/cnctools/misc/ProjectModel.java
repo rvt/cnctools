@@ -146,12 +146,12 @@ public class ProjectModel {
         xStream.alias("OListWrapper", ObservableListWrapper.class);
 
         // Program properties aliases
-        xStream.alias("Task", Task.class);
+        xStream.alias("Task", TaskRunnable.class);
         xStream.alias("Project", Project.class);
         xStream.alias("StockToolParameter", StockToolParameter.class);
         xStream.alias("EndMill", EndMill.class);
         xStream.alias("BallMill", BallMill.class);
-        xStream.alias("AvailableTask", TaskTemplate.class);
+        xStream.alias("AvailableTask", AbstractTask.class);
         xStream.alias("ToolParameter", ToolParameter.class);
 
         String contents = "<tag>my data conents</tag>";

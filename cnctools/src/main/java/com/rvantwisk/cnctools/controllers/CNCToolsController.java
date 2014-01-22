@@ -109,7 +109,7 @@ public class CNCToolsController extends AbstractController {
     @FXML
     ListView<Project> v_projectList;
     @FXML
-    TableColumn<Task, Boolean> milltaskEnabled;
+    TableColumn<TaskRunnable, Boolean> milltaskEnabled;
     @FXML
     Button addMillTask;
     @FXML
@@ -272,17 +272,17 @@ public class CNCToolsController extends AbstractController {
     public void editMillTask(ActionEvent event) throws Exception {
         try {
             final Project project = v_projectList.getSelectionModel().selectedItemProperty().get();
-            Task task = (Task) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
-            screens.registerBean(task.getClassName());
+            TaskRunnable taskRunnable = (TaskRunnable) tbl_millTasks.getSelectionModel().selectedItemProperty().get();
+            screens.registerBean(taskRunnable.getClassName());
             FXMLDialog dialog = screens.taskEditDialog();
             TaskEditController controller = dialog.getController();
-            controller.setTask(project, task.copy());
+            controller.setTask(project, taskRunnable.copy());
             dialog.showAndWait();
             if (controller.getReturned() == Result.SAVE) {
                 int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
-                Task modified = controller.getTask();
+                TaskRunnable modified = controller.getTask();
                 project.millTasksProperty().add(index, modified);
-                project.millTasksProperty().remove(tbl_millTasks.getItems().indexOf(task));
+                project.millTasksProperty().remove(tbl_millTasks.getItems().indexOf(taskRunnable));
                 tbl_millTasks.getSelectionModel().select(modified);
             }
         } catch (Exception e) {
@@ -294,14 +294,14 @@ public class CNCToolsController extends AbstractController {
     private void addProjectDefaults() {
         Project p = new Project("Round stock 30mm", "Creates a round stock of 100mx30mm. Feedrate 2400");
         projectModel.addProject(p);
-        Task mt = new Task("Make Round", "Make square stock round (invalid milltask)", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
+        TaskRunnable mt = new TaskRunnable("Make Round", "Make square stock round (invalid milltask)", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
 
         ToolParameter nt = Factory.newTool();
         nt.setName("6MM end Mill");
         mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
-        mt = new Task("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
+        mt = new TaskRunnable("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
         nt = Factory.newTool();
         nt.setName("8MM end Mill");
         nt.radialDepthProperty().set(DimensionProperty.DimMM(4.0));
@@ -312,7 +312,7 @@ public class CNCToolsController extends AbstractController {
 
 
         p = new Project("Facing 30mmx30mm", "Facing of wood. Feedrate 2400");
-        mt = new Task("Make Round Form Square", "Make feed edge", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
+        mt = new TaskRunnable("Make Round Form Square", "Make feed edge", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
         nt = Factory.newTool();
         nt.setName("10mm end Mill");
         nt.radialDepthProperty().set(DimensionProperty.DimMM(5.0));
@@ -478,9 +478,9 @@ public class CNCToolsController extends AbstractController {
         });
 
         // Enable/Disable up/Down arrows
-        tbl_millTasks.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Task>() {
+        tbl_millTasks.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TaskRunnable>() {
             @Override
-            public void changed(ObservableValue <? extends Task> observable, Task o, Task o2) {
+            public void changed(ObservableValue <? extends TaskRunnable> observable, TaskRunnable o, TaskRunnable o2) {
                 if (o2!=null) {
                     final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
                     btnMoveTaskUp.setDisable(index==0?true:false);
@@ -515,16 +515,17 @@ public class CNCToolsController extends AbstractController {
         });
 
         // checkbox renderer for milltasks
-        milltaskEnabled.setCellFactory(new Callback<TableColumn<Task, Boolean>, TableCell<Task, Boolean>>() {
+        milltaskEnabled.setCellFactory(new Callback<TableColumn<TaskRunnable, Boolean>, TableCell<TaskRunnable, Boolean>>() {
             @Override
-            public TableCell<Task, Boolean> call(TableColumn<Task, Boolean> p) {
-                CheckBoxTableCell<Task, Boolean> cell = new CheckBoxTableCell<>();
+            public TableCell<TaskRunnable, Boolean> call(TableColumn<TaskRunnable, Boolean> p) {
+                CheckBoxTableCell<TaskRunnable, Boolean> cell = new CheckBoxTableCell<>();
                 cell.setEditable(true);
                 cell.setAlignment(Pos.CENTER);
                 return cell;
             }
         });
         tbl_millTasks.setEditable(true);
+
 
 
         // Save DB on exit
@@ -627,12 +628,12 @@ public class CNCToolsController extends AbstractController {
         model.setgCodeFile(fName);
         model.setReferencedFile(true);
 
-        Task task = new Task("G-Code", "", CustomGCodeController.class.getName(), "CustomGCode.fxml");
-        task.setMilltaskModel(model);
+        TaskRunnable taskRunnable = new TaskRunnable("G-Code", "", CustomGCodeController.class.getName(), "CustomGCode.fxml");
+        taskRunnable.setMilltaskModel(model);
 
-        ScreensConfiguration.getInstance().registerBean(task.getClassName());
+        ScreensConfiguration.getInstance().registerBean(taskRunnable.getClassName());
         TaskEditController controller = dialog.getController();
-        controller.setTask(project, task.copy());
+        controller.setTask(project, taskRunnable.copy());
         dialog.showAndWait();
     }
 
@@ -663,14 +664,14 @@ public class CNCToolsController extends AbstractController {
         final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
         final int index = tbl_millTasks.getSelectionModel().getSelectedIndex()-1;
 
-        final Task t1 = p.millTasksProperty().get(index);
-        final Task t2 = p.millTasksProperty().get(index+1);
+        final TaskRunnable t1 = p.millTasksProperty().get(index);
+        final TaskRunnable t2 = p.millTasksProperty().get(index+1);
 
         p.millTasksProperty().remove(index);
         p.millTasksProperty().remove(index);
 
         p.millTasksProperty().add(index, t2);
-        p.millTasksProperty().add(index+1, t1);
+        p.millTasksProperty().add(index + 1, t1);
     }
 
     @FXML
@@ -678,8 +679,8 @@ public class CNCToolsController extends AbstractController {
         final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
         final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
 
-        final Task t1 = p.millTasksProperty().get(index);
-        final Task t2 = p.millTasksProperty().get(index+1);
+        final TaskRunnable t1 = p.millTasksProperty().get(index);
+        final TaskRunnable t2 = p.millTasksProperty().get(index+1);
 
         p.millTasksProperty().remove(index);
         p.millTasksProperty().remove(index);

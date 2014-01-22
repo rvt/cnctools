@@ -38,9 +38,9 @@
 
 package com.rvantwisk.cnctools.controllers;
 
+import com.rvantwisk.cnctools.data.AbstractTask;
 import com.rvantwisk.cnctools.data.Project;
-import com.rvantwisk.cnctools.data.Task;
-import com.rvantwisk.cnctools.data.TaskTemplate;
+import com.rvantwisk.cnctools.data.TaskRunnable;
 import com.rvantwisk.cnctools.misc.AbstractController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -60,7 +60,7 @@ import java.util.List;
 public class AddMillTaskController extends AbstractController {
 
     @Resource(name = "applicapableMillTasks")
-    private List<TaskTemplate> applicapableMillTasks;
+    private List<AbstractTask> applicapableMillTasks;
 
     @FXML TableView tbl_assignedMillTasks;
     @FXML TextField tv_taskName;
@@ -83,8 +83,8 @@ public class AddMillTaskController extends AbstractController {
     @FXML
     public void add() {
         if (tbl_assignedMillTasks.getSelectionModel().selectedItemProperty().get()!=null) {
-            TaskTemplate mt = (TaskTemplate)tbl_assignedMillTasks.getSelectionModel().getSelectedItem();
-            currentProject.millTasksProperty().add(new Task(tv_taskName.getText(), mt.getDescription(), mt.getClassName(), mt.getFxmlFileName()));
+            AbstractTask mt = (AbstractTask)tbl_assignedMillTasks.getSelectionModel().getSelectedItem();
+            currentProject.millTasksProperty().add(new TaskRunnable(tv_taskName.getText(), mt.getDescription(), mt.getClassName(), mt.getFxmlFileName()));
             getDialog().close();
         }
     }

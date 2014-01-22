@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,51 +36,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.cnctools.data;
+package com.rvantwisk.cnctools.operations.customgcode;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.rvantwisk.cnctools.data.AbstractTask;
+import com.rvantwisk.cnctools.data.interfaces.Task;
 
 /**
- * Created with IntelliJ IDEA.
- * User: rvt
- * Date: 10/27/13
- * Time: 4:38 PM
- * To change this template use File | Settings | File Templates.
+ * Created by rvt on 1/22/14.
  */
+@Task
+public class CustomGCodeTask  extends AbstractTask {
 
-public abstract class AbstractTask {
-
-    private StringProperty name = new SimpleStringProperty();
-    private StringProperty description = new SimpleStringProperty();
-    private StringProperty className = new SimpleStringProperty();
-    private StringProperty fxmlFileName = new SimpleStringProperty();
-
-
-    public AbstractTask() {
+    public CustomGCodeTask() {
+        super("Custom G-Code", "Let's you create your own G-Code.", "com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController", "CustomGCode.fxml");
     }
-
-    public AbstractTask(String name, String description, String className, String fxmlFileName) {
-        this.name.set(name);
-        this.description.set(description);
-        this.className.set(className);
-        this.fxmlFileName.set(fxmlFileName);
-    }
-
-    public String getName() {
-        return name.get();
-    }
-
-    public String getDescription() {
-        return description.get();
-    }
-
-    public String getClassName() {
-        return className.get();
-    }
-
-    public String getFxmlFileName() {
-        return fxmlFileName.get();
-    }
-
 }
