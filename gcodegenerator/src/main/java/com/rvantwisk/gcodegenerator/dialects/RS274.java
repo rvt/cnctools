@@ -39,12 +39,12 @@
 package com.rvantwisk.gcodegenerator.dialects;
 
 import com.rvantwisk.gcodegenerator.GCodeBuilder;
+import com.rvantwisk.gcodegenerator.GCodeCollection;
 import com.rvantwisk.gcodegenerator.GCodeWord;
 import com.rvantwisk.gcodegenerator.interfaces.GCodeGenerator;
 import com.rvantwisk.gcodegenerator.interfaces.PostProcessorConfig;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,20 +57,14 @@ public class RS274 implements GCodeGenerator {
     private static final String SPACE = " ";
     private static final String separator = System.getProperty("line.separator");
 
-    private PrintStream out;
+    private final GCodeCollection generatedGCode = new GCodeCollection();
     private final PostProcessorConfig postProcessorConfig;
-
     private boolean addSpaceBetweenWords = true;
+    private StringBuilder out = null;
 
     public RS274(PostProcessorConfig pc) {
         postProcessorConfig = pc;
         rebuildSetup();
-    }
-
-    @Override
-    public void setOutput(final PrintStream out) {
-        this.out = out;
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -82,6 +76,17 @@ public class RS274 implements GCodeGenerator {
         out.append("(").append(StringUtils.rightPad("---", 50, "-")).append(")").append(separator);
         out.append("(").append(comment.trim()).append(")").append(separator);
         out.append("(").append(StringUtils.rightPad("---", 50, "-")).append(")").append(separator);
+    }
+
+    @Override
+    public void newSet(final String id) {
+        out = new StringBuilder();
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(out, id));
+    }
+
+    @Override
+    public  GCodeCollection getGCode() {
+        return generatedGCode.deepCopy();
     }
 
     public void addBlock(final GCodeBuilder gCodeBuilder) {
@@ -216,12 +221,12 @@ public class RS274 implements GCodeGenerator {
 
     @Override
     public void startProgram() {
-        out.append(postProcessorConfig.getPreamble().trim()).append(separator);
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPreamble()).append(separator), "preamble"));
     }
 
     @Override
     public void endProgram() {
-        out.append(postProcessorConfig.getPostamble().trim()).append(separator);
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPostamble()).append(separator), "postamble"));
     }
 
     public <T extends PostProcessorConfig> T getPostProcessorConfig() {

@@ -39,8 +39,7 @@
 package com.rvantwisk.gcodegenerator.interfaces;
 
 import com.rvantwisk.gcodegenerator.GCodeBuilder;
-
-import java.io.PrintStream;
+import com.rvantwisk.gcodegenerator.GCodeCollection;
 
 public interface GCodeGenerator {
 
@@ -59,11 +58,17 @@ public interface GCodeGenerator {
     public void commentLarge(final String comment);
 
     /**
-     * Provide a output to write into
+     * Start a new G-Code session
      *
-     * @param out
      */
-    public void setOutput(final PrintStream out);
+    public void newSet(final String id);
+
+    /**
+     * Receive a deep copy of the current dataset, this will include the postamble
+     *
+     * @return
+     */
+    public GCodeCollection getGCode();
 
     /**
      * Add a new GCode block

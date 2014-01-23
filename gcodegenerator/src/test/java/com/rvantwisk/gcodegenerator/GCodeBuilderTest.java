@@ -40,11 +40,10 @@ package com.rvantwisk.gcodegenerator;
 
 import com.rvantwisk.gcodegenerator.dialects.RS274;
 import com.rvantwisk.gcodegenerator.dialects.RS274PostProcessorConfig;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -54,31 +53,17 @@ import static org.junit.Assert.assertTrue;
 public class GCodeBuilderTest {
     private static String SEPARATOR = System.getProperty("line.separator");
 
-
     RS274 generator;
-    ByteArrayOutputStream os;
     RS274PostProcessorConfig ppc;
 
     @Before
     public void newGenerator() {
         ppc = new RS274PostProcessorConfig();
-
         generator = new RS274(ppc);
-        os = new ByteArrayOutputStream();
-        generator.setOutput(new PrintStream(os));
     }
 
-    private String asString(final InputStream input) throws IOException {
-        StringBuffer sb = new StringBuffer(10);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                if (!StringUtils.isEmpty(line)) {
-                    sb.append(line).append(SEPARATOR);
-                }
-            }
-        }
-        return sb.toString().trim();
+    private String asString() throws IOException {
+        return "";
     }
 
     @Test
@@ -87,7 +72,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().M6(2));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("M6 T2"));
     }
 
@@ -97,7 +82,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().G0().A(123.456));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G0 A123.456"));
     }
 
@@ -107,7 +92,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().G1().A(123.456123).F(123.4));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G1 A123.4561 F123.400"));
     }
 
@@ -118,7 +103,7 @@ public class GCodeBuilderTest {
         generator.startProgram();
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("F100 G0" + SEPARATOR + "M30"));
     }
 
@@ -135,7 +120,7 @@ public class GCodeBuilderTest {
         generator.comment("Nearly there!");
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("(start)" + SEPARATOR +
                 "G0 X0 Y0 Z0 A0" + SEPARATOR +
                 "G1 X10 F100.000" + SEPARATOR +
@@ -152,7 +137,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().G4(10.0));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G4 P10"));
     }
 
@@ -162,7 +147,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().word("G12", 12.12345678));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G12/12.123"));
     }
 
@@ -172,7 +157,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().word("F", 12.987654321).comment("Set feedrate"));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("F12.988; Set feedrate"));
     }
 
@@ -184,7 +169,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().G0().A(10.12));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G0 AXIS_A10.12"));
     }
 
@@ -196,7 +181,7 @@ public class GCodeBuilderTest {
         generator.addBlock(GCodeBuilder.builder().G0().A(10.12345678).X(10.12345678));
         generator.endProgram();
 
-        String out = asString(new ByteArrayInputStream(os.toByteArray()));
+        String out = asString();
         assertTrue(out.equals("G0 X10.1235 A10.123457"));
     }
 
