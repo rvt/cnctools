@@ -138,7 +138,7 @@ public class Test {
             };
 
             File file = new File("/tmp/flowmold101.txt");
-            GCodeParser parser = new GCodeParser(null, new BufferedInputStream(new FileInputStream(file)), machineController);
+            GCodeParser parser = new GCodeParser(null, new StringBuilder(), machineController);
 
             br.flush();
             br.close();
@@ -229,7 +229,7 @@ public class Test {
             };
 
             File file = new File("/Volumes/bottle.tap");
-            GCodeParser parser = new GCodeParser(null, new BufferedInputStream(new FileInputStream(file)), machineController);
+            GCodeParser parser = new GCodeParser(null, new StringBuilder(), machineController);
 
             br.flush();
             br.close();

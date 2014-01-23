@@ -39,14 +39,9 @@
 package com.rvantwisk.gcodeparser;
 
 import com.rvantwisk.gcodeparser.exceptions.SimException;
-import com.rvantwisk.gcodeparser.exceptions.SimParsingException;
 import com.rvantwisk.gcodeparser.exceptions.SimValidationException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -71,20 +66,19 @@ import java.util.regex.Pattern;
  * TODO: Change in such a way that the capabilities can easily be extended.
  */
 public class GCodeParser {
-
+    private static String SEPARATOR = System.getProperty("line.separator");
     private final MachineStatus machineStatus = new MachineStatus();        // kept's track of machine status after end of block
     private final MachineStatus intermediateStatus = new MachineStatus();   // Keeps tracking of machine status during block processing
     private final MachineController machineController[];                      // A machine controller to send parsed block's + machine status into
-    private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
     private final AbstractMachineValidator machineValidator;                      // A machine controller to send parsed block's + machine status into
     private final Pattern GCODEPATTERN = Pattern.compile("([GXYZABCDFHIJKLMNPQRSTUVW]o?)\\s*([0-9.+-]+)?(\\s*/?\\s*)([0-9.+-]+)?");
     private final Pattern COMMENTS1 = Pattern.compile("\\(.*\\)"); // Comment between ()
     private final Pattern COMMENTS2 = Pattern.compile("\\;.*"); // comment after ;
-
+    private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
     private String currentLine = ""; // Hold's the current line between begin and endblock calls
-    private int currentLineNumber=1;
+    private int currentLineNumber = 1;
 
-    public GCodeParser(final AbstractMachineValidator machineValidator, final InputStream input, final MachineController ... machineController) throws SimException {
+    public GCodeParser(final AbstractMachineValidator machineValidator, final StringBuilder input, final MachineController... machineController) throws SimException {
         for (Object c : machineController) {
             if (!(c instanceof MachineController)) {
                 throw new IllegalArgumentException("StatisticLimitsController only accepts type's of MachineController");
@@ -94,25 +88,16 @@ public class GCodeParser {
         this.machineController = machineController;
         this.machineValidator = machineValidator;
         Charset charset = Charset.forName("UTF-8");
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                currentLine = line;
-                parseLine();
-                currentLineNumber++;
-            }
-            for (MachineController controller : this.machineController) {
-                controller.end(this, intermediateStatus);
-            }
+        String[] lines = input.toString().split(SEPARATOR);
+        for (final String line : lines) {
+            currentLine = line;
+            parseLine();
+            currentLineNumber++;
+        }
+        for (MachineController controller : this.machineController) {
+            controller.end(this, intermediateStatus);
+        }
 
-        } catch (IOException x) {
-            throw new SimParsingException("Unable to read stream", x);
-        }
-        try {
-            input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void parseLine() throws SimException {
