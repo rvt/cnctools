@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, R. van Twisk
+ * Copyright (c) 2014, R. van Twisk
  * All rights reserved.
  * Licensed under the The BSD 3-Clause License;
  * you may not use this file except in compliance with the License.
@@ -36,73 +36,25 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rvantwisk.gcodegenerator.interfaces;
+package com.rvantwisk.cnctools.data;
 
-import com.rvantwisk.gcodegenerator.GCodeBuilder;
-import com.rvantwisk.gcodegenerator.GCodeCollection;
+/**
+ * Created by rvt on 1/23/14.
+ */
+public class GeneratedCode {
+    private final StringBuilder gCode;
+    private final ToolParameter toolParameter;
 
-public interface GCodeGenerator {
+    public GeneratedCode(StringBuilder gCode, ToolParameter toolParameter) {
+        this.gCode = gCode;
+        this.toolParameter = toolParameter;
+    }
 
-    /**
-     * Add a small comtent on the next line
-     *
-     * @param comment
-     */
-    public void comment(final String comment);
+    public StringBuilder getgCode() {
+        return gCode;
+    }
 
-    /**
-     * Add a large comment on the next line(s)
-     *
-     * @param comment
-     */
-    public void commentLarge(final String comment);
-
-    /**
-     * Start a new G-Code session
-     *
-     */
-    public void newSet(final boolean mergable, final String id, final String toolId);
-
-    /**
-     * Receive a deep copy of the current dataset, this will include the postamble
-     *
-     * @return
-     */
-    public GCodeCollection getGCode();
-
-    /**
-     * Add a new GCode block
-     *
-     * @param GCodeBuilder
-     */
-    public void addBlock(final GCodeBuilder GCodeBuilder);
-
-    /**
-     * Add raw gcode, be carefull using raw code, not all dialect's might support what you are trying to accomplish
-     *
-     * @param s
-     */
-    void addRaw(String s);
-
-    /**
-     * Add the start (preamble) of the GCode to the start of a program
-     * Execute this before any G-Code get's added
-     */
-    void startProgram();
-
-    /**
-     * Add the end (postabmle) to the end of the program
-     * Execute this after all G-Code has been added, no G-Code can be added after endProgram is called
-     */
-    void endProgram();
-
-    /**
-     * Return the associated post processor configuration
-     *
-     * @param <T>
-     * @return
-     */
-    public <T extends PostProcessorConfig> T getPostProcessorConfig();
-
-
+    public ToolParameter getToolParameter() {
+        return toolParameter;
+    }
 }

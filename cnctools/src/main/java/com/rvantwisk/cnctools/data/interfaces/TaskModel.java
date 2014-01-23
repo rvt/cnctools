@@ -51,5 +51,5 @@ import com.rvantwisk.cnctools.misc.ToolDBManager;
 
 public interface TaskModel extends Copyable<TaskModel> {
 
-    void generateGCode(final ToolDBManager toolDBManager, final CncToolsGCodegenerator gCodeGenerator);
+    void generateGCode(final ToolDBManager toolDBManager, final CncToolsGCodegenerator gCodeGenerator, final String taskId);
 }

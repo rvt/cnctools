@@ -79,9 +79,9 @@ public class RS274 implements GCodeGenerator {
     }
 
     @Override
-    public void newSet(final String id) {
+    public void newSet(final boolean mergable, final String id, final String toolId) {
         out = new StringBuilder();
-        generatedGCode.add(new GCodeCollection.GeneratedGCode(out, id));
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(out, mergable, id, toolId));
     }
 
     @Override
@@ -221,12 +221,12 @@ public class RS274 implements GCodeGenerator {
 
     @Override
     public void startProgram() {
-        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPreamble()).append(separator), "preamble"));
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPreamble()).append(separator), true, "preamble", null));
     }
 
     @Override
     public void endProgram() {
-        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPostamble()).append(separator), "postamble"));
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPostamble()).append(separator), true, "postamble", null));
     }
 
     public <T extends PostProcessorConfig> T getPostProcessorConfig() {

@@ -43,9 +43,10 @@ import com.rvantwisk.cnctools.data.*;
 import com.rvantwisk.cnctools.data.tools.BallMill;
 import com.rvantwisk.cnctools.data.tools.EndMill;
 import com.rvantwisk.cnctools.misc.*;
-import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockTaskModel;
+import com.rvantwisk.cnctools.operations.createRoundStock.RoundStockModel;
 import com.rvantwisk.cnctools.operations.customgcode.CustomGCodeController;
 import com.rvantwisk.cnctools.operations.customgcode.GCodeTaskModel;
+import com.rvantwisk.gcodegenerator.GCodeCollection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -87,21 +88,6 @@ import java.util.ResourceBundle;
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class CNCToolsController extends AbstractController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private ProjectModel projectModel;
-
-    @Autowired
-    private ToolDBManager toolDBManager;
-
-    @FXML
-    private ResourceBundle resources;
-    @FXML
-    private URL location;
-    @FXML
-    private AnchorPane details;
-    @FXML
-    private Label displayedIssueLabel;
     @FXML
     TextArea descriptionValue;
     @FXML
@@ -124,18 +110,51 @@ public class CNCToolsController extends AbstractController {
     Button btnView;
     @FXML
     Button btnPostProcessor;
+    BeanPathAdapter<Project> currentProjectBinding;
+    @Autowired
+    private ProjectModel projectModel;
+    @Autowired
+    private ToolDBManager toolDBManager;
+    @FXML
+    private ResourceBundle resources;
+    @FXML
+    private URL location;
+    @FXML
+    private AnchorPane details;
+    @FXML
+    private Label displayedIssueLabel;
     @FXML
     private Button btnMoveTaskDown;
     @FXML
     private Button btnMoveTaskUp;
-
-    BeanPathAdapter<Project> currentProjectBinding;
-
     private ScreensConfiguration screens;
 
 
     public CNCToolsController(ScreensConfiguration screens) {
         this.screens = screens;
+    }
+
+    /**
+     * Show's a dialog's with gcode from file
+     *
+     * @param project
+     * @param fName
+     */
+    public static void showGCodeFromFile(final Project project, final String fName) {
+        FXMLDialog dialog = ScreensConfiguration.getInstance().taskEditDialog();
+
+        GCodeTaskModel model = new GCodeTaskModel();
+        model.setgCodeFile(fName);
+        model.setReferencedFile(true);
+
+        TaskRunnable taskRunnable = new TaskRunnable("G-Code", "", CustomGCodeController.class.getName(), "CustomGCode.fxml");
+        taskRunnable.setMilltaskModel(model);
+
+        ScreensConfiguration.getInstance().registerBean(taskRunnable.getClassName());
+        TaskEditController controller = dialog.getController();
+        controller.setViewAs(TaskEditController.ViewAs.CLOSE);
+        controller.setTask(project, taskRunnable.copy());
+        dialog.showAndWait();
     }
 
     @FXML
@@ -178,19 +197,19 @@ public class CNCToolsController extends AbstractController {
                     dialog.show();
                 } else {
 
-                    final StringBuilder gCode = p.getGCode(toolDBManager);
+                    final GCodeCollection gCode = p.getGCode(toolDBManager);
 
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.getExtensionFilters().addAll(
                             new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
                     fileChooser.setTitle("Save GCode");
                     File file = fileChooser.showSaveDialog(null);
-                    file.delete();
                     if (file != null) {
+                        file.delete();
                         try (BufferedWriter br = Files.newBufferedWriter(file.toPath(),
                                 Charset.forName("UTF-8"),
                                 new OpenOption[]{StandardOpenOption.CREATE_NEW})) {
-                            br.write(gCode.toString());
+                            br.write(gCode.concate().toString());
                             br.write("\n");
 
                             br.flush();
@@ -206,7 +225,6 @@ public class CNCToolsController extends AbstractController {
             handleException(e);
         }
     }
-
 
     @FXML
     public void deleteProject(ActionEvent event) throws Exception {
@@ -290,7 +308,6 @@ public class CNCToolsController extends AbstractController {
         }
     }
 
-
     private void addProjectDefaults() {
         Project p = new Project("Round stock 30mm", "Creates a round stock of 100mx30mm. Feedrate 2400");
         projectModel.addProject(p);
@@ -298,7 +315,7 @@ public class CNCToolsController extends AbstractController {
 
         ToolParameter nt = Factory.newTool();
         nt.setName("6MM end Mill");
-        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
         mt = new TaskRunnable("Make Square", "Make round stock square", "com.rvantwisk.cnctools.operations.createRoundStock.CreateRoundStockController", "CreateRoundStock.fxml");
@@ -307,7 +324,7 @@ public class CNCToolsController extends AbstractController {
         nt.radialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(4.0));
         nt.setToolType(new EndMill(new DimensionProperty(8.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
 
 
@@ -318,7 +335,7 @@ public class CNCToolsController extends AbstractController {
         nt.radialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.axialDepthProperty().set(DimensionProperty.DimMM(5.0));
         nt.setToolType(new EndMill(new DimensionProperty(10.0, Dimensions.Dim.MM)));
-        mt.setMilltaskModel(new RoundStockTaskModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
+        mt.setMilltaskModel(new RoundStockModel(new SimpleStringProperty(""), DimensionProperty.DimMM(30.0), DimensionProperty.DimMM(20.0), DimensionProperty.DimMM(100.0)));
         p.millTasksProperty().add(mt);
         projectModel.addProject(p);
 
@@ -397,7 +414,6 @@ public class CNCToolsController extends AbstractController {
                 "G64 P0.001");
         projectModel.postProcessorsProperty().add(ppc);
     }
-
 
     @FXML
         // This method is called by the FXMLLoader when initialization is complete
@@ -480,11 +496,11 @@ public class CNCToolsController extends AbstractController {
         // Enable/Disable up/Down arrows
         tbl_millTasks.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TaskRunnable>() {
             @Override
-            public void changed(ObservableValue <? extends TaskRunnable> observable, TaskRunnable o, TaskRunnable o2) {
-                if (o2!=null) {
+            public void changed(ObservableValue<? extends TaskRunnable> observable, TaskRunnable o, TaskRunnable o2) {
+                if (o2 != null) {
                     final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
-                    btnMoveTaskUp.setDisable(index==0?true:false);
-                    btnMoveTaskDown.setDisable((index+1)==tbl_millTasks.getItems().size()?true:false);
+                    btnMoveTaskUp.setDisable(index == 0 ? true : false);
+                    btnMoveTaskDown.setDisable((index + 1) == tbl_millTasks.getItems().size() ? true : false);
                 } else {
                     btnMoveTaskUp.setDisable(true);
                     btnMoveTaskDown.setDisable(true);
@@ -527,7 +543,6 @@ public class CNCToolsController extends AbstractController {
         tbl_millTasks.setEditable(true);
 
 
-
         // Save DB on exit
         getDialog().setOnHidden(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
@@ -535,7 +550,6 @@ public class CNCToolsController extends AbstractController {
             }
         });
     }
-
 
     public void save(ActionEvent actionEvent) {
         try {
@@ -587,15 +601,15 @@ public class CNCToolsController extends AbstractController {
                     dialog.show();
                 } else {
 
-                    File file =  File.createTempFile("cnctools", "gcode");
-                    final StringBuilder gCode = p.getGCode(toolDBManager);
+                    File file = File.createTempFile("cnctools", "gcode");
+                    final GCodeCollection gCode = p.getGCode(toolDBManager);
                     file.createNewFile();
                     file.deleteOnExit();
                     if (file != null) {
                         try (BufferedWriter br = Files.newBufferedWriter(file.toPath(),
                                 Charset.forName("UTF-8"),
                                 new OpenOption[]{StandardOpenOption.WRITE})) {
-                            br.write(gCode.toString());
+                            br.write(gCode.concate().toString());
                             br.write("\n");
                             br.flush();
                             br.close();
@@ -614,28 +628,6 @@ public class CNCToolsController extends AbstractController {
         } catch (Exception e) {
             handleException(e);
         }
-    }
-
-    /**
-     * Show's a dialog's with gcode from file
-     * @param project
-     * @param fName
-     */
-    public static void showGCodeFromFile(final Project project, final String fName) {
-        FXMLDialog dialog = ScreensConfiguration.getInstance().taskEditDialog();
-
-        GCodeTaskModel model = new GCodeTaskModel();
-        model.setgCodeFile(fName);
-        model.setReferencedFile(true);
-
-        TaskRunnable taskRunnable = new TaskRunnable("G-Code", "", CustomGCodeController.class.getName(), "CustomGCode.fxml");
-        taskRunnable.setMilltaskModel(model);
-
-        ScreensConfiguration.getInstance().registerBean(taskRunnable.getClassName());
-        TaskEditController controller = dialog.getController();
-        controller.setViewAs(TaskEditController.ViewAs.CLOSE);
-        controller.setTask(project, taskRunnable.copy());
-        dialog.showAndWait();
     }
 
     /**
@@ -663,10 +655,10 @@ public class CNCToolsController extends AbstractController {
     @FXML
     void onMoveTaskUp(ActionEvent event) {
         final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
-        final int index = tbl_millTasks.getSelectionModel().getSelectedIndex()-1;
+        final int index = tbl_millTasks.getSelectionModel().getSelectedIndex() - 1;
 
         final TaskRunnable t1 = p.millTasksProperty().get(index);
-        final TaskRunnable t2 = p.millTasksProperty().get(index+1);
+        final TaskRunnable t2 = p.millTasksProperty().get(index + 1);
 
         p.millTasksProperty().remove(index);
         p.millTasksProperty().remove(index);
@@ -681,13 +673,13 @@ public class CNCToolsController extends AbstractController {
         final int index = tbl_millTasks.getSelectionModel().getSelectedIndex();
 
         final TaskRunnable t1 = p.millTasksProperty().get(index);
-        final TaskRunnable t2 = p.millTasksProperty().get(index+1);
+        final TaskRunnable t2 = p.millTasksProperty().get(index + 1);
 
         p.millTasksProperty().remove(index);
         p.millTasksProperty().remove(index);
 
         p.millTasksProperty().add(index, t2);
-        p.millTasksProperty().add(index+1, t1);
+        p.millTasksProperty().add(index + 1, t1);
     }
 }
 

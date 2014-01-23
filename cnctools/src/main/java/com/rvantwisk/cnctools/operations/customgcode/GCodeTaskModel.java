@@ -61,7 +61,9 @@ public class GCodeTaskModel implements TaskModel {
     private BooleanProperty referencedFile = new SimpleBooleanProperty(false);
 
     @Override
-    public void generateGCode(final ToolDBManager toolDBManager, CncToolsGCodegenerator gCodeGenerator) {
+    public void generateGCode(final ToolDBManager toolDBManager, CncToolsGCodegenerator gCodeGenerator, final String taskId) {
+
+        gCodeGenerator.newSet(false, taskId, null);
 
         // Load the file if it was referenced
         if (referencedFile.get() == true && !StringUtils.isEmpty(gCodeFile.get())) {
@@ -73,6 +75,7 @@ public class GCodeTaskModel implements TaskModel {
         } else {
             gCodeGenerator.addRaw(gcode.get());
         }
+
     }
 
     public Object readResolve() {

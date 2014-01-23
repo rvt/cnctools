@@ -69,17 +69,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
-
 @Component
 @Scope("prototype")
 public class CreateRoundStockController implements MillTaskController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private Project project;
-    private RoundStockTaskModel model;
+    private RoundStockModel model;
     @Autowired
     private ToolDBManager toolDBManager;
     @FXML
@@ -99,7 +94,7 @@ public class CreateRoundStockController implements MillTaskController {
 
     @Override
     public <T extends TaskModel> T createNewModel() {
-        return (T) new RoundStockTaskModel();
+        return (T) new RoundStockModel();
     }
 
     @Override
@@ -120,7 +115,7 @@ public class CreateRoundStockController implements MillTaskController {
 
     @Override
     public void setModel(TaskModel model) {
-        this.model = (RoundStockTaskModel) model;
+        this.model = (RoundStockModel) model;
     }
 
     private void formToModel() {
@@ -185,22 +180,17 @@ public class CreateRoundStockController implements MillTaskController {
                 ppc = Factory.newPostProcessor();
             }
 
-            final ByteArrayOutputStream os = new ByteArrayOutputStream();
-            final PrintStream printStream = new PrintStream(os);
-
             CncToolsRS274 gCodeGenerator = new CncToolsRS274(ppc);
-            gCodeGenerator.setOutput(printStream);
             gCodeGenerator.startProgram();
-            model.generateGCode(toolDBManager, gCodeGenerator);
-
-            InputStream in = new ByteArrayInputStream(os.toByteArray());
+            gCodeGenerator.newSet(true, "", null);
+            model.generateGCode(toolDBManager, gCodeGenerator, null);
+            gCodeGenerator.endProgram();
 
             GCodeActor machine = new GCodeActor("gcode");
             ArrowsActor arrows = new ArrowsActor("arrows");
             StatisticLimitsController stats = new StatisticLimitsController();
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(validator, in, stats, machine, arrows);
-            gCodeGenerator.endProgram();
+            GCodeParser parser = new GCodeParser(validator, gCodeGenerator.getGCode().concate(), stats, machine, arrows);
 
             gCodeViewerControl.addActor(arrows);
 

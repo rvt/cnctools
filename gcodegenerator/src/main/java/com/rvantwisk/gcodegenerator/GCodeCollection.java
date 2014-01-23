@@ -49,16 +49,24 @@ public class GCodeCollection extends ArrayList<GCodeCollection.GeneratedGCode> {
     public static class GeneratedGCode {
         private final StringBuilder gCode;
         private final String id;
+        private final String toolId;
+        private boolean mergeable;
 
-        public GeneratedGCode(StringBuilder gCode, String id) {
+        public GeneratedGCode(final StringBuilder gCode, final boolean mergeable, final String id, final String toolId) {
             if (id==null) {
                 throw new IllegalArgumentException("Id most not be null");
             }
             if (gCode==null) {
                 throw new IllegalArgumentException("GCode most not be null");
             }
+            this.mergeable = mergeable;
             this.gCode = gCode;
             this.id = id;
+            this.toolId = toolId;
+        }
+
+        public GeneratedGCode(final StringBuilder gCode, final boolean mergeable, final String id) {
+            this(gCode, mergeable, id, null);
         }
 
         public StringBuilder getGCode() {
@@ -67,6 +75,14 @@ public class GCodeCollection extends ArrayList<GCodeCollection.GeneratedGCode> {
 
         public String getId() {
             return id;
+        }
+
+        public String getToolId() {
+            return toolId;
+        }
+
+        public boolean isMergeable() {
+            return mergeable;
         }
 
         @Override
@@ -98,11 +114,9 @@ public class GCodeCollection extends ArrayList<GCodeCollection.GeneratedGCode> {
     public GCodeCollection deepCopy() {
         GCodeCollection col = new GCodeCollection();
         for (GeneratedGCode code : this) {
-            col.add(new GeneratedGCode(new StringBuilder(code.getGCode()), code.getId()));
+            col.add(new GeneratedGCode(new StringBuilder(code.getGCode()), code.isMergeable(), code.getId(), code.getToolId()));
         }
         return col;
     }
-
-
 
 }

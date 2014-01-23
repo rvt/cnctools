@@ -70,11 +70,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @Scope("prototype")
@@ -154,12 +151,12 @@ public class CustomGCodeController implements MillTaskController {
 
     private void reRenderModel() {
         try {
-            InputStream str = null;
+            final StringBuilder str = new StringBuilder();
 
             if (model.referencedFileProperty().get() && !StringUtils.isEmpty(model.getgCodeFile())) {
-                str = new ByteArrayInputStream(model.getGcode().getBytes(StandardCharsets.UTF_8));
+                str.append(model.getGcode());
             } else if (gCodeText.getText() != null) {
-                str = new ByteArrayInputStream(gCodeText.getText().getBytes(StandardCharsets.UTF_8));
+                str.append(gCodeText.getText());
             }
 
             if (str != null) {
@@ -168,7 +165,6 @@ public class CustomGCodeController implements MillTaskController {
                 StatisticLimitsController stats = new StatisticLimitsController();
                 LinuxCNCValidator validator = new LinuxCNCValidator();
                 GCodeParser parser = new GCodeParser(validator, str, machine, arrows, stats);
-
                 gCodeViewerControl.addActor(arrows);
 
                 // create a platform
