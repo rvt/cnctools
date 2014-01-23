@@ -41,6 +41,7 @@ package com.rvantwisk.cnctools.data;
 import com.rvantwisk.cnctools.gcode.CncToolsGCodegenerator;
 import com.rvantwisk.cnctools.misc.Factory;
 import com.rvantwisk.cnctools.misc.ToolDBManager;
+import com.rvantwisk.gcodegenerator.GCodeCollection;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -48,15 +49,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 public class Project {
 
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty description = new SimpleStringProperty();
     private final ObservableList<TaskRunnable> milltasks = FXCollections.observableArrayList();
-    private  ObjectProperty<CNCToolsPostProcessConfig> postProcessor = new SimpleObjectProperty<>();
+    private ObjectProperty<CNCToolsPostProcessConfig> postProcessor = new SimpleObjectProperty<>();
 
     public Project() {
     }
@@ -67,7 +65,7 @@ public class Project {
     }
 
     public Object readResolve() {
-        if (postProcessor==null) {
+        if (postProcessor == null) {
             postProcessor = new SimpleObjectProperty<>();
             postProcessorProperty().set(Factory.newPostProcessor());
         }
@@ -81,6 +79,7 @@ public class Project {
                 ", has Operations='" + milltasks.size() + '\'' +
                 '}';
     }
+
     public ObservableList<TaskRunnable> millTasksProperty() {
         return milltasks;
     }
@@ -113,20 +112,16 @@ public class Project {
         return postProcessor.get();
     }
 
-    public ObjectProperty<CNCToolsPostProcessConfig> postProcessorProperty() {
-        return postProcessor;
-    }
-
     public void setPostProcessor(CNCToolsPostProcessConfig postProcessor) {
         this.postProcessor.set(postProcessor);
     }
 
-    public StringBuilder getGCode(ToolDBManager toolDBManager) {
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        final PrintStream printStream = new PrintStream(os);
+    public ObjectProperty<CNCToolsPostProcessConfig> postProcessorProperty() {
+        return postProcessor;
+    }
 
+    public GCodeCollection getGCode(ToolDBManager toolDBManager) {
         final CncToolsGCodegenerator gCodeGenerator = Factory.getProcessorDialect(postProcessor.get());
-        gCodeGenerator.setOutput(printStream);
 
         gCodeGenerator.startProgram();
         for (TaskRunnable t : milltasks) {
@@ -134,9 +129,7 @@ public class Project {
         }
         gCodeGenerator.endProgram();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(os.toString());
-        return sb;
+        return gCodeGenerator.getGCode();
     }
 
 }

@@ -48,6 +48,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.UUID;
+
 /**
  * Created with IntelliJ IDEA.
  * User: rvt
@@ -57,12 +59,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class TaskRunnable extends AbstractTask implements Copyable<TaskRunnable> {
 
+    private String id;
     private BooleanProperty enabled = new SimpleBooleanProperty();
     private ObjectProperty<TaskModel> milltaskModel = new SimpleObjectProperty<TaskModel>();
 
     public TaskRunnable(String name, String description, String className, String fxmlFileName) {
         super(name, description, className, fxmlFileName);
         this.enabled.set(Boolean.TRUE);
+        id = UUID.randomUUID().toString();
     }
 
 
@@ -92,16 +96,27 @@ public class TaskRunnable extends AbstractTask implements Copyable<TaskRunnable>
 
     public void generateGCode(final ToolDBManager toolDBManager, final CncToolsGCodegenerator gCodeGenerator) {
         if (enabled.get() == true) {
+            gCodeGenerator.newSet(id);
             gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + getName(), 50, "-"));
             milltaskModel.get().generateGCode(toolDBManager, gCodeGenerator);
         } else {
+            gCodeGenerator.newSet(id);
             gCodeGenerator.comment(StringUtils.rightPad("--- Program: " + getName() + " (disabled)", 50, "-"));
         }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
     public TaskRunnable copy() {
         TaskRunnable t = new TaskRunnable(this.getName(), this.getDescription(), this.getClassName(), this.getFxmlFileName());
+        t.setId(this.getId());
         this.enabled.set(this.getEnabled());
         if (milltaskModel.get()!=null) {
             t.milltaskModel.set(milltaskModel.get().copy());

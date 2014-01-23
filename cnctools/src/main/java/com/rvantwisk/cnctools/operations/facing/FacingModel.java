@@ -56,7 +56,7 @@ import math.geom2d.domain.ContourArray2D;
 /**
  * Created by rvt on 12/30/13.
  */
-public class FacingOperation implements TaskModel {
+public class FacingModel implements TaskModel {
 
     public static class Configuration {
         public final String name;
@@ -118,7 +118,7 @@ public class FacingOperation implements TaskModel {
 
         final FacingHelper helper = new FacingHelper(gCodeGenerator);
         ToolParameter tp = toolDBManager.getByID(getToolID());
-        gCodeGenerator.addTool(tp);
+        gCodeGenerator.setTool(tp);
 
         EndMill em = tp.getToolType();
         helper.setzFinal(gCodeGenerator.convert(zFinal).getValue());
@@ -172,18 +172,13 @@ public class FacingOperation implements TaskModel {
         CirculinearContourArray2D foo = CirculinearContourArray2D.create(transformedCurve.continuousCurves());
 
         helper.setDomain(foo);
-
-
-
-
         helper.calculate();
-
 
     }
 
     @Override
     public TaskModel copy() {
-        FacingOperation f = new FacingOperation();
+        FacingModel f = new FacingModel();
         f.setCutStrategy(this.getCutStrategy());
         f.setEdgeCleanup(this.getEdgeCleanup());
         f.setEdgeCleanupClimb(this.getEdgeCleanupClimb());

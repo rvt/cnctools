@@ -15,6 +15,8 @@ public class CncToolsRS274 extends RS274 implements CncToolsGCodegenerator {
         super(pc);
     }
 
+    private ToolParameter toolParameter=null;
+
     @Override
     public DimensionProperty convert(final DimensionProperty dimensionProperty) {
         if (dimensionProperty.getDimension().getType() == Dimensions.Type.RPM) {
@@ -46,7 +48,10 @@ public class CncToolsRS274 extends RS274 implements CncToolsGCodegenerator {
     }
 
     @Override
-    public void addTool(ToolParameter tool) {
+    public void setTool(ToolParameter tool) {
+        toolParameter = tool;
+        if (tool==null) return;
+
         // Add tool if this machine has a tool changer
         if (this.getPostProcessorConfig().isHasToolChanger() && tool.toolNumberProperty().getValue()!=null) {
             this.addBlock(GCodeBuilder.builder().M6(tool.getToolNumber()));
@@ -66,4 +71,5 @@ public class CncToolsRS274 extends RS274 implements CncToolsGCodegenerator {
             }
         }
     }
+
 }

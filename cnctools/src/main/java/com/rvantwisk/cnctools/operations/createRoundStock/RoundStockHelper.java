@@ -88,6 +88,7 @@ public class RoundStockHelper {
 
         // gCode.addBlock(GCodeBuilder.builder().F(feedRate));
 
+
         gCode.addBlock(GCodeBuilder.builder().G0().Z(stockSize * Math.sqrt(2) + stockClearance));
         gCode.addBlock(GCodeBuilder.builder().A(0.0).X(0.0).Y(0.0));
 

@@ -54,7 +54,7 @@ import javafx.beans.property.StringProperty;
  * Time: 3:56 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RoundStockTaskModel implements TaskModel {
+public class RoundStockModel implements TaskModel {
 
 
     private final DimensionProperty stockSize= new DimensionProperty();
@@ -62,10 +62,10 @@ public class RoundStockTaskModel implements TaskModel {
     private final DimensionProperty finalSize = new DimensionProperty();
     private final StringProperty toolID = new SimpleStringProperty();
 
-    public RoundStockTaskModel() {
+    public RoundStockModel() {
     }
 
-    public RoundStockTaskModel(StringProperty toolID, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
+    public RoundStockModel(StringProperty toolID, DimensionProperty stockSizeProperty, DimensionProperty finalSizeProperty, DimensionProperty finalLengthProperty) {
         this.toolID.set(toolID.get());
         this.finalLength.set(finalLengthProperty);
         this.stockSize.set(stockSizeProperty);
@@ -102,7 +102,7 @@ public class RoundStockTaskModel implements TaskModel {
         final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
         ToolParameter tp = toolDBManager.getByID(getToolID());
-        gCodeGenerator.addTool(tp);
+        gCodeGenerator.setTool(tp);
 
         EndMill em = tp.getToolType();
 
@@ -121,7 +121,7 @@ public class RoundStockTaskModel implements TaskModel {
 
     @Override
     public TaskModel copy() {
-        RoundStockTaskModel n = new RoundStockTaskModel();
+        RoundStockModel n = new RoundStockModel();
         n.stockSizeProperty().set(this.stockSizeProperty());
         n.finalLengthProperty().set(this.finalLengthProperty());
         n.finalSizeProperty().set(this.finalSizeProperty());

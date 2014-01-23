@@ -68,10 +68,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -84,7 +80,7 @@ public class FacingController implements MillTaskController {
     private Project project;
     @Autowired
     private ToolDBManager toolDBManager;
-    private FacingOperation model;
+    private FacingModel model;
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -96,7 +92,7 @@ public class FacingController implements MillTaskController {
     @FXML
     private GCodeViewerControl gCodeViewerControl;
     @FXML
-    private ComboBox<FacingOperation.Configuration> iCutStrategy;
+    private ComboBox<FacingModel.Configuration> iCutStrategy;
     @FXML
     private CheckBox iEdgeCleanup;
     @FXML
@@ -148,7 +144,7 @@ public class FacingController implements MillTaskController {
 
 
         iCutStrategy.getItems().clear();
-        iCutStrategy.getItems().addAll(FacingOperation.CONFIGLIST);
+        iCutStrategy.getItems().addAll(FacingModel.CONFIGLIST);
 
         modelToForm();
 
@@ -211,10 +207,10 @@ public class FacingController implements MillTaskController {
             }
         });
 
-        iCutStrategy.valueProperty().addListener(new ChangeListener<FacingOperation.Configuration>() {
+        iCutStrategy.valueProperty().addListener(new ChangeListener<FacingModel.Configuration>() {
 
             @Override
-            public void changed(ObservableValue<? extends FacingOperation.Configuration> observableValue, FacingOperation.Configuration configuration, FacingOperation.Configuration configuration2) {
+            public void changed(ObservableValue<? extends FacingModel.Configuration> observableValue, FacingModel.Configuration configuration, FacingModel.Configuration configuration2) {
                 generateGCode();
             }
         });
@@ -238,12 +234,12 @@ public class FacingController implements MillTaskController {
 
     @Override
     public void setModel(final TaskModel model) {
-        this.model = (FacingOperation) model;
+        this.model = (FacingModel) model;
     }
 
     @Override
     public <T extends TaskModel> T createNewModel() {
-        return (T) new FacingOperation();
+        return (T) new FacingModel();
     }
 
     @Override
@@ -303,22 +299,18 @@ public class FacingController implements MillTaskController {
                 ppc = Factory.newPostProcessor();
             }
 
-            final ByteArrayOutputStream os = new ByteArrayOutputStream();
-            final PrintStream printStream = new PrintStream(os);
-
             CncToolsRS274 gCodeGenerator = new CncToolsRS274(ppc);
-            gCodeGenerator.setOutput(printStream);
             gCodeGenerator.startProgram();
-
+            gCodeGenerator.newSet("");
             model.generateGCode(toolDBManager, gCodeGenerator);
-            InputStream in = new ByteArrayInputStream(os.toByteArray());
+            gCodeGenerator.endProgram();
 
             GCodeActor machine = new GCodeActor("gcode");
             ArrowsActor arrows = new ArrowsActor("arrows");
             StatisticLimitsController stats = new StatisticLimitsController();
             LinuxCNCValidator validator = new LinuxCNCValidator();
-            GCodeParser parser = new GCodeParser(validator, in, machine, arrows, stats);
-            gCodeGenerator.endProgram();
+
+            GCodeParser parser = new GCodeParser(validator, gCodeGenerator.getGCode().concate(), machine, arrows, stats);
 
             gCodeViewerControl.addActor(machine);
             gCodeViewerControl.addActor(arrows);

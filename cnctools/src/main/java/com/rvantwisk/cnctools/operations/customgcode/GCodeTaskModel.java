@@ -73,6 +73,7 @@ public class GCodeTaskModel implements TaskModel {
         } else {
             gCodeGenerator.addRaw(gcode.get());
         }
+
     }
 
     public Object readResolve() {
