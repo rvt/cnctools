@@ -62,7 +62,6 @@ import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import jfxtras.labs.dialogs.MonologFX;
 import jfxtras.labs.dialogs.MonologFXButton;
-import jfxtras.labs.scene.control.BeanPathAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +86,7 @@ import java.util.ResourceBundle;
  */
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class CNCToolsController extends AbstractController {
+    private static final String SEPERATOR = System.getProperty("line.separator");
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @FXML
     TextArea descriptionValue;
@@ -110,7 +110,6 @@ public class CNCToolsController extends AbstractController {
     Button btnView;
     @FXML
     Button btnPostProcessor;
-    BeanPathAdapter<Project> currentProjectBinding;
     @Autowired
     private ProjectModel projectModel;
     @Autowired
@@ -128,7 +127,6 @@ public class CNCToolsController extends AbstractController {
     @FXML
     private Button btnMoveTaskUp;
     private ScreensConfiguration screens;
-
 
     public CNCToolsController(ScreensConfiguration screens) {
         this.screens = screens;
@@ -186,43 +184,76 @@ public class CNCToolsController extends AbstractController {
 
     @FXML
     public void generateGCode(ActionEvent event) throws Exception {
-        try {
-            if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
-                final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
+        if (v_projectList.getSelectionModel().selectedItemProperty().get() != null) {
+            final Project p = v_projectList.getSelectionModel().selectedItemProperty().get();
 
-                if (p.postProcessorProperty().get() == null) {
-                    MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
-                    dialog.setTitleText("No postprocessor");
-                    dialog.setMessage("No post processor configured, please select a post processor first!");
-                    dialog.show();
-                } else {
+            if (p.postProcessorProperty().get() == null) {
+                MonologFX dialog = new MonologFX(MonologFX.Type.QUESTION);
+                dialog.setTitleText("No postprocessor");
+                dialog.setMessage("No post processor configured, please select a post processor first!");
+                dialog.show();
+            } else {
 
-                    final GCodeCollection gCode = p.getGCode(toolDBManager);
+                final GCodeCollection gCode = p.getGCode(toolDBManager);
+                gCode.merge();
 
-                    FileChooser fileChooser = new FileChooser();
-                    fileChooser.getExtensionFilters().addAll(
-                            new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
-                    fileChooser.setTitle("Save GCode");
-                    File file = fileChooser.showSaveDialog(null);
-                    if (file != null) {
-                        file.delete();
-                        try (BufferedWriter br = Files.newBufferedWriter(file.toPath(),
-                                Charset.forName("UTF-8"),
-                                new OpenOption[]{StandardOpenOption.CREATE_NEW})) {
-                            br.write(gCode.concate().toString());
-                            br.write("\n");
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("NC File", "*.tap", "*.ngc"));
+                fileChooser.setTitle("Save GCode");
+                File choosenName = fileChooser.showSaveDialog(null);
+                if (choosenName != null) {
+                    choosenName.delete();
 
-                            br.flush();
-                            br.close();
-                        } catch (IOException ex) {
-                            System.out.println(ex.getMessage());
+                    if (!p.getPostProcessor().isHasToolChanger()) {
+                        final GCodeCollection.GeneratedGCode preAmble = gCode.get(0);
+                        final GCodeCollection.GeneratedGCode postAmble = gCode.get(gCode.size() - 1);
+                        for (int i = 1; i <= (gCode.size() - 2); i++) {
+                            final String[] path = choosenName.getPath().split("\\.(?=[^\\.]+$)");
+                            File thisSet = new File(path[0] + "-" + i + "." + path[1]);
+                            thisSet.delete();
+                            // Concate all g-code
+                            String file =
+                                    preAmble.getGCode().toString() +
+                                            SEPERATOR +
+                                            gCode.get(i).getGCode().toString() +
+                                            SEPERATOR +
+                                            postAmble.getGCode().toString() +
+                                            SEPERATOR;
+                            saveGCode(file, thisSet);
                         }
+                    } else {
+                        saveGCode(gCode.concate().toString(), choosenName);
                     }
                 }
 
             }
-        } catch (Exception e) {
-            handleException(e);
+
+        }
+    }
+
+    private void saveGCode(String gCode, final File filename) {
+        if (gCode==null) {
+            throw new IllegalArgumentException("gCode most not be null");
+        }
+        if (filename==null) {
+            throw new IllegalArgumentException("filename most not be null");
+        }
+        try (BufferedWriter br = Files.newBufferedWriter(filename.toPath(),
+                Charset.forName("UTF-8"),
+                new OpenOption[]{StandardOpenOption.CREATE_NEW})) {
+
+            // Cleanup empty lines
+            // We do this currently in memory because we don't expect large files anyways
+            while (gCode.lastIndexOf(SEPERATOR + SEPERATOR) != -1) {
+                gCode = gCode.replaceAll(SEPERATOR + SEPERATOR, SEPERATOR);
+            }
+
+            br.write(gCode.trim());
+            br.flush();
+            br.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
