@@ -56,7 +56,7 @@ import math.geom2d.domain.ContourArray2D;
 /**
  * Created by rvt on 12/30/13.
  */
-public class FacingModel implements TaskModel {
+public class FacingOperation implements TaskModel {
 
     public static class Configuration {
         public final String name;
@@ -114,13 +114,11 @@ public class FacingModel implements TaskModel {
     }
 
     @Override
-    public void generateGCode(ToolDBManager toolDBManager, CncToolsGCodegenerator gCodeGenerator, final String taskId) {
-
-        ToolParameter tp = toolDBManager.getByID(getToolID());
-        gCodeGenerator.newSet(false, taskId, tp.getId());
+    public void generateGCode(ToolDBManager toolDBManager, CncToolsGCodegenerator gCodeGenerator) {
 
         final FacingHelper helper = new FacingHelper(gCodeGenerator);
-        gCodeGenerator.setTool(tp);
+        ToolParameter tp = toolDBManager.getByID(getToolID());
+        gCodeGenerator.addTool(tp);
 
         EndMill em = tp.getToolType();
         helper.setzFinal(gCodeGenerator.convert(zFinal).getValue());
@@ -174,13 +172,18 @@ public class FacingModel implements TaskModel {
         CirculinearContourArray2D foo = CirculinearContourArray2D.create(transformedCurve.continuousCurves());
 
         helper.setDomain(foo);
+
+
+
+
         helper.calculate();
+
 
     }
 
     @Override
     public TaskModel copy() {
-        FacingModel f = new FacingModel();
+        FacingOperation f = new FacingOperation();
         f.setCutStrategy(this.getCutStrategy());
         f.setEdgeCleanup(this.getEdgeCleanup());
         f.setEdgeCleanupClimb(this.getEdgeCleanupClimb());
