@@ -221,12 +221,12 @@ public class RS274 implements GCodeGenerator {
 
     @Override
     public void startProgram() {
-        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPreamble()).append(separator), true, "preamble", null));
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPreamble()).append(separator), false, "preamble", null));
     }
 
     @Override
     public void endProgram() {
-        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPostamble()).append(separator), true, "postamble", null));
+        generatedGCode.add(new GCodeCollection.GeneratedGCode(new StringBuilder(postProcessorConfig.getPostamble()).append(separator), false, "postamble", null));
     }
 
     public <T extends PostProcessorConfig> T getPostProcessorConfig() {
