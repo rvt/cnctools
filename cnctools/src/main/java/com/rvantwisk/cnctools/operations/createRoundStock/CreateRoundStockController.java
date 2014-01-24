@@ -182,8 +182,7 @@ public class CreateRoundStockController implements MillTaskController {
 
             CncToolsRS274 gCodeGenerator = new CncToolsRS274(ppc);
             gCodeGenerator.startProgram();
-            gCodeGenerator.newSet(true, "", null);
-            model.generateGCode(toolDBManager, gCodeGenerator, null);
+            model.generateGCode(toolDBManager, gCodeGenerator, "");
             gCodeGenerator.endProgram();
 
             GCodeActor machine = new GCodeActor("gcode");

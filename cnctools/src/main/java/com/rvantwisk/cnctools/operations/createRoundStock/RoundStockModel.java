@@ -102,8 +102,8 @@ public class RoundStockModel implements TaskModel {
         final RoundStockHelper helper = new RoundStockHelper(gCodeGenerator);
 
         ToolParameter tp = toolDBManager.getByID(getToolID());
-        gCodeGenerator.setTool(tp);
         gCodeGenerator.newSet(false, taskId, tp.getId());
+        gCodeGenerator.setTool(tp);
 
         EndMill em = tp.getToolType();
 
