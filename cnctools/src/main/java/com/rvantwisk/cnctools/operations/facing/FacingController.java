@@ -329,8 +329,7 @@ public class FacingController implements MillTaskController {
         } catch (SimException e) {
             error = e.getMessage();
             logger.error("SimException", e);
-        } catch (Exception e) {
-            logger.error("Exception", e);
+        } catch (Exception e) {            logger.error("Exception", e);
             error = e.getMessage();
         }
     }

@@ -25,6 +25,7 @@
         <module>gcodegenerator</module>
         <module>gcodeparser</module>
         <module>cnctools</module>
+        <module>openvoronoi</module>
     </modules>
 
     <build>
@@ -42,7 +43,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>[3.0.3,3.1.0]</version>
+                                    <version>[3.0.3,3.0.99]</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>

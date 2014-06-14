@@ -199,6 +199,12 @@ public class GCodeCollection extends ArrayList<GCodeCollection.GeneratedGCode> {
         public int hashCode() {
             return id != null ? id.hashCode() : 0;
         }
+
+
+        @Override
+        public String toString() {
+            return  gCode.toString();
+        }
     }
 
 }

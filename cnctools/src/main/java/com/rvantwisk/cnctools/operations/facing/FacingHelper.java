@@ -325,8 +325,8 @@ public class FacingHelper {
             if (i < (size - 1)) {
                 LineSegment2D nextItem = (LineSegment2D) array.get(i + 1);
                 sorted[pos++] = new G0Point3D(item.lastPoint().x(), item.lastPoint().y(), zSafe);
-                sorted[pos++] = new G0Point3D(item.firstPoint().x(), item.firstPoint().y(), zSafe);
-                sorted[pos++] = new Point3D(item.firstPoint().x(), item.firstPoint().y(), zHeight);
+                sorted[pos++] = new G0Point3D(item.lastPoint().x(), item.lastPoint().y(), zSafe);
+                sorted[pos++] = new G0Point3D(nextItem.firstPoint().x(), nextItem.firstPoint().y(), zSafe);
                 sorted[pos++] = new Point3D(nextItem.firstPoint().x(), nextItem.firstPoint().y(), zHeight);
             }
         }

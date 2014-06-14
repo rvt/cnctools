@@ -510,7 +510,9 @@ final public class GCodeBuilder {
                     }
             }
         }
-        sb.append(' ' + COMMENTCHAR + ' ' + comment);
+        if (comment!=null && comment.length()>0) {
+            sb.append(' ' + COMMENTCHAR + ' ' + comment);
+        }
         return sb.toString();
     }
 
